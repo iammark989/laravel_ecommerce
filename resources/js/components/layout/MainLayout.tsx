@@ -1,5 +1,5 @@
-import Navbar from '@/components/section/NavBar'
-import Footer from '@/components/section/Footer'
+import Navbar from '@/components/sections/NavBar'
+import Footer from '@/components/sections/Footer'
 import {usePage} from "@inertiajs/react";
 import {useEffect} from "react";
 //import Swal from "sweetalert2";
