@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CustomersController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -24,7 +25,16 @@ Route::get('/categories',function(){
     return Inertia::render('categories');
 })->name('categories');
 
+        // CUSTOMER SIDE CONTROL //
 
+        // CUSTOMER REGISTER
+Route::post('/register-customer',[CustomersController::class,'register'])->name('registercustomer');
+
+        // CUSTOMER LOGIN
+Route::post('/login-customer',[CustomersController::class,'login'])->name('customerslogin');
+
+        // CUSTOMER LOGOUT
+Route::post('/logout-customer',[CustomersController::class,'logout'])->name('customerslogout');
 
 
         // ADMIN SIDE CONTROL //
@@ -33,13 +43,14 @@ Route::get('/categories',function(){
         // GO TO LOGIN PAGE
 Route::get('/admin',[AdminController::class,'login'])->name('admin-login');
 
+
 Route::get('/admin/item-masterlist',function(){
     return Inertia::render('admin/itemmasterlist');
-})->name('item_masterlist')->middleware('adminonly');
+})->name('item_masterlist')->middleware('staffonly');
 
 Route::get('/admin/add-item',function(){
     return Inertia::render('admin/addnewitem');
-})->name('item_add')->middleware('adminonly');
+})->name('item_add')->middleware('staffonly');
 
 
 

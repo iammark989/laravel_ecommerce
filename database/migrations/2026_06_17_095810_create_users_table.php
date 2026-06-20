@@ -26,7 +26,7 @@ return new class extends Migration
             $table->foreignID('role_id')->constrained('roles')->cascadeOnDelete()->default('1');
 
             $table->boolean('is_active')->default(true);
-            $table->boolean('is_admin')->default(false);
+            $table->boolean('is_staff')->default(false);
 
             $table->rememberToken();
             $table->timestamps();

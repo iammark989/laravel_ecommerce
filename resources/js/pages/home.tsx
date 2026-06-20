@@ -1,9 +1,24 @@
 import MainLayout from "@/components/layout/MainLayout";
+import GuestAccountBanner from "@/pages/guestbanner";
+import { useState } from "react";
+import { usePage } from "@inertiajs/react";
 
 export default function Home() {
+
+const [ auth ] = usePage().props as any;
+
+const user = auth?.user;
   return (
     <MainLayout><section>
-    <div>
+      
+       {/* GUEST BANNER */}
+      
+      
+      <section><GuestAccountBanner /></section><div className="py-2"></div>
+
+   
+     
+          
 
       {/* HERO */}
 
@@ -151,6 +166,7 @@ export default function Home() {
 
         </div>
 
+
       </section>
 
       {/* TESTIMONIALS */}
@@ -187,7 +203,7 @@ export default function Home() {
 
       </section>
 
-    </div>
+ 
     </section></MainLayout>
   );
 }

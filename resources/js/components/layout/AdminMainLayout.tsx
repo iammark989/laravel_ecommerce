@@ -24,7 +24,7 @@ export default function AdminMainLayout({ children }: LayoutProps) {
         <div className="min-h-screen flex flex-col bg-slate-100">
             <AdminNavbar />
 
-            <main className="flex-1 pt-20">
+            <main className="flex-1 pt-5">
                 {children}
             </main>
 

@@ -2,16 +2,16 @@
 
 namespace App\Models;
 
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
-class Addresse extends Model
+class UserAddresse extends Model
 {
-    use HasFactory, Notifiable;
+     use HasFactory, Notifiable;
 
      protected $fillable = [
+        'user_id',
         'address_line',
         'barangay',
         'city',

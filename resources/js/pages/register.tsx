@@ -1,5 +1,5 @@
 import MainLayout from "@/components/layout/MainLayout";
-import { Link } from "@inertiajs/react";
+import { Link,router } from "@inertiajs/react";
 import { ShoppingBag, UserPlus } from "lucide-react";
 import { useState } from "react";
 
@@ -18,9 +18,36 @@ export default function CustomerSignupPage() {
       city: "",
       province: "",
       postal_code: "",
+      password_confirmation:"",
   }); 
 
   const handleSubmit = (e: React.FormEvent) =>{
+    e.preventDefault();
+
+    router.post('/register-customer',form,{
+
+      onSuccess: () => {
+        setForm({
+            first_name: "",
+            middle_name: "",
+            last_name: "",
+            suffix: "",
+            mobile: "",
+            email: "",
+            password: "",
+            address_line: "",
+            barangay: "",
+            city: "",
+            province: "",
+            postal_code: "",
+            password_confirmation:"",
+            });
+      },
+      onError: (error) => {
+        console.log(error);
+      },
+
+    });
 
   }
 
@@ -240,6 +267,7 @@ export default function CustomerSignupPage() {
                       className="w-full border rounded-xl px-4 py-3"
                       placeholder="Barangay"
                       required
+                      maxLength={50}
                     />
                   </div>
 
@@ -255,6 +283,7 @@ export default function CustomerSignupPage() {
                       className="w-full border rounded-xl px-4 py-3"
                       placeholder="City"
                       required
+                      maxLength={50}
                     />
                   </div>
 
@@ -274,6 +303,7 @@ export default function CustomerSignupPage() {
                       className="w-full border rounded-xl px-4 py-3"
                       placeholder="Province"
                       required
+                      maxLength={50}
                     />
                   </div>
 
@@ -289,6 +319,7 @@ export default function CustomerSignupPage() {
                       className="w-full border rounded-xl px-4 py-3"
                       placeholder="3000"
                       required
+                      maxLength={25}
                     />
                   </div>
 
@@ -313,8 +344,13 @@ export default function CustomerSignupPage() {
 
                   <input
                     type="password"
+                    value={form.password}
+                      onChange={(e) => setForm({...form, password: e.target.value})}
                     className="w-full border rounded-xl px-4 py-3"
                     placeholder="********"
+                    required
+                    minLength={8}
+                    maxLength={16}
                   />
                 </div>
 
@@ -325,8 +361,11 @@ export default function CustomerSignupPage() {
 
                   <input
                     type="password"
+                    value={form.password_confirmation}
+                      onChange={(e) => setForm({...form, password_confirmation: e.target.value})}
                     className="w-full border rounded-xl px-4 py-3"
                     placeholder="********"
+                    required
                   />
                 </div>
 

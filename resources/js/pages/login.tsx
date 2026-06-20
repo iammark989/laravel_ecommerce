@@ -1,8 +1,31 @@
 import MainLayout from "@/components/layout/MainLayout";
-import { Link } from "@inertiajs/react";
+import { Link,router } from "@inertiajs/react";
 import { ShoppingBag, LogIn } from "lucide-react";
+import { useState } from "react";
 
 export default function CustomerSignInPage() {
+
+const [ form, setForm ] = useState({
+    email: "",
+    password: "",
+});
+
+const handleSubmit = (e: React.FormEvent) => {
+  e.preventDefault();
+
+  router.post('/login-customer',form,{
+
+      onSuccess:()=>{
+        
+      },
+      onError: (error) => {
+       
+      },
+
+  });
+
+}
+
   return (
     <MainLayout><section>
     <div className="min-h-screen bg-gradient-to-br from-sky-50 via-white to-sky-100 flex items-center justify-center p-4">
@@ -79,7 +102,7 @@ export default function CustomerSignInPage() {
 
             </div>
 
-            <form className="space-y-5">
+            <form className="space-y-5" onSubmit={handleSubmit}>
 
               {/* Email */}
 
@@ -91,8 +114,12 @@ export default function CustomerSignInPage() {
 
                 <input
                   type="email"
-                  placeholder="example@email.com"
+                  placeholder="your@email.com"
+                  value={form.email}
+                  onChange={(e) => setForm({...form, email: e.target.value})}
                   className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  required
+                  maxLength={50}
                 />
 
               </div>
@@ -108,7 +135,11 @@ export default function CustomerSignInPage() {
                 <input
                   type="password"
                   placeholder="********"
+                  value={form.password}
+                  onChange={(e) => setForm({...form, password: e.target.value})}
                   className="w-full border rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                  maxLength={16}
+                  minLength={8}
                 />
 
               </div>

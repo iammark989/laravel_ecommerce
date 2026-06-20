@@ -30,14 +30,14 @@ class User extends Authenticatable
         'password',
         'role_id',
         'is_active',
-        'is_admin',
+        'is_staff',
     ];
 
     public function roles(){
         return $this->belongsTo(Role::class,'id','role_id');
     }
 
-    public function addresses(){
+    public function user_addresses(){
         return $this->hasMany(Addresse::class,'user_id','id');
     }
 

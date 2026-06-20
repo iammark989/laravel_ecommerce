@@ -21,7 +21,7 @@ return new class extends Migration
             $table->string('province');
             $table->string('postal_code');
 
-            $table->boolean('is_default');
+            $table->boolean('is_default')->default(true);
 
             $table->timestamps();
         });
