@@ -7,7 +7,7 @@ use Inertia\Inertia;
 
 Route::get('/', function () {
     return Inertia::render('home');
-})->name('home');
+})->name('home')->middleware('customersonly');
 
 Route::get('/register', function () {
     return Inertia::render('register');
@@ -39,9 +39,17 @@ Route::post('/logout-customer',[CustomersController::class,'logout'])->name('cus
 
         // ADMIN SIDE CONTROL //
 
+        // GO TO HOME
+Route::get('/admin/',[AdminController::class,'home'])->name('adminhome')->middleware('staffonly');
+Route::get('/admin/home',[AdminController::class,'home'])->name('adminhome')->middleware('staffonly');
 
         // GO TO LOGIN PAGE
-Route::get('/admin',[AdminController::class,'login'])->name('admin-login');
+Route::get('/admin/login',[AdminController::class,'gotologin'])->name('admin-login');
+
+        // ADMIN LOGIN
+Route::post('/admin/loginattempt',[AdminController::class,'login'])->name('adminloginattempt');
+        // ADMIN LOGOUT
+Route::post('/admin/logout',[AdminController::class,'adminlogout'])->name('adminlogout');
 
 
 Route::get('/admin/item-masterlist',function(){

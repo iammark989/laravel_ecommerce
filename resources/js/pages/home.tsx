@@ -1,21 +1,19 @@
 import MainLayout from "@/components/layout/MainLayout";
 import GuestAccountBanner from "@/pages/guestbanner";
 import { useState } from "react";
-import { usePage } from "@inertiajs/react";
+import AuthOnly from "@/components/AuthOnly";
+import GuestOnly from "@/components/GuestOnly"; 
 
 export default function Home() {
 
-const [ auth ] = usePage().props as any;
-
-const user = auth?.user;
   return (
     <MainLayout><section>
       
-       {/* GUEST BANNER */}
-      
-      
-      <section><GuestAccountBanner /></section><div className="py-2"></div>
 
+       {/* GUEST BANNER */}
+      <GuestOnly>
+      <section><GuestAccountBanner /></section><div className="py-2"></div>
+      </GuestOnly>
    
      
           

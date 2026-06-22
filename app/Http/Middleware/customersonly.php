@@ -6,7 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-class adminonly
+class customersonly
 {
     /**
      * Handle an incoming request.
@@ -16,14 +16,12 @@ class adminonly
     public function handle(Request $request, Closure $next): Response
     {
         if(!auth()->check()){
-            return redirect('/admin/login')->with('failed','You must be logged in!');
-        }
-
-        if(auth()->user()->is_staff === 0){
-            abort(403);
-        }
-
             return $next($request);
-        
+        }
+
+        if(auth()->user()->is_staff === 1){
+            return redirect('/admin');
+        }
+            return $next($request);
     }
 }

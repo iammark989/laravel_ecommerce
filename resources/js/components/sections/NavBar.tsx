@@ -1,6 +1,8 @@
 import { ShoppingCart, User, Menu, UserCog,LogOut } from "lucide-react";
 import { useState } from "react";
 import { Link } from "@inertiajs/react";
+import AuthOnly from "../AuthOnly";
+import GuestOnly from "../GuestOnly";
 
 export default function Navbar() {
     const [open, setOpen] = useState(false);
@@ -27,6 +29,8 @@ export default function Navbar() {
 
           <div className="hidden md:flex items-center gap-4">
             <ShoppingCart size={22} />
+
+
             {/* Profile Dropdown */}
                             <div className="relative">
 
@@ -53,7 +57,10 @@ export default function Navbar() {
                                     />
                                 </button>
 
+                                    <AuthOnly>
                                 {profileOpen && (
+                                    
+                                    
                                     <div
                                         className="
                                             absolute
@@ -121,8 +128,49 @@ export default function Navbar() {
                                             Logout
                                         </Link>
                                     </div>
+                                    
                                 )}
+                                 </AuthOnly>
+                                  
+                                   <GuestOnly>
+                                    {profileOpen && (
+                                    
+                                    
+                                    <div
+                                        className="
+                                            absolute
+                                            right-0
+                                            mt-3
+                                            w-52
+                                            bg-white
+                                            rounded-2xl
+                                            shadow-lg
+                                            border
+                                            border-gray-100
+                                            overflow-hidden
+                                            z-50
+                                        "
+                                    >
+                                        <Link
+                                            href="/register"
+                                            className="
+                                                flex
+                                                items-center
+                                                gap-3
+                                                px-5
+                                                py-4
+                                                hover:bg-gray-50
+                                            "
+                                        >
+                                            <User size={18} />
+                                            Register now
+                                        </Link>
+                                        </div>
+                                    
+                                )}
+                                   </GuestOnly>
 
+                                   
                             </div>
                          </div>            
           <button

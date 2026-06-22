@@ -33,8 +33,8 @@ const AdminLoginPage: React.FC = () => {
 
     });
 
-    // Example:
-    // router.post('/admin/login', form)
+    
+    
   };
 
   return (
