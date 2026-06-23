@@ -1,6 +1,7 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
+import { Link } from "@inertiajs/react";
 
 export default function ProductMasterlist() {
   const [search, setSearch] = useState("");
@@ -57,12 +58,13 @@ export default function ProductMasterlist() {
           </p>
         </div>
 
-        <button
+        <Link
+          href="/admin/product/create"
           className="bg-sky-500 hover:bg-sky-600 text-white px-5 py-3 rounded-xl flex items-center gap-2"
         >
           <Plus size={18} />
           Add New Product
-        </button>
+        </Link>
 
       </div>
 

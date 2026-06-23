@@ -75,7 +75,7 @@ export default function AdminNavbar() {
                                   "
                                 >
                                   <Link
-                                    href="/items"
+                                    href="/admin/item-masterlist"
                                     className="
                                       flex items-center gap-3
                                       px-4 py-3
@@ -281,7 +281,7 @@ export default function AdminNavbar() {
               {itemsOpen && (
                 <div className="ml-4 flex flex-col border-l">
                   <Link
-                    href="/items"
+                    href="/admin/item-masterlist"
                     className="px-4 py-2 hover:bg-gray-100"
                   >
                     Item Masterlist

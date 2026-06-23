@@ -51,14 +51,14 @@ Route::post('/admin/loginattempt',[AdminController::class,'login'])->name('admin
         // ADMIN LOGOUT
 Route::post('/admin/logout',[AdminController::class,'adminlogout'])->name('adminlogout');
 
+        // ADD CATEGORY
+Route::post('/admin/category/add',[AdminController::class,'adminAddCategory'])->name('addcategory')->middleware('staffonly');
 
 Route::get('/admin/item-masterlist',function(){
     return Inertia::render('admin/itemmasterlist');
 })->name('item_masterlist')->middleware('staffonly');
 
-Route::get('/admin/add-item',function(){
-    return Inertia::render('admin/addnewitem');
-})->name('item_add')->middleware('staffonly');
+Route::get('/admin/product/create',[AdminController::class,'addproduct'])->name('addproduct')->middleware('staffonly');
 
 
 

@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 
+use App\Models\Categorie;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
 
@@ -58,6 +60,31 @@ class AdminController extends Controller
         $request->session()->regenerateToken(); // regenerate CSRF token
 
         return redirect()->intended('/admin/login');
+
+    }
+
+
+
+    //////////////      PRODUCT / ITEMS CONTROLLER //////////
+
+    // GO TO ADD PRODUCT / ITEM
+    public function addproduct(){
+
+    $categories = Categorie::orderBy('name','asc')->get();
+    return Inertia::render('admin/addnewitem',
+    [ 'categories' => $categories]);
+    }
+
+    // ADD CATEGORY
+    public function adminAddCategory(Request $request){
+        $incomingFields = $request->validate([
+            'name' => 'required|string|max:25',
+            'description' => 'required|string|max:255',
+        ]);
+
+        $incomingFields['slug'] = Str::slug($incomingFields['name']);
+        Categorie::create($incomingFields);
+
 
     }
 

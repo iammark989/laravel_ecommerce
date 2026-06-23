@@ -43,7 +43,7 @@ class CustomersController extends Controller
         $request->session()->invalidate(); // destroys session data
         $request->session()->regenerateToken(); // regenerate CSRF token
 
-    return redirect()->intended('/');
+        return redirect()->intended('/');
     }
 
         // CUSTOMER REGISTER //
