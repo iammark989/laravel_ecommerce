@@ -6,6 +6,7 @@ import {
     Trash2,
     Package
 } from "lucide-react";
+import { Link } from "@inertiajs/react";
 
 export default function ProductVariantPage() {
     const variants = [
@@ -60,10 +61,12 @@ export default function ProductVariantPage() {
                             Back
                         </button>
 
-                        <button className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-xl flex items-center gap-2">
+                        <Link 
+                            href=""
+                        className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-xl flex items-center gap-2">
                             <Plus size={18} />
                             Add Variant
-                        </button>
+                        </Link>
 
                     </div>
 

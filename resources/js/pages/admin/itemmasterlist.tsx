@@ -117,7 +117,7 @@ export default function ProductMasterlist() {
 
                 <td className="p-4">
                   <img
-                    src={product.featured_image}
+                    src={product.image}
                     alt=""
                     className="w-14 h-14 rounded-lg"
                   />
@@ -128,11 +128,11 @@ export default function ProductMasterlist() {
                 </td>
 
                 <td className="p-4">
-                  {product.category_id}
+                  {product.category}
                 </td>
 
                 <td className="p-4">
-                  {product.brand_id}
+                  {product.brand}
                 </td>
 
                 <td className="p-4">
@@ -156,7 +156,7 @@ export default function ProductMasterlist() {
                 </td>
 
                 <td className="p-4">
-                  {product.createdBy}
+                  {product.created_by}
                 </td>
 
                 <td className="p-4">

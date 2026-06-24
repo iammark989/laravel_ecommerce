@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 use Inertia\Inertia;
@@ -71,18 +72,36 @@ class AdminController extends Controller
 
     // GO TO ITEM MASTERLIST
     public function goToItemMasterlist(){
-        $products = Product::orderBy('name','asc')->get();
-                    {/** DB::raw(products as product)
-                    ->select(
-                        'product.id as id',
-                        'product.name as name',
-                        'product.featured_image as image',
-                        'product.is_active as status',
-                        'user.name as created_by',
-                        'category.name as category'
-                        'brand.name as brand',
-                        'count(variants.sku) as variants',
-                        ); */}
+        $products = DB::table('products as product')
+            ->leftJoin('categories as category', 'category.id', '=', 'product.category_id')
+            ->leftJoin('brands as brand', 'brand.id', '=', 'product.brand_id')
+            ->leftJoin('users as user', 'user.id', '=', 'product.created_by')
+            ->leftJoin(
+                'product_variants as variants',
+                'variants.product_id',
+                '=',
+                'product.id'
+            )
+            ->select(
+                'product.id',
+                'product.name',
+                'product.featured_image as image',
+                'product.is_active as status',
+                'user.username as created_by',
+                'category.name as category',
+                'brand.name as brand',
+                DB::raw('COUNT(variants.id) as variants')
+            )
+            ->groupBy(
+                'product.id',
+                'product.name',
+                'product.featured_image',
+                'product.is_active',
+                'user.username',
+                'category.name',
+                'brand.name'
+            )
+            ->get();
 
         
         return Inertia::render('admin/itemmasterlist',[
