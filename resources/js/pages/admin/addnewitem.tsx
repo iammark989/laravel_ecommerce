@@ -1,23 +1,28 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { useState } from "react";
-import { ArrowLeft, Upload, Save, Plus } from "lucide-react";
+import { ArrowLeft, Upload, Save, Plus, X } from "lucide-react";
 import { Link, router, usePage } from "@inertiajs/react";
-import AdminAddCategories from "@/components/modals/adminAddCategories";
 import Swal from "sweetalert2";
 
 
 export default function AddNewItemPage() {
   const [preview, setPreview] = useState<string | null>(null);
 
-  const { categories } = usePage().props as any;
+  const { categories,brands,products } = usePage().props as any;
 
-  
-const [ showCategoryModal,setShowCategoryModal] = useState(false);
-const [ categoryActive,setCategoryActive] = useState(true);
+  const [ showCategoryModal,setShowCategoryModal] = useState(false);
 
-const [ showBrandModal, setShowBrandModal ] = useState(false);
-const [ brandActive, setBrandActive ] = useState(true);
-const [ logoPreview ] = useState("");
+  const [ showBrandModal, setShowBrandModal ] = useState(false);
+
+const [ product, setProduct ] = useState({
+      'category_id':"",
+      'brand_id':"",
+      'name':"",
+      'short_description':"",
+      'description':"",
+      'featured_image':  null as File | null,
+      'is_active':true,
+});
 
 const [ category, setCategory ] = useState({
   name:"",
@@ -25,40 +30,122 @@ const [ category, setCategory ] = useState({
 
 });
 
+const [ brand, setBrand ] = useState({
+  name: "",
+  description:"",
+  logo: null as File | null,
+});
+
+    // ADD CATEGORY
 const handleSubmitCategory = (e: React.FormEvent) => {
       e.preventDefault();
 
+      // CHECK DUPLICATE
       const categoryExist = categories.some(
       (d: any) => d.name.toLowerCase() === category.name.toLowerCase()
     );
-
 
     if (categoryExist) {
       Swal.fire("Duplicate", "Category already exists", "warning");
       return;
     }
 
-      router.post('/admin/category/add',category,{
+      router.post('/admin/products/add-category',category,{
       preserveScroll: true,
         onSuccess: () => {
           setCategory({
             name:"",
             description:"",
           });
-          console.log("success");
+          setShowCategoryModal(false);
+         
         },
         onError: (error) => {
-          console.log(error);
+         
         },
-
-
-
-
       });
-     
 }
 
-const handleBrandLogo = "";
+function closeCategory(){
+      setShowCategoryModal(false);
+      setCategory({
+        name:"",
+        description:"",
+      });
+}
+
+
+    // ADD BRAND
+const handleSubmitBrand = (e: React.FormEvent) => {
+      e.preventDefault();
+
+      // CHECK DUPLICATE
+      const brandExist = brands.some(
+      (d: any) => d.name.toLowerCase() === brand.name.toLowerCase()
+    );
+
+    if (brandExist) {
+      Swal.fire("Duplicate", "Brand Name already exists", "warning");
+      return;
+    }
+
+      router.post('/admin/products/add-brand',brand,{
+      preserveScroll: true,
+        onSuccess: () => {
+          setBrand({
+            name:"",
+            logo: null as File | null,
+            description:"",
+          });
+          setShowBrandModal(false);
+        },
+        onError: (error) => {
+          
+        },
+      });
+}
+
+function closeBrand(){
+    setShowBrandModal(false);
+    setBrand({
+      name:"",
+      logo: null as File | null,
+      description:"",
+    }); 
+}
+
+const handleSubmitProduct = (e: React.FormEvent) => {
+  e.preventDefault();
+
+   // CHECK DUPLICATE
+      const productExist = products.some(
+      (d: any) => d.name.toLowerCase() === product.name.toLowerCase()
+    );
+
+    if (productExist) {
+      Swal.fire("Duplicate", "Product Already exists", "warning");
+      return;
+    }
+
+  router.post('/admin/products/add-product',product,{
+
+    onSuccess: () =>{
+      setProduct({
+      'category_id':"",
+      'brand_id':"",
+      'name':"",
+      'short_description':"",
+      'description':"",
+      'featured_image':  null as File | null,
+      'is_active':true,
+      });
+    },
+    onError: (error) => {
+      //console.log(error);
+    },
+
+  });
+}
 
   const handleImage = (
     e: React.ChangeEvent<HTMLInputElement>
@@ -72,13 +159,13 @@ const handleBrandLogo = "";
 
   return (
     <AdminMainLayout><section>
-      <AdminAddCategories />
+      
 
 {/** MAIN PAGE */}
 <div className="min-h-screen bg-slate-50 p-4 md:p-6">
 
       {/* Header */}
-
+      
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
 
         <div>
@@ -91,17 +178,18 @@ const handleBrandLogo = "";
           </p>
         </div>
 
-        <button
+        <Link
+          href="/admin/item-masterlist"
           className="flex items-center gap-2 border px-4 py-2 rounded-xl bg-white hover:bg-slate-100"
         >
           <ArrowLeft size={18} />
           Back
-        </button>
+        </Link>
 
       </div>
 
       {/* Form */}
-
+      <form onSubmit={handleSubmitProduct} >
       <div className="bg-white rounded-2xl shadow-sm p-6">
 
         <div className="grid lg:grid-cols-3 gap-6">
@@ -119,12 +207,15 @@ const handleBrandLogo = "";
 
               <input
                 type="text"
+                value={product.name}
+                onChange={(e) => setProduct({...product, name: e.target.value})}
                 placeholder="Enter Product Name"
                 className="w-full border rounded-xl px-4 py-3"
+                maxLength={50}
               />
             </div>
 
-            {/* Slug */}
+            {/* Slug 
 
             <div>
               <label className="block text-sm font-medium mb-2">
@@ -137,6 +228,7 @@ const handleBrandLogo = "";
                 className="w-full border rounded-xl px-4 py-3"
               />
             </div>
+              */}
 
            {/* Category & Brand */}
 
@@ -153,13 +245,16 @@ const handleBrandLogo = "";
 
                   <select
                     className="flex-1 border rounded-xl px-4 py-3"
+                    required
+                    value={product.category_id}
+                    onChange={(e) => setProduct({...product, category_id: e.target.value})}
                   >
-                    <option>Select Category</option>
+                    <option value="" >Select Category</option>
                     {categories.map((category: any) => (
                     <option key={category.id} value={category.id}>
                        {category.name.toUpperCase()}
                     </option>
-                  ))}
+                    ))}
                   </select>
 
                   <button
@@ -185,11 +280,16 @@ const handleBrandLogo = "";
 
                   <select
                     className="flex-1 border rounded-xl px-4 py-3"
+                    required
+                    value={product.brand_id}
+                    onChange={(e) => setProduct({...product, brand_id: e.target.value})}
                   >
-                    <option>Select Brand</option>
-                    <option>Nike</option>
-                    <option>Samsung</option>
-                    <option>FoodCorp</option>
+                    <option value="">Select Brand</option>
+                    {brands.map((brand: any) => (
+                    <option key={brand.id} value={brand.id}>
+                       {brand.name.toUpperCase()}
+                    </option>
+                    ))}
                   </select>
 
                   <button
@@ -217,6 +317,10 @@ const handleBrandLogo = "";
                 rows={3}
                 className="w-full border rounded-xl px-4 py-3"
                 placeholder="Short summary..."
+                required
+                value={product.short_description}
+                onChange={(e) => setProduct({...product, short_description: e.target.value})}
+                maxLength={255}
               />
             </div>
 
@@ -231,6 +335,10 @@ const handleBrandLogo = "";
                 rows={8}
                 className="w-full border rounded-xl px-4 py-3"
                 placeholder="Full product description..."
+                required
+                value={product.description}
+                onChange={(e) => setProduct({...product, description: e.target.value})}
+                maxLength={1000}
               />
             </div>
 
@@ -252,9 +360,9 @@ const handleBrandLogo = "";
                 className="border-2 border-dashed rounded-xl h-56 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500"
               >
 
-                {preview ? (
+                {product.featured_image ? (
                   <img
-                    src={preview}
+                    src={URL.createObjectURL(product.featured_image)}
                     alt=""
                     className="w-full h-full object-cover rounded-xl"
                   />
@@ -274,8 +382,8 @@ const handleBrandLogo = "";
                 <input
                   type="file"
                   hidden
-                  accept="image/*"
-                  onChange={handleImage}
+                  accept="image/*"    
+                  onChange={(e) => setProduct({...product, featured_image: e.target.files?.[0] || null,})}
                 />
 
               </label>
@@ -284,24 +392,61 @@ const handleBrandLogo = "";
 
             {/* Status */}
 
-            <div className="border rounded-2xl p-5">
+            <div className="rounded-2xl border bg-white p-5 shadow-sm">
+                <div className="mb-4">
+                    <h2 className="text-lg font-semibold text-gray-900">
+                        Product Status
+                    </h2>
+                    <p className="text-sm text-gray-500">
+                        Enable or disable this product from appearing on the website.
+                    </p>
+                </div>
 
-              <h2 className="font-semibold mb-4">
-                Status
-              </h2>
+                <div className="flex items-center justify-between rounded-xl border bg-gray-50 p-4">
+                    <div>
+                        <p className="font-medium text-gray-800">
+                            Visibility
+                        </p>
+                        <p className="text-sm text-gray-500">
+                            Control whether this product is active.
+                        </p>
+                    </div>
 
-              <select
-                className="w-full border rounded-xl px-4 py-3"
-              >
-                <option value="1">
-                  Active
-                </option>
+                    <div className="flex items-center gap-4">
+                        <span
+                            className={`rounded-full px-3 py-1 text-sm font-medium ${
+                                product.is_active
+                                    ? "bg-green-100 text-green-700"
+                                    : "bg-red-100 text-red-700"
+                            }`}
+                        >
+                            {product.is_active ? "Active" : "Inactive"}
+                        </span>
 
-                <option value="0">
-                  Inactive
-                </option>
-              </select>
-
+                        <button
+                            type="button"
+                            onClick={() =>
+                                setProduct({
+                                    ...product,
+                                    is_active: !product.is_active,
+                                })
+                            }
+                            className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${
+                                product.is_active
+                                    ? "bg-sky-500"
+                                    : "bg-gray-300"
+                            }`}
+                        >
+                            <span
+                                className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow transition-transform duration-300 ${
+                                    product.is_active
+                                        ? "translate-x-6"
+                                        : ""
+                                }`}
+                            />
+                        </button>
+                    </div>
+                </div>
             </div>
 
             {/* Information */}
@@ -333,11 +478,12 @@ const handleBrandLogo = "";
 
         <div className="border-t mt-8 pt-6 flex flex-col sm:flex-row gap-3 justify-end">
 
-          <button
+          <Link
+          href="/admin/item-masterlist"
             className="px-6 py-3 border rounded-xl"
           >
             Cancel
-          </button>
+          </Link>
 
           <button
             className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2"
@@ -347,9 +493,9 @@ const handleBrandLogo = "";
           </button>
 
         </div>
-
+               
       </div>
-
+            </form>     
 </div>
 
                 {/* ADD CATEGORY MODAL */}
@@ -367,10 +513,10 @@ const handleBrandLogo = "";
                 </h2>
 
                 <button
-                    onClick={() => setShowCategoryModal(false)}
+                    onClick={closeCategory}
                     className="text-gray-500 text-xl"
                 >
-                    ×
+                    <X size={25} />
                 </button>
 
             </div>
@@ -448,13 +594,11 @@ const handleBrandLogo = "";
             </div>
 
             <div className="border-t p-6 flex justify-end gap-3">
-
                 <button
-                    onClick={() =>
-                        setShowCategoryModal(false)
-                    }
-                    className="px-5 py-3 border rounded-xl"
-                >
+                     type="button"
+                     onClick={closeCategory}
+                    className="px-5 py-3 bg-white hover:bg-gray-100 border rounded-xl"
+                    >
                     Cancel
                 </button>
 
@@ -484,25 +628,29 @@ const handleBrandLogo = "";
                 </h2>
 
                 <button
-                    onClick={() => setShowBrandModal(false)}
+                    onClick={closeBrand}
                     className="text-gray-500 text-xl"
                 >
-                    ×
+                    <X size={25} />
                 </button>
 
             </div>
-
+                   <form onSubmit={handleSubmitBrand}>
             <div className="p-6 space-y-5">
-
+                 
                 <div>
                     <label className="block mb-2 text-sm font-medium">
-                        Name *
+                        Name <span className="text-red-500"> *</span>
                     </label>
 
                     <input
                         type="text"
+                        value={brand.name}
+                        onChange={(e) => setBrand({...brand, name: e.target.value})}
                         className="w-full border rounded-xl px-4 py-3"
                         placeholder="Nike"
+                        required
+                        maxLength={30}
                     />
                 </div>
 
@@ -513,9 +661,9 @@ const handleBrandLogo = "";
 
                     <label className="border-2 border-dashed rounded-xl h-44 flex flex-col justify-center items-center cursor-pointer">
 
-                        {logoPreview ? (
+                        {brand.logo ? (
                             <img
-                                src={logoPreview}
+                                src={URL.createObjectURL(brand.logo)}
                                 className="w-full h-full object-contain rounded-xl"
                             />
                         ) : (
@@ -535,7 +683,7 @@ const handleBrandLogo = "";
                             type="file"
                             hidden
                             accept="image/*"
-                            onChange={handleBrandLogo}
+                            onChange={(e) => setBrand({...brand, logo: e.target.files?.[0] || null,})}
                         />
 
                     </label>
@@ -549,10 +697,15 @@ const handleBrandLogo = "";
 
                     <textarea
                         rows={4}
+                        value={brand.description}
+                        onChange={(e) => setBrand({...brand, description: e.target.value})}
                         className="w-full border rounded-xl px-4 py-3"
+                        required
+                        maxLength={255}
                     />
                 </div>
-
+                
+                          {/*
                 <div className="flex items-center justify-between border rounded-xl p-4">
 
                     <div>
@@ -565,7 +718,7 @@ const handleBrandLogo = "";
                         </p>
                     </div>
 
-                    <button
+                     <button
                         type="button"
                         onClick={() =>
                             setBrandActive(!brandActive)
@@ -584,30 +737,31 @@ const handleBrandLogo = "";
                             }`}
                         />
                     </button>
-
-                </div>
+                        
+                </div>*/}
 
             </div>
 
             <div className="border-t p-6 flex justify-end gap-3">
-
                 <button
-                    onClick={() =>
-                        setShowBrandModal(false)
-                    }
-                    className="px-5 py-3 border rounded-xl"
-                >
+                     type="button"
+                     onClick={closeBrand}
+                    className="px-5 py-3 bg-white hover:bg-gray-100 border rounded-xl"
+                    >
                     Cancel
-                </button>
+                </button>              
+            
 
                 <button
                     className="px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl"
                 >
                     Save Brand
                 </button>
+          
+                
 
             </div>
-
+              </form>
         </div>
 
     </div>

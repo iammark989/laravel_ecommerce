@@ -51,12 +51,14 @@ Route::post('/admin/loginattempt',[AdminController::class,'login'])->name('admin
         // ADMIN LOGOUT
 Route::post('/admin/logout',[AdminController::class,'adminlogout'])->name('adminlogout');
 
-        // ADD CATEGORY
-Route::post('/admin/category/add',[AdminController::class,'adminAddCategory'])->name('addcategory')->middleware('staffonly');
+        // ADD CATEGORY AND BRAND AND ADD PRODUCT
+Route::post('/admin/products/add-category',[AdminController::class,'adminAddCategory'])->name('addcategory')->middleware('staffonly');
+Route::post('/admin/products/add-brand',[AdminController::class,'adminAddBrand'])->name('addbrand')->middleware('staffonly');
+Route::post('/admin/products/add-product',[AdminController::class,'adminAddProduct'])->name('addproduct')->middleware('staffonly');
 
-Route::get('/admin/item-masterlist',function(){
-    return Inertia::render('admin/itemmasterlist');
-})->name('item_masterlist')->middleware('staffonly');
+Route::get('/admin/products/{slug}/variants',[AdminController::class,'goToProductVariant'])->name('gotoproductvariant')->middleware('staffonly');
+
+Route::get('/admin/item-masterlist',[AdminController::class,'goToItemMasterlist'])->name('itemmasterlist')->middleware('staffonly');
 
 Route::get('/admin/product/create',[AdminController::class,'addproduct'])->name('addproduct')->middleware('staffonly');
 

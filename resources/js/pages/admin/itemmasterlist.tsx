@@ -1,43 +1,14 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { Plus, Search, Edit, Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Link } from "@inertiajs/react";
+import { Link,usePage } from "@inertiajs/react";
 
 export default function ProductMasterlist() {
   const [search, setSearch] = useState("");
 
-  const products = [
-    {
-      id: 1,
-      image: "https://placehold.co/80x80",
-      name: "Premium Wireless Headphones",
-      category: "Electronics",
-      brand: "SoundTech",
-      variants: 4,
-      status: true,
-      createdBy: "Admin",
-    },
-    {
-      id: 2,
-      image: "https://placehold.co/80x80",
-      name: "Running Shoes",
-      category: "Footwear",
-      brand: "FastStep",
-      variants: 8,
-      status: true,
-      createdBy: "Admin",
-    },
-    {
-      id: 3,
-      image: "https://placehold.co/80x80",
-      name: "Meat Loaf",
-      category: "Canned Goods",
-      brand: "FoodCorp",
-      variants: 4,
-      status: false,
-      createdBy: "Marketing",
-    },
-  ];
+  const { products } = usePage().props as any;
+
+  
 
   return (
 
@@ -138,7 +109,7 @@ export default function ProductMasterlist() {
 
           <tbody>
 
-            {products.map((product) => (
+            {products.map((product: any) => (
               <tr
                 key={product.id}
                 className="border-t hover:bg-slate-50"
@@ -146,7 +117,7 @@ export default function ProductMasterlist() {
 
                 <td className="p-4">
                   <img
-                    src={product.image}
+                    src={product.featured_image}
                     alt=""
                     className="w-14 h-14 rounded-lg"
                   />
@@ -157,11 +128,11 @@ export default function ProductMasterlist() {
                 </td>
 
                 <td className="p-4">
-                  {product.category}
+                  {product.category_id}
                 </td>
 
                 <td className="p-4">
-                  {product.brand}
+                  {product.brand_id}
                 </td>
 
                 <td className="p-4">

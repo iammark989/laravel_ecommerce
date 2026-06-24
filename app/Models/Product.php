@@ -1,0 +1,39 @@
+<?php
+
+namespace App\Models;
+
+use App\Models\Brand;
+use App\Models\Categorie;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Notifications\Notifiable;
+
+class Product extends Model
+{
+    use HasFactory, Notifiable;
+
+     protected $fillable = [
+        'category_id',
+        'brand_id',
+        'name',
+        'slug',
+        'short_description',
+        'description',
+        'featured_image',
+        'created_by',
+        'is_active',
+    ];
+
+        public function categorie(){
+        return $this->belongsTo(Categorie::class,'category_id','id');
+    }
+
+        public function brand(){
+        return $this->belongsTo(Brand::class,'category_id','id');
+    }
+
+    public function users(){
+        return $this->belongsTo(User::class,'created_by','id');
+    }
+
+}
