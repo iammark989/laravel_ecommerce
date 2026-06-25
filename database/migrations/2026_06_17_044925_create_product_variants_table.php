@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained();
 
-            $table->string('sku');
+            $table->string('sku')->unique();;
             $table->string('barcode')->nullable()->unique();
 
             $table->decimal('cost_price',10,2);
             $table->decimal('selling_price',10,2);
 
-            $table->string('variant_name');
+            $table->string('variant_name')->unique();
 
             $table->boolean('is_active')->default(true);
 

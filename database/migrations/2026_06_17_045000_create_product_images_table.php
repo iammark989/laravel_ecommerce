@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained();
 
-            $table->string('image_path');
-            $table->string('sort_order');
+            $table->string('image');
+            $table->unsignedInteger('sort_order')->default(1);
 
             $table->timestamps();
         });

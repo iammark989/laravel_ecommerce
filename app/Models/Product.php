@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Brand;
 use App\Models\Categorie;
+use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -35,5 +36,10 @@ class Product extends Model
     public function users(){
         return $this->belongsTo(User::class,'created_by','id');
     }
+
+    public function productvariants(){
+        return $this->hasMany(ProductVariant::class,'product_id','id');
+    }
+    
 
 }

@@ -1,9 +1,45 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
+import { Link,usePage,router } from "@inertiajs/react";
 import { ArrowLeft, Upload, Save } from "lucide-react";
 import { useState } from "react";
 
+
 export default function AddVariantPage() {
     const [preview, setPreview] = useState<string | null>(null);
+
+    const { products,categories } = usePage().props as any;
+
+    const [ product,setProduct ] = useState({
+        sku: "",
+        barcode: "",
+        cost_price: "",
+        selling_price:"",
+        variant_name:"",
+        is_active:true,
+        image:  null as File | null,
+        quantity_on_hand:"",
+        reorder_level:"",
+
+    });
+
+    const [ errorMsg,setErrorMsg]=useState("");
+
+    const submitHandle = (e: React.FormEvent) => {
+        e.preventDefault();
+
+        router.post(`/admin/products/${products.slug}/variants/save`,product,{
+
+            onSuccess:()=>{
+
+            },
+            onError:(error)=>{
+                setErrorMsg(error.errorMsg);
+            },
+
+        });
+
+
+    }
 
     const handleImage = (
         e: React.ChangeEvent<HTMLInputElement>
@@ -33,10 +69,12 @@ export default function AddVariantPage() {
                         </p>
                     </div>
 
-                    <button className="flex items-center gap-2 border px-4 py-2 rounded-xl bg-white hover:bg-slate-100">
+                    <Link 
+                        href=""
+                    className="flex items-center gap-2 border px-4 py-2 rounded-xl bg-white hover:bg-slate-100">
                         <ArrowLeft size={18} />
                         Back
-                    </button>
+                    </Link>
 
                 </div>
 
@@ -57,11 +95,11 @@ export default function AddVariantPage() {
 
                         <div>
                             <h3 className="font-semibold text-lg">
-                                Nike Air Max
+                               {products.name.toUpperCase()}
                             </h3>
 
                             <p className="text-gray-500">
-                                Footwear • Nike
+                                {categories.name.toUpperCase()}
                             </p>
                         </div>
 
@@ -70,7 +108,7 @@ export default function AddVariantPage() {
                 </div>
 
                 {/* Form */}
-
+                <form onSubmit={submitHandle}>
                 <div className="bg-white rounded-2xl shadow-sm p-6">
 
                     <div className="grid lg:grid-cols-3 gap-6">
@@ -83,25 +121,39 @@ export default function AddVariantPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        SKU *
+                                        SKU <span className="text-red-500"> *</span>
                                     </label>
+                                    {errorMsg && (
+                            <div className="text-red-500 text-sm mt-2">
+                                {errorMsg}
+                            </div>
+                            )}
 
                                     <input
                                         type="text"
                                         className="w-full border rounded-xl px-4 py-3"
                                         placeholder="NIKE-BLK-8"
+                                        required
+                                        maxLength={16}
+                                        minLength={6}
+                                        value={product.sku}
+                                        onChange={(e) => setProduct({...product, sku: e.target.value})}
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Barcode
+                                        Barcode 
                                     </label>
 
                                     <input
                                         type="text"
                                         className="w-full border rounded-xl px-4 py-3"
                                         placeholder="123456789"
+                                        min={4}
+                                        maxLength={50}
+                                        value={product.barcode}
+                                        onChange={(e) => setProduct({...product, barcode: e.target.value})}
                                     />
                                 </div>
 
@@ -109,13 +161,18 @@ export default function AddVariantPage() {
 
                             <div>
                                 <label className="block text-sm font-medium mb-2">
-                                    Variant Name *
+                                    Variant Name <span className="text-red-500"> *</span>
                                 </label>
 
                                 <input
                                     type="text"
                                     className="w-full border rounded-xl px-4 py-3"
                                     placeholder="Black Size 8"
+                                    required
+                                    minLength={6}
+                                    maxLength={50}
+                                    value={product.variant_name}
+                                    onChange={(e) => setProduct({...product, variant_name: e.target.value})}
                                 />
                             </div>
 
@@ -123,25 +180,33 @@ export default function AddVariantPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Cost Price
+                                        Cost Price <span className="text-red-500"> *</span>
                                     </label>
 
                                     <input
                                         type="number"
                                         className="w-full border rounded-xl px-4 py-3"
                                         placeholder="3000.00"
+                                        required
+                                        maxLength={12}
+                                        value={product.cost_price}
+                                        onChange={(e) => setProduct({...product, cost_price: e.target.value})}
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Selling Price
+                                        Selling Price <span className="text-red-500"> *</span>
                                     </label>
 
                                     <input
                                         type="number"
                                         className="w-full border rounded-xl px-4 py-3"
                                         placeholder="4999.00"
+                                        required
+                                        maxLength={12}
+                                        value={product.selling_price}
+                                        onChange={(e) => setProduct({...product, selling_price: e.target.value})}
                                     />
                                 </div>
 
@@ -151,25 +216,33 @@ export default function AddVariantPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Quantity On Hand
+                                        Quantity On Hand <span className="text-red-500"> *</span>
                                     </label>
 
                                     <input
                                         type="number"
                                         className="w-full border rounded-xl px-4 py-3"
                                         placeholder="20"
+                                        maxLength={6}
+                                        required
+                                        value={product.quantity_on_hand}
+                                        onChange={(e) => setProduct({...product, quantity_on_hand: e.target.value})}
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Reorder Level
+                                        Reorder Level <span className="text-red-500"> *</span>
                                     </label>
 
                                     <input
                                         type="number"
                                         className="w-full border rounded-xl px-4 py-3"
                                         placeholder="5"
+                                        required
+                                        maxLength={5}
+                                        value={product.reorder_level}
+                                        onChange={(e) => setProduct({...product, reorder_level: e.target.value})}
                                     />
                                 </div>
 
@@ -191,9 +264,9 @@ export default function AddVariantPage() {
 
                                 <label className="border-2 border-dashed rounded-xl h-56 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500">
 
-                                    {preview ? (
+                                    {product.image ? (
                                         <img
-                                            src={preview}
+                                            src={URL.createObjectURL(product.image)}
                                             className="w-full h-full object-cover rounded-xl"
                                         />
                                     ) : (
@@ -213,7 +286,7 @@ export default function AddVariantPage() {
                                         type="file"
                                         hidden
                                         accept="image/*"
-                                        onChange={handleImage}
+                                        onChange={(e) => setProduct({...product, image: e.target.files?.[0] || null,})}
                                     />
 
                                 </label>
@@ -222,23 +295,62 @@ export default function AddVariantPage() {
 
                             {/* Status */}
 
-                            <div className="border rounded-2xl p-5">
-
-                                <h2 className="font-semibold mb-4">
-                                    Status
+                        <div className="rounded-2xl border bg-white p-5 shadow-sm">
+                            <div className="mb-4">
+                                <h2 className="text-lg font-semibold text-gray-900">
+                                    Product Status
                                 </h2>
-
-                                <select className="w-full border rounded-xl px-4 py-3">
-                                    <option value="1">
-                                        Active
-                                    </option>
-
-                                    <option value="0">
-                                        Inactive
-                                    </option>
-                                </select>
-
+                                <p className="text-sm text-gray-500">
+                                    Enable or disable this product from appearing on the website.
+                                </p>
                             </div>
+
+                            <div className="flex items-center justify-between rounded-xl border bg-gray-50 p-4">
+                                <div>
+                                    <p className="font-medium text-gray-800">
+                                        Visibility
+                                    </p>
+                                    <p className="text-sm text-gray-500">
+                                        Control whether this product is active.
+                                    </p>
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <span
+                                        className={`rounded-full px-3 py-1 text-sm font-medium ${
+                                            product.is_active
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-red-100 text-red-700"
+                                        }`}
+                                    >
+                                        {product.is_active ? "Active" : "Inactive"}
+                                    </span>
+
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setProduct({
+                                                ...product,
+                                                is_active: !product.is_active,
+                                            })
+                                        }
+                                        className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${
+                                            product.is_active
+                                                ? "bg-sky-500"
+                                                : "bg-gray-300"
+                                        }`}
+                                    >
+                                        <span
+                                            className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow transition-transform duration-300 ${
+                                                product.is_active
+                                                    ? "translate-x-6"
+                                                    : ""
+                                            }`}
+                                        />
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
 
                             {/* Information */}
 
@@ -288,7 +400,7 @@ export default function AddVariantPage() {
                     </div>
 
                 </div>
-
+                      </form>                          
             </div>
         </AdminMainLayout>
     );

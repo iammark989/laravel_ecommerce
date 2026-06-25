@@ -6,35 +6,12 @@ import {
     Trash2,
     Package
 } from "lucide-react";
-import { Link } from "@inertiajs/react";
+import { Link, usePage } from "@inertiajs/react";
+
 
 export default function ProductVariantPage() {
-    const variants = [
-        {
-            id: 1,
-            sku: "NIKE-001-BLK-8",
-            name: "Black Size 8",
-            price: 4999,
-            stock: 20,
-            status: true,
-        },
-        {
-            id: 2,
-            sku: "NIKE-001-BLK-9",
-            name: "Black Size 9",
-            price: 4999,
-            stock: 15,
-            status: true,
-        },
-        {
-            id: 3,
-            sku: "NIKE-001-WHT-8",
-            name: "White Size 8",
-            price: 5199,
-            stock: 8,
-            status: true,
-        },
-    ];
+    const { variants,products,categories } = usePage().props as any;
+   
 
     return (
         <AdminMainLayout>
@@ -62,7 +39,7 @@ export default function ProductVariantPage() {
                         </button>
 
                         <Link 
-                            href=""
+                            href={`/admin/products/${products.slug}/variants/create`}
                         className="bg-sky-500 hover:bg-sky-600 text-white px-4 py-2 rounded-xl flex items-center gap-2">
                             <Plus size={18} />
                             Add Variant
@@ -86,15 +63,15 @@ export default function ProductVariantPage() {
                         <div className="flex-1">
 
                             <h2 className="text-2xl font-bold text-slate-800">
-                                Nike Air Max
+                                {products.name.toUpperCase()}
                             </h2>
 
                             <p className="text-gray-500 mt-1">
-                                Footwear • Nike
+                                {categories.name.toUpperCase()}
                             </p>
 
                             <p className="mt-4 text-gray-600">
-                                Premium running shoes with multiple sizes and colors.
+                                {products.short_description.toUpperCase()}
                             </p>
 
                         </div>
@@ -126,7 +103,7 @@ export default function ProductVariantPage() {
 
                         <tbody>
 
-                            {variants.map((variant) => (
+                            {variants.map((variant: any) => (
                                 <tr
                                     key={variant.id}
                                     className="border-t"
@@ -136,11 +113,11 @@ export default function ProductVariantPage() {
                                     </td>
 
                                     <td className="p-4 font-medium">
-                                        {variant.name}
+                                        {variant.variant_name}
                                     </td>
 
                                     <td className="p-4">
-                                        ₱{variant.price.toLocaleString()}
+                                        ₱{variant.selling_price.toLocaleString()}
                                     </td>
 
                                     <td className="p-4">
@@ -150,7 +127,7 @@ export default function ProductVariantPage() {
                                     <td className="p-4">
 
                                         <span className="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm">
-                                            Active
+                                           {variant.is_active ? "active" : "Inactive"}
                                         </span>
 
                                     </td>
@@ -184,7 +161,7 @@ export default function ProductVariantPage() {
 
                 <div className="lg:hidden space-y-4">
 
-                    {variants.map((variant) => (
+                    {variants.map((variant: any) => (
 
                         <div
                             key={variant.id}
@@ -196,7 +173,7 @@ export default function ProductVariantPage() {
                                 <div>
 
                                     <h3 className="font-semibold text-slate-800">
-                                        {variant.name}
+                                        {variant.variant_name}
                                     </h3>
 
                                     <p className="text-gray-500 text-sm">
@@ -220,7 +197,7 @@ export default function ProductVariantPage() {
                                     </p>
 
                                     <p className="font-semibold">
-                                        ₱{variant.price}
+                                        ₱{variant.selling_price}
                                     </p>
                                 </div>
 

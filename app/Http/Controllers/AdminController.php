@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Categorie;
 use App\Models\Product;
+use App\Models\ProductVariant;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -114,7 +115,7 @@ class AdminController extends Controller
     $categories = Categorie::orderBy('name','asc')->get();
     $brands = Brand::orderBy('name','asc')->get();
     $products = Product::orderBy('name','asc')->get();
-    return Inertia::render('admin/addnewitem',
+    return Inertia::render('admin/productcreatepage',
     [ 'categories' => $categories, 'brands' => $brands, 'products' => $products]);
     }
 
@@ -148,7 +149,7 @@ class AdminController extends Controller
         Brand::create($incomingFields);
     }
 
-    // ADD PRODUCT
+    // ADD PRODUCT POST
     public function adminAddProduct(Request $request){
         $incomingFields = $request->validate([
             'category_id' => 'required',
@@ -172,9 +173,36 @@ class AdminController extends Controller
     // GO TO VARIANT
         public function goToProductVariant($slug){
             $products = Product::where('slug','=',$slug)->firstOrFail();
-            return Inertia::render('admin/addproductvariant',[
+            $categories = Categorie::where('id',$products->category_id)->firstOrFail();
+            $variants = ProductVariant::orderBy('variant_name','asc')->get();
+            return Inertia::render('admin/productvariantpage',[
                 'products' => $products,
+                'variants' => $variants,
+                'categories' => $categories,
             ]);
         }
 
+    // GO TO CREATE VARIANT
+        public function goToCreateProductVariant($slug){
+            $products = Product::where('slug','=',$slug)->firstOrFail();
+            $categories = Categorie::where('id',$products->category_id)->firstOrFail();
+            return Inertia::render('admin/productvariantcreate',[
+                'products' => $products, 'categories' => $categories,
+            ]);
+        }
+    // SAVE CREATEAD VARIANT
+        public function saveVariant(Request $request,$slug){
+            $incomingFields = $request->validate([
+                'sku' => 'required|string|max:50|unique:product_variants,sku',
+                'barcode' => 'nullable|string|max:100|unique:product_variants,barcode',
+                'cost_price' => 'required|numeric|min:0',
+                'selling_price' => 'required|numeric|min:0|gte:cost_price',
+                'variant_name' => 'required|string|max:100',
+                'is_active' => 'required|boolean',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'quantity_on_hand' => 'required|numeric|min:0',
+                'reorder_level' => 'required|numeric|min:0',
+            ]);
+            
+        }
 }
