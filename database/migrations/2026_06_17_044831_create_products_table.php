@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('short_description');
             $table->text('description');
 
-            $table->string('featured_image')->nullable();
+            $table->string('featured_image')->nullable()->default('fallback_image.png');
 
             $table->boolean('is_active')->default(true);
 

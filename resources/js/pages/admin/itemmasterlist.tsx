@@ -117,8 +117,8 @@ export default function ProductMasterlist() {
 
                 <td className="p-4">
                   <img
-                    src={product.image}
-                    alt=""
+                    src={`${import.meta.env.VITE_IMAGE_URL}/files/product_images/${product.image}`}
+                    alt="Product Image"
                     className="w-14 h-14 rounded-lg"
                   />
                 </td>
@@ -163,12 +163,8 @@ export default function ProductMasterlist() {
 
                   <div className="flex gap-2">
 
-                    <button className="p-2 bg-sky-100 text-sky-600 rounded-lg">
+                    <button className="p-2 rounded-lg border hover:bg-slate-100">
                       <Edit size={18} />
-                    </button>
-
-                    <button className="p-2 bg-red-100 text-red-600 rounded-lg">
-                      <Trash2 size={18} />
                     </button>
 
                   </div>
@@ -188,7 +184,7 @@ export default function ProductMasterlist() {
 
       <div className="lg:hidden mt-6 space-y-4">
 
-        {products.map((product) => (
+        {products.map((product: any) => (
 
           <div
             key={product.id}
@@ -233,15 +229,12 @@ export default function ProductMasterlist() {
 
             </div>
 
-            <div className="grid grid-cols-2 gap-2 mt-4">
+            <div className="grid grid-cols-1 gap-2 mt-4">
 
               <button className="bg-sky-500 text-white py-2 rounded-lg">
                 Edit
               </button>
 
-              <button className="bg-red-500 text-white py-2 rounded-lg">
-                Delete
-              </button>
 
             </div>
 

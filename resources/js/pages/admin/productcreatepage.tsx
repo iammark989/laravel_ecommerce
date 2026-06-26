@@ -14,6 +14,8 @@ export default function AddNewItemPage() {
 
   const [ showBrandModal, setShowBrandModal ] = useState(false);
 
+  const [ save, setSave ] = useState(false);
+
 const [ product, setProduct ] = useState({
       'category_id':"",
       'brand_id':"",
@@ -39,7 +41,7 @@ const [ brand, setBrand ] = useState({
     // ADD CATEGORY
 const handleSubmitCategory = (e: React.FormEvent) => {
       e.preventDefault();
-
+      setSave(true);
       // CHECK DUPLICATE
       const categoryExist = categories.some(
       (d: any) => d.name.toLowerCase() === category.name.toLowerCase()
@@ -58,7 +60,7 @@ const handleSubmitCategory = (e: React.FormEvent) => {
             description:"",
           });
           setShowCategoryModal(false);
-         
+          setSave(false);
         },
         onError: (error) => {
          
@@ -78,7 +80,7 @@ function closeCategory(){
     // ADD BRAND
 const handleSubmitBrand = (e: React.FormEvent) => {
       e.preventDefault();
-
+      setSave(true);
       // CHECK DUPLICATE
       const brandExist = brands.some(
       (d: any) => d.name.toLowerCase() === brand.name.toLowerCase()
@@ -98,6 +100,7 @@ const handleSubmitBrand = (e: React.FormEvent) => {
             description:"",
           });
           setShowBrandModal(false);
+          setSave(false);
         },
         onError: (error) => {
           
@@ -601,13 +604,20 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                     >
                     Cancel
                 </button>
-
+                    {!save ?
                 <button
-                    className="px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl"
+                    className="px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl"  
                 >
-                    Save Category
+                   Save Category
                 </button>
-
+                    :
+                    <button
+                    className="px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl"  
+                      disabled
+                >
+                   Saving...
+                   </button>
+                    }
             </div>
         </form>
         </div>
@@ -751,15 +761,21 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                     Cancel
                 </button>              
             
-
-                <button
+                 {!save ?
+                 <button
                     className="px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl"
                 >
                     Save Brand
                 </button>
-          
-                
-
+                  : 
+                  <button
+                    className="px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl"
+                    disabled
+                >
+                    Saving...
+                </button>
+                   }             
+               
             </div>
               </form>
         </div>

@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\VariantInventorie;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -33,5 +34,8 @@ class ProductVariant extends Model
         return $this->hasMany(VariantInventorie::class,'product_variant_id','id');
     }
 
+    public function productimages(){
+        return $this->hasMany(ProductImage::class,'product_variant_id','id');
+    }
 
 }

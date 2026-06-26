@@ -13,9 +13,9 @@ return new class extends Migration
     {
         Schema::create('product_images', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_id')->constrained();
+            $table->foreignId('product_variant_id')->constrained();
 
-            $table->string('image');
+            $table->string('image')->default('fallback_image.png');
             $table->unsignedInteger('sort_order')->default(1);
 
             $table->timestamps();

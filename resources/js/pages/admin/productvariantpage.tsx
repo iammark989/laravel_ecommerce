@@ -33,10 +33,12 @@ export default function ProductVariantPage() {
 
                     <div className="flex gap-3">
 
-                        <button className="border px-4 py-2 rounded-xl bg-white hover:bg-gray-100 flex items-center gap-2">
+                        <Link 
+                        href="/admin/product/create"
+                        className="border px-4 py-2 rounded-xl bg-white hover:bg-gray-100 flex items-center gap-2">
                             <ArrowLeft size={18} />
                             Back
-                        </button>
+                        </Link>
 
                         <Link 
                             href={`/admin/products/${products.slug}/variants/create`}
@@ -121,7 +123,7 @@ export default function ProductVariantPage() {
                                     </td>
 
                                     <td className="p-4">
-                                        {variant.stock}
+                                        {variant.quantity_on_hand}
                                     </td>
 
                                     <td className="p-4">
@@ -207,7 +209,7 @@ export default function ProductVariantPage() {
                                     </p>
 
                                     <p className="font-semibold">
-                                        {variant.stock}
+                                        {variant.quantity_on_hand}
                                     </p>
                                 </div>
 

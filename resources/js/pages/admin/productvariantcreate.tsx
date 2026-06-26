@@ -8,6 +8,7 @@ export default function AddVariantPage() {
     const [preview, setPreview] = useState<string | null>(null);
 
     const { products,categories } = usePage().props as any;
+    const { errors } = usePage().props;
 
     const [ product,setProduct ] = useState({
         sku: "",
@@ -30,10 +31,11 @@ export default function AddVariantPage() {
         router.post(`/admin/products/${products.slug}/variants/save`,product,{
 
             onSuccess:()=>{
-
+                console.log('success');
             },
-            onError:(error)=>{
-                setErrorMsg(error.errorMsg);
+            onError:(errors)=>{
+                setErrorMsg(errors.errorMsg);
+                console.log(errors);
             },
 
         });
@@ -70,7 +72,7 @@ export default function AddVariantPage() {
                     </div>
 
                     <Link 
-                        href=""
+                        href={`/admin/products/${products.slug}/variants`}
                     className="flex items-center gap-2 border px-4 py-2 rounded-xl bg-white hover:bg-slate-100">
                         <ArrowLeft size={18} />
                         Back
@@ -122,12 +124,11 @@ export default function AddVariantPage() {
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
                                         SKU <span className="text-red-500"> *</span>
+                                         {errors.sku && (  <span className="text-red-500 text-sm mt-2"> {errors.sku} 
+                                            
+                                         </span>  )}
                                     </label>
-                                    {errorMsg && (
-                            <div className="text-red-500 text-sm mt-2">
-                                {errorMsg}
-                            </div>
-                            )}
+                                    
 
                                     <input
                                         type="text"
@@ -138,12 +139,15 @@ export default function AddVariantPage() {
                                         minLength={6}
                                         value={product.sku}
                                         onChange={(e) => setProduct({...product, sku: e.target.value})}
+                                    
                                     />
                                 </div>
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
                                         Barcode 
+                                        {errors.barcode && (  <span className="text-red-500 text-sm mt-2"> {errors.barcode} 
+                                         </span>  )}
                                     </label>
 
                                     <input
@@ -162,6 +166,8 @@ export default function AddVariantPage() {
                             <div>
                                 <label className="block text-sm font-medium mb-2">
                                     Variant Name <span className="text-red-500"> *</span>
+                                    {errors.variant_name && (  <span className="text-red-500 text-sm mt-2"> {errors.variant_name} 
+                                         </span>  )}
                                 </label>
 
                                 <input
@@ -196,7 +202,9 @@ export default function AddVariantPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Selling Price <span className="text-red-500"> *</span>
+                                        Selling Price <span className="text-red-500"> *</span> 
+                                                    {errors.selling_price && (  <span className="text-red-500 text-sm mt-2"> {errors.selling_price}
+                                                         </span> )}
                                     </label>
 
                                     <input

@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Brand;
 use App\Models\Categorie;
+use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -39,6 +40,10 @@ class Product extends Model
 
     public function productvariants(){
         return $this->hasMany(ProductVariant::class,'product_id','id');
+    }
+
+    public function productimages(){
+        return $this->hasMany(ProductImage::class,'product_id','id');
     }
     
 

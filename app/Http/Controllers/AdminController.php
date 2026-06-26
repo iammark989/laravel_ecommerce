@@ -6,8 +6,10 @@ namespace App\Http\Controllers;
 use App\Models\Brand;
 use App\Models\Categorie;
 use App\Models\Product;
+use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\User;
+use App\Models\VariantInventorie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -138,18 +140,20 @@ class AdminController extends Controller
         ]);
         $incomingFields['slug'] = Str::slug($incomingFields['name']);
             if(!$request->hasFile('logo')){
-                 $incomingFields['logo'] = "";
+                 $incomingFields['logo'] = "fallback_image.png";
             }else{
-                $filename = Str::slug($incomingFields['name'])."logo".".jpg";
                 $file = $request->file('logo');
-                $file->move(public_path('files/brandlogos'), $filename);
+                $extension = $file->getClientOriginalExtension();
+                $filename = Str::slug($incomingFields['name'])."logo".".".$extension;
+               
+                $file->move(public_path('files/brand_images'), $filename);
                 $incomingFields['logo'] = $filename;
             }
         
         Brand::create($incomingFields);
     }
 
-    // ADD PRODUCT POST
+    // ADD PRODUCT 
     public function adminAddProduct(Request $request){
         $incomingFields = $request->validate([
             'category_id' => 'required',
@@ -161,9 +165,21 @@ class AdminController extends Controller
             'is_active' => 'required|boolean',
         ]);
 
-            $user = auth()->user()->id;
+        $user = auth()->user()->id;
         $incomingFields['slug'] = Str::slug($incomingFields['name']);
         $incomingFields['created_by'] = $user;
+
+        if(!$request->hasFile('featured_image')){
+                 $incomingFields['featured_image'] = "fallback_image.png";
+            }else{
+                $file = $request->file('logo');
+                $extension = $file->getClientOriginalExtension();
+                $filename = Str::slug($incomingFields['name'])."logo".".".$extension;
+               
+                $file->move(public_path('files/brand_images'), $filename);
+                $incomingFields['logo'] = $filename;
+            }
+
 
         $newProduct = Product::create($incomingFields);
         return redirect("/admin/products/{$newProduct->slug}/variants");
@@ -174,7 +190,27 @@ class AdminController extends Controller
         public function goToProductVariant($slug){
             $products = Product::where('slug','=',$slug)->firstOrFail();
             $categories = Categorie::where('id',$products->category_id)->firstOrFail();
-            $variants = ProductVariant::orderBy('variant_name','asc')->get();
+            $variants = DB::table('product_variants as variants')
+                        ->leftJoin('variant_inventories as inventory','inventory.product_variant_id','=','variants.id')
+                        ->select(
+                            'variants.id as id',
+                            'variants.sku as sku',
+                            'variants.selling_price as selling_price',
+                            'variants.variant_name as variant_name',
+                            'variants.is_active as is_active',
+                            'inventory.quantity_on_hand as quantity_on_hand',
+                        )
+                        ->where('variants.product_id','=',$products->id)
+                        ->groupBy(
+                            'variants.id',
+                            'variants.sku',
+                            'variants.selling_price',
+                            'variants.variant_name',
+                            'variants.is_active',
+                            'inventory.quantity_on_hand',
+                        )
+                        ->get();
+        
             return Inertia::render('admin/productvariantpage',[
                 'products' => $products,
                 'variants' => $variants,
@@ -197,12 +233,61 @@ class AdminController extends Controller
                 'barcode' => 'nullable|string|max:100|unique:product_variants,barcode',
                 'cost_price' => 'required|numeric|min:0',
                 'selling_price' => 'required|numeric|min:0|gte:cost_price',
-                'variant_name' => 'required|string|max:100',
+                'variant_name' => 'required|string|max:100|unique:product_variants,variant_name',
                 'is_active' => 'required|boolean',
                 'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
                 'quantity_on_hand' => 'required|numeric|min:0',
                 'reorder_level' => 'required|numeric|min:0',
             ]);
+                $product = Product::where('slug','=',$slug)->firstOrFail();
+                $incomingFields['product_id'] = $product->id;
+
+            DB::transaction(function () use ($request, $incomingFields, $product) {
             
+            $variant = ProductVariant::create([
+                'product_id' => $incomingFields['product_id'],
+                'sku' => $incomingFields['sku'],
+                'barcode' => $incomingFields['barcode'],
+                'cost_price' => $incomingFields['cost_price'],
+                'selling_price' => $incomingFields['selling_price'],
+                'variant_name' => $incomingFields['variant_name'],
+                'is_active' => $incomingFields['is_active'],
+            ]);
+
+            VariantInventorie::create([
+                'product_variant_id' => $variant->id,
+                'quantity_on_hand' => $incomingFields['quantity_on_hand'],
+                'reorder_level' => $incomingFields['reorder_level'],
+            ]);
+
+
+            if($request->hasFile('image')){
+                $file = $request->file('image');
+                $extension = $file->getClientOriginalExtension();
+                $filename = Str::slug($incomingFields['variant_name']).uniqid().".".$extension;
+                
+                $file->move(public_path('files/variant_images'), $filename);
+                $incomingFields['image'] = $filename;
+
+                $imageCheck = ProductImage::where('product_variant_id',$variant->id)->latest()->first();
+                if(!$imageCheck){
+                    ProductImage::create([
+                        'product_variant_id' =>  $variant->id,
+                        'image' =>$incomingFields['image'],
+                        'sort_order' => 1,
+                        ]);
+                }else{
+                    $incomingFields['sort_order'] = $imageCheck->sort_order + 1;
+                    ProductImage::create([
+                        'product_variant_id' =>  $variant->id,
+                        'image' => $incomingFields['image'],
+                        'sort_order' =>$incomingFields['sort_order'],
+                        ]);
+                }
+            }
+
+           });
+           return redirect("/admin/products/{$slug}/variants");     
+
         }
 }
