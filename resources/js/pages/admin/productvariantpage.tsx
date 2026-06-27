@@ -58,22 +58,23 @@ export default function ProductVariantPage() {
                     <div className="flex flex-col md:flex-row gap-5">
 
                         <img
-                            src="https://placehold.co/120x120"
+                            src={`${import.meta.env.VITE_IMAGE_URL}/files/product_images/${products.featured_image}`}
+                            alt="Product Image"
                             className="w-28 h-28 rounded-xl object-cover"
                         />
 
                         <div className="flex-1">
 
                             <h2 className="text-2xl font-bold text-slate-800">
-                                {products.name.toUpperCase()}
+                                {products.name}
                             </h2>
 
                             <p className="text-gray-500 mt-1">
-                                {categories.name.toUpperCase()}
+                                {categories.name}
                             </p>
 
                             <p className="mt-4 text-gray-600">
-                                {products.short_description.toUpperCase()}
+                                {products.short_description}
                             </p>
 
                         </div>
@@ -91,7 +92,7 @@ export default function ProductVariantPage() {
                         <thead className="bg-slate-100">
 
                             <tr className="text-left">
-
+                                <th className="p-4">IMAGE</th>
                                 <th className="p-4">SKU</th>
                                 <th className="p-4">Variant</th>
                                 <th className="p-4">Price</th>
@@ -110,6 +111,14 @@ export default function ProductVariantPage() {
                                     key={variant.id}
                                     className="border-t"
                                 >
+                                    <td className="p-4">
+                                         <img
+                                            src={`${import.meta.env.VITE_IMAGE_URL}/files/variant_images/${variant.image}`}
+                                            alt="Product Image"
+                                            className="w-14 h-14 rounded-lg"
+                                        />
+                                    </td>
+
                                     <td className="p-4">
                                         {variant.sku}
                                     </td>
@@ -142,9 +151,6 @@ export default function ProductVariantPage() {
                                                 <Edit size={18} />
                                             </button>
 
-                                            <button className="p-2 rounded-lg border text-red-500 hover:bg-red-50">
-                                                <Trash2 size={18} />
-                                            </button>
 
                                         </div>
 
@@ -173,6 +179,11 @@ export default function ProductVariantPage() {
                             <div className="flex justify-between mb-4">
 
                                 <div>
+                                    <img
+                                        src={`${import.meta.env.VITE_IMAGE_URL}/files/variant_images/${variant.image}`}
+                                        alt="Product Image"
+                                        className="w-20 h-20 rounded-lg"
+                                    />
 
                                     <h3 className="font-semibold text-slate-800">
                                         {variant.variant_name}
@@ -217,13 +228,11 @@ export default function ProductVariantPage() {
 
                             <div className="flex gap-2 mt-5">
 
-                                <button className="flex-1 border rounded-xl py-2">
+                                <button className="flex-1 bg-sky-500 text-white border rounded-xl py-2">
+                                    
                                     Edit
                                 </button>
 
-                                <button className="flex-1 bg-red-500 text-white rounded-xl py-2">
-                                    Delete
-                                </button>
 
                             </div>
 

@@ -1,29 +1,32 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { useState } from "react";
-import { ArrowLeft, Upload, Save, Plus, X } from "lucide-react";
+import { ArrowLeft, Upload, Save, Plus, X, Edit } from "lucide-react";
 import { Link, router, usePage } from "@inertiajs/react";
 import Swal from "sweetalert2";
 
 
-export default function AddNewItemPage() {
+export default function productEditPage() {
   const [preview, setPreview] = useState<string | null>(null);
 
-  const { categories,brands,products } = usePage().props as any;
+  const { categories,brands,products,allProducts } = usePage().props as any;
 
   const [ showCategoryModal,setShowCategoryModal] = useState(false);
 
   const [ showBrandModal, setShowBrandModal ] = useState(false);
 
+  const [ editOn, setEditOn ] = useState(false);
+
   const [ saving, setSaving ] = useState(false);
 
 const [ product, setProduct ] = useState({
-      'category_id':"",
-      'brand_id':"",
-      'name':"",
-      'short_description':"",
-      'description':"",
+        'id' : products.id,
+      'category_id': products.category_id,
+      'brand_id': products.brand_id,
+      'name':products.name,
+      'short_description':products.short_description,
+      'description':products.description,
       'featured_image':  null as File | null,
-      'is_active':true,
+      'is_active':products.is_active,
 });
 
 const [ category, setCategory ] = useState({
@@ -121,31 +124,41 @@ const handleSubmitProduct = (e: React.FormEvent) => {
   e.preventDefault();
 
    // CHECK DUPLICATE
-      const productExist = products.some(
-      (d: any) => d.name.toLowerCase() === product.name.toLowerCase()
-    );
+      const productExist = allProducts.some(
+    (d: any) =>
+        d.id !== product.id &&
+        d.name.toLowerCase() === product.name.toLowerCase()
+        );
 
-    if (productExist) {
-      Swal.fire("Duplicate", "Product Already exists", "warning");
-      return;
-    }
+        if (productExist) {
+        Swal.fire(
+            "Duplicate",
+            "Product already exists.",
+            "warning"
+        );
+        return;
+        }
+
     setSaving(true);
-  router.post('/admin/products/add-product',product,{
-
+  router.post(`/admin/products/${products.slug}/save`,{...product,_method: "put",},{
+    forceFormData: true,
+    
     onSuccess: () =>{
       setProduct({
-      'category_id':"",
-      'brand_id':"",
-      'name':"",
-      'short_description':"",
-      'description':"",
+        'id': products.id,
+      'category_id': products.category_id,
+      'brand_id': products.brand_id,
+      'name':products.name,
+      'short_description':products.short_description,
+      'description':products.description,
       'featured_image':  null as File | null,
-      'is_active':true,
+      'is_active':products.is_active,
       });
       setSaving(false);
+
     },
     onError: (error) => {
-      //console.log(error);
+      console.log(error);
     },
 
   });
@@ -174,11 +187,11 @@ const handleSubmitProduct = (e: React.FormEvent) => {
 
         <div>
           <h1 className="text-3xl font-bold text-slate-800">
-            Add New Product
+            {products.name} Product Details
           </h1>
 
           <p className="text-gray-500">
-            Create a new item in the master list
+            View and Edit product details in the master list
           </p>
         </div>
 
@@ -214,25 +227,13 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                 value={product.name}
                 onChange={(e) => setProduct({...product, name: e.target.value})}
                 placeholder="Enter Product Name"
-                className="w-full border rounded-xl px-4 py-3"
+                className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'} `}
                 maxLength={50}
+                disabled={!editOn}
+               
               />
             </div>
 
-            {/* Slug 
-
-            <div>
-              <label className="block text-sm font-medium mb-2">
-                Slug *
-              </label>
-
-              <input
-                type="text"
-                placeholder="nike-air-max"
-                className="w-full border rounded-xl px-4 py-3"
-              />
-            </div>
-              */}
 
            {/* Category & Brand */}
 
@@ -248,10 +249,12 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                 <div className="flex gap-2">
 
                   <select
-                    className="flex-1 border rounded-xl px-4 py-3"
+                    className={`flex-1 border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white' }`}
+                    
                     required
                     value={product.category_id}
                     onChange={(e) => setProduct({...product, category_id: e.target.value})}
+                    disabled={!editOn}
                   >
                     <option value="" >Select Category</option>
                     {categories.map((category: any) => (
@@ -262,6 +265,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                   </select>
 
                   <button
+                    hidden={!editOn}
                     onClick={() => setShowCategoryModal(true)}
                     className="bg-sky-500 hover:bg-sky-600 text-white px-4 rounded-xl flex items-center justify-center"
                   >
@@ -283,7 +287,8 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                 <div className="flex gap-2">
 
                   <select
-                    className="flex-1 border rounded-xl px-4 py-3"
+                    className={`flex-1 border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                    disabled={!editOn}
                     required
                     value={product.brand_id}
                     onChange={(e) => setProduct({...product, brand_id: e.target.value})}
@@ -297,6 +302,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                   </select>
 
                   <button
+                  hidden={!editOn}
                  onClick={() => setShowBrandModal(true)}
                   className="bg-sky-500 hover:bg-sky-600 text-white px-4 rounded-xl flex items-center justify-center"
                 >
@@ -319,12 +325,13 @@ const handleSubmitProduct = (e: React.FormEvent) => {
 
               <textarea
                 rows={3}
-                className="w-full border rounded-xl px-4 py-3"
+                className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
                 placeholder="Short summary..."
                 required
                 value={product.short_description}
                 onChange={(e) => setProduct({...product, short_description: e.target.value})}
                 maxLength={255}
+                disabled={!editOn}
               />
             </div>
 
@@ -337,12 +344,13 @@ const handleSubmitProduct = (e: React.FormEvent) => {
 
               <textarea
                 rows={8}
-                className="w-full border rounded-xl px-4 py-3"
+                className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
                 placeholder="Full product description..."
                 required
                 value={product.description}
                 onChange={(e) => setProduct({...product, description: e.target.value})}
                 maxLength={1000}
+                disabled={!editOn}
               />
             </div>
 
@@ -361,34 +369,37 @@ const handleSubmitProduct = (e: React.FormEvent) => {
               </h2>
 
               <label
-                className="border-2 border-dashed rounded-xl h-56 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500"
+                className={`border-2 border-dashed rounded-xl h-56 flex flex-col items-center justify-center ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'cursor-pointer hover:border-sky-500'}`}
               >
 
-                {product.featured_image ? (
-                  <img
+                {!product.featured_image 
+                    
+                ? 
+                 <img
+                    src={`${import.meta.env.VITE_IMAGE_URL}/files/product_images/${products.featured_image}`}
+                    alt=""
+                    className="w-full h-full object-cover rounded-xl"
+                  />
+                  
+                 :
+                                   <img
                     src={URL.createObjectURL(product.featured_image)}
                     alt=""
                     className="w-full h-full object-cover rounded-xl"
                   />
-                ) : (
-                  <>
-                    <Upload
-                      size={30}
-                      className="text-gray-400"
-                    />
-
-                    <span className="text-gray-500 mt-2">
-                      Upload Image
-                    </span>
-                  </>
-                )}
+                
+                }        
+                
 
                 <input
                   type="file"
                   hidden
                   accept="image/*"    
                   onChange={(e) => setProduct({...product, featured_image: e.target.files?.[0] || null,})}
+                    disabled={!editOn}
+                    
                 />
+                
 
               </label>
 
@@ -428,6 +439,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                         </span>
 
                         <button
+                           disabled={!editOn}
                             type="button"
                             onClick={() =>
                                 setProduct({
@@ -435,7 +447,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                                     is_active: !product.is_active,
                                 })
                             }
-                            className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${
+                            className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${!editOn ? "" : 'hover:cursor-pointer' } ${
                                 product.is_active
                                     ? "bg-sky-500"
                                     : "bg-gray-300"
@@ -448,31 +460,13 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                                         : ""
                                 }`}
                             />
+                            
                         </button>
                     </div>
                 </div>
             </div>
 
-            {/* Information */}
-
-            <div className="border rounded-2xl p-5 bg-sky-50">
-
-              <h2 className="font-semibold mb-3">
-                Next Step
-              </h2>
-
-              <p className="text-sm text-gray-600">
-                After saving this product,
-                you can create:
-              </p>
-
-              <ul className="mt-3 text-sm space-y-2 text-gray-700">
-                <li>• Product Variants</li>
-                <li>• Product Images</li>
-                <li>• Inventory Quantity</li>
-              </ul>
-
-            </div>
+            
 
           </div>
 
@@ -481,29 +475,42 @@ const handleSubmitProduct = (e: React.FormEvent) => {
         {/* Buttons */}
 
         <div className="border-t mt-8 pt-6 flex flex-col sm:flex-row gap-3 justify-end">
-
-          <Link
+           
+           <Link
           href="/admin/item-masterlist"
             className="px-6 py-3 border rounded-xl hover:bg-gray-100"
           >
             Cancel
           </Link>
-
-                              
-          <button
-            className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2"
-            disabled={saving}
-          >
-            <Save size={18} />
-            {!saving ? "Save Product" : "Saving..."}
-          </button>
-        
-
-
+            
+            
+                <button
+                    onClick={function(){setEditOn(true)}}
+                    type="button"
+                    className="px-6 py-3 bg-sky-500 hover:bg-sky-600 hover:cursor-pointer text-white rounded-xl flex items-center justify-center gap-2"     
+                    hidden={editOn}
+                >
+                    <Edit size={18} />
+                    Edit
+            </button>
+            
+            <button
+                    type="submit"
+                    className="px-6 py-3 bg-sky-500 hover:bg-sky-600 hover:cursor-pointer text-white rounded-xl flex items-center justify-center gap-2"
+                    disabled={saving}
+                    hidden={!editOn}           
+                >
+                    <Save size={18} />
+                    {!saving ? "Save" : "Saving..."}
+            </button> 
+            
+                             
         </div>
                
       </div>
-            </form>     
+       
+          </form>  
+           
 </div>
 
                 {/* ADD CATEGORY MODAL */}
@@ -602,6 +609,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
             </div>
 
             <div className="border-t p-6 flex justify-end gap-3">
+                
                 <button
                      type="button"
                      onClick={closeCategory}

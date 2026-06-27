@@ -9,6 +9,7 @@ export default function AddVariantPage() {
 
     const { products,categories } = usePage().props as any;
     const { errors } = usePage().props;
+    const [ saving, setSaving ] = useState(false);
 
     const [ product,setProduct ] = useState({
         sku: "",
@@ -27,11 +28,12 @@ export default function AddVariantPage() {
 
     const submitHandle = (e: React.FormEvent) => {
         e.preventDefault();
-
+        setSaving(true)
         router.post(`/admin/products/${products.slug}/variants/save`,product,{
 
             onSuccess:()=>{
                 console.log('success');
+                setSaving(false);
             },
             onError:(errors)=>{
                 setErrorMsg(errors.errorMsg);
@@ -91,7 +93,7 @@ export default function AddVariantPage() {
                     <div className="mt-4 flex items-center gap-4">
 
                         <img
-                            src="https://placehold.co/100x100"
+                            src={`${import.meta.env.VITE_IMAGE_URL}/files/product_images/${products.featured_image}`}
                             className="w-20 h-20 rounded-xl object-cover"
                         />
 
@@ -396,15 +398,26 @@ export default function AddVariantPage() {
 
                     <div className="border-t mt-8 pt-6 flex flex-col sm:flex-row gap-3 justify-end">
 
-                        <button className="px-6 py-3 border rounded-xl">
+                        <Link
+                        href={`/admin/products/${products.slug}/variants`}
+                        type="button"
+                        className="px-6 py-3 bg-white border rounded-xl hover:bg-gray-100">
                             Cancel
-                        </button>
+                        </Link>
 
-                        <button className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2">
+                         {!saving ?
+                         <button className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2">
                             <Save size={18} />
                             Save Variant
                         </button>
 
+                        :
+                        <button disabled className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2">
+                            <Save size={18} />
+                            Saving...
+                        </button>
+                        }                       
+                        
                     </div>
 
                 </div>

@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\VariantInventorie;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -37,5 +38,12 @@ class ProductVariant extends Model
     public function productimages(){
         return $this->hasMany(ProductImage::class,'product_variant_id','id');
     }
+
+protected function variant_name(): Attribute
+{
+    return Attribute::make(
+        set: fn ($value) => ucwords(strtolower($value)),
+    );
+}
 
 }

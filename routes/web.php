@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomersController;
+use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -54,22 +55,27 @@ Route::post('/admin/logout',[AdminController::class,'adminlogout'])->name('admin
         // ADD CATEGORY AND BRAND AND ADD PRODUCT
         
         // ADD CATEGORY POST
-Route::post('/admin/products/add-category',[AdminController::class,'adminAddCategory'])->name('addcategory')->middleware('staffonly');
+Route::post('/admin/products/add-category',[ProductController::class,'adminAddCategory'])->name('addcategory')->middleware('staffonly');
         // ADD BRAND POST
-Route::post('/admin/products/add-brand',[AdminController::class,'adminAddBrand'])->name('addbrand')->middleware('staffonly');
+Route::post('/admin/products/add-brand',[ProductController::class,'adminAddBrand'])->name('addbrand')->middleware('staffonly');
         // ADD PRODUCT POST
-Route::post('/admin/products/add-product',[AdminController::class,'adminAddProduct'])->name('addproduct')->middleware('staffonly');
+Route::post('/admin/products/add-product',[ProductController::class,'adminAddProduct'])->name('addproduct')->middleware('staffonly');
         // GO TO VARIANT PAGE
-Route::get('/admin/products/{slug}/variants',[AdminController::class,'goToProductVariant'])->name('gotoproductvariant')->middleware('staffonly');
+Route::get('/admin/products/{slug}/variants',[ProductController::class,'goToProductVariant'])->name('gotoproductvariant')->middleware('staffonly');
         // GO TO ADD VARIANTPAGE
-Route::get('/admin/products/{slug}/variants/create',[AdminController::class,'goToCreateProductVariant'])->name('gotocreateproductvariant')->middleware('staffonly');
+Route::get('/admin/products/{slug}/variants/create',[ProductController::class,'goToCreateProductVariant'])->name('gotocreateproductvariant')->middleware('staffonly');
        // SAVE PRODUCT VARIANT
-Route::post('/admin/products/{slug}/variants/save',[AdminController::class,'saveVariant'])->name('savevariant')->middleware('staffonly');
+Route::post('/admin/products/{slug}/variants/save',[ProductController::class,'saveVariant'])->name('savevariant')->middleware('staffonly');
+
+        // EDIT PAGES PRODUCTS AND VARIANTS GO AND SAVE CHANGES
+Route::get('/admin/products/{slug}/details',[ProductController::class,'productEditPage'])->name('productEditPage')->middleware('staffonly'); 
+
+Route::put('/admin/products/{slug}/save',[ProductController::class,'saveChanges'])->name('savechanges')->middleware('staffonly');
 
 // GOTO ITEM MASTELIST
-Route::get('/admin/item-masterlist',[AdminController::class,'goToItemMasterlist'])->name('itemmasterlist')->middleware('staffonly');
+Route::get('/admin/item-masterlist',[ProductController::class,'goToItemMasterlist'])->name('itemmasterlist')->middleware('staffonly');
 
-Route::get('/admin/product/create',[AdminController::class,'addproduct'])->name('addproduct')->middleware('staffonly');
+Route::get('/admin/product/create',[ProductController::class,'addproduct'])->name('addproduct')->middleware('staffonly');
 
 
 

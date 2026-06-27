@@ -1,5 +1,5 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
-import { Plus, Search, Edit, Trash2 } from "lucide-react";
+import { Plus, Search, Edit, Eye } from "lucide-react";
 import { useState } from "react";
 import { Link,usePage } from "@inertiajs/react";
 
@@ -163,9 +163,11 @@ export default function ProductMasterlist() {
 
                   <div className="flex gap-2">
 
-                    <button className="p-2 rounded-lg border hover:bg-slate-100">
-                      <Edit size={18} />
-                    </button>
+                    <Link 
+                    href={`/admin/products/${product.slug}/details`}
+                    className="p-2 rounded-lg border hover:bg-slate-100">
+                      <Eye size={18} />
+                    </Link>
 
                   </div>
 
@@ -194,8 +196,8 @@ export default function ProductMasterlist() {
             <div className="flex gap-4">
 
               <img
-                src={product.image}
-                alt=""
+                src={`${import.meta.env.VITE_IMAGE_URL}/files/product_images/${product.image}`}
+                alt="Product Image"
                 className="w-20 h-20 rounded-lg"
               />
 
@@ -231,9 +233,11 @@ export default function ProductMasterlist() {
 
             <div className="grid grid-cols-1 gap-2 mt-4">
 
-              <button className="bg-sky-500 text-white py-2 rounded-lg">
-                Edit
-              </button>
+              <Link 
+                href={`/admin/products/${product.slug}/details`}
+              className="bg-sky-500 text-white py-2 rounded-lg text-center">
+                View Details
+              </Link>
 
 
             </div>

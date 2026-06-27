@@ -6,6 +6,7 @@ use App\Models\Brand;
 use App\Models\Categorie;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -46,5 +47,12 @@ class Product extends Model
         return $this->hasMany(ProductImage::class,'product_id','id');
     }
     
+
+    protected function name(): Attribute
+{
+    return Attribute::make(
+        set: fn ($value) => ucwords(strtolower($value)),
+    );
+}
 
 }
