@@ -8,7 +8,7 @@ import Swal from "sweetalert2";
 export default function productEditPage() {
   const [preview, setPreview] = useState<string | null>(null);
 
-  const { categories,brands,products,allProducts } = usePage().props as any;
+  const { categories,brands,products,allProducts,variants } = usePage().props as any;
 
   const [ showCategoryModal,setShowCategoryModal] = useState(false);
 
@@ -104,6 +104,7 @@ const handleSubmitBrand = (e: React.FormEvent) => {
           });
           setShowBrandModal(false);
           setSaving(false);
+          
         },
         onError: (error) => {
           
@@ -144,21 +145,17 @@ const handleSubmitProduct = (e: React.FormEvent) => {
     forceFormData: true,
     
     onSuccess: () =>{
-      setProduct({
-        'id': products.id,
-      'category_id': products.category_id,
-      'brand_id': products.brand_id,
-      'name':products.name,
-      'short_description':products.short_description,
-      'description':products.description,
-      'featured_image':  null as File | null,
-      'is_active':products.is_active,
+      Swal.fire({
+            title:"Product updated successfully.",
+             timer: 1500,
       });
+      
       setSaving(false);
+      setEditOn(false);
 
     },
     onError: (error) => {
-      console.log(error);
+      //console.log(error);
     },
 
   });
@@ -361,48 +358,67 @@ const handleSubmitProduct = (e: React.FormEvent) => {
           <div className="space-y-5">
 
             {/* Featured Image */}
-
             <div className="border rounded-2xl p-5">
+                <h2 className="font-semibold mb-4">
+                    Featured Image
+                </h2>
 
-              <h2 className="font-semibold mb-4">
-                Featured Image
-              </h2>
+                <label
+                    className={`
+                        relative
+                        block
+                        h-76
+                        overflow-hidden
+                        rounded-xl
+                        border-2
+                        border-dashed
+                        ${
+                            !editOn
+                                ? "bg-gray-100 cursor-not-allowed"
+                                : "cursor-pointer hover:border-sky-500"
+                        }
+                    `}
+                >
+                    {!product.featured_image ? (
+                        <img
+                            src={`${import.meta.env.VITE_IMAGE_URL}/files/product_images/${products.featured_image}`}
+                            alt=""
+                            className="absolute inset-0 h-full w-full object-cover"
+                        />
+                    ) : (
+                        <img
+                            src={URL.createObjectURL(product.featured_image)}
+                            alt=""
+                            className="absolute inset-0 h-full w-full object-cover"
+                        />
+                    )}
 
-              <label
-                className={`border-2 border-dashed rounded-xl h-56 flex flex-col items-center justify-center ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'cursor-pointer hover:border-sky-500'}`}
-              >
+                    {!products.featured_image && !product.featured_image && (
+                        <div className="flex h-full flex-col items-center justify-center">
+                            <Upload
+                                size={30}
+                                className="text-gray-400"
+                            />
+                            <span className="mt-2 text-gray-500">
+                                Upload Image
+                            </span>
+                        </div>
+                    )}
 
-                {!product.featured_image 
-                    
-                ? 
-                 <img
-                    src={`${import.meta.env.VITE_IMAGE_URL}/files/product_images/${products.featured_image}`}
-                    alt=""
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                  
-                 :
-                                   <img
-                    src={URL.createObjectURL(product.featured_image)}
-                    alt=""
-                    className="w-full h-full object-cover rounded-xl"
-                  />
-                
-                }        
-                
-
-                <input
-                  type="file"
-                  hidden
-                  accept="image/*"    
-                  onChange={(e) => setProduct({...product, featured_image: e.target.files?.[0] || null,})}
-                    disabled={!editOn}
-                    
-                />
-                
-
-              </label>
-
+                    <input
+                        type="file"
+                        hidden
+                        accept="image/*"
+                        disabled={!editOn}
+                        onChange={(e) =>
+                            setProduct({
+                                ...product,
+                                featured_image:
+                                    e.target.files?.[0] || null,
+                            })
+                        }
+                    />
+                </label>
             </div>
 
             {/* Status */}
@@ -447,7 +463,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                                     is_active: !product.is_active,
                                 })
                             }
-                            className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${!editOn ? "" : 'hover:cursor-pointer' } ${
+                            className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${!editOn ? 'hover:cursor-not-allowed' : 'hover:cursor-pointer' } ${
                                 product.is_active
                                     ? "bg-sky-500"
                                     : "bg-gray-300"
@@ -510,6 +526,194 @@ const handleSubmitProduct = (e: React.FormEvent) => {
       </div>
        
           </form>  
+
+
+
+          {/* Product Variants */}
+            <div className="mt-8 bg-white rounded-2xl shadow-sm p-6">
+
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-800">
+                            Product Variants
+                        </h2>
+
+                        <p className="text-gray-500">
+                            Manage product sizes, prices, and inventory.
+                        </p>
+                    </div>
+
+                    <Link
+                        href={`/admin/products/${products.slug}/variants/add`}
+                        className="inline-flex items-center gap-2 px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl"
+                    >
+                        <Plus size={18} />
+                        Add Variant
+                    </Link>
+                </div>
+
+                {/* Desktop Table */}
+                <div className="hidden lg:block overflow-x-auto">
+                    <table className="w-full">
+                        <thead>
+                            <tr className="border-b text-left text-sm text-gray-500">
+                                <th className="py-3">Image</th>
+                                <th className="py-3">SKU</th>
+                                <th className="py-3">Variant Name</th>
+                                <th className="py-3">Price</th>
+                                <th className="py-3">Stocks</th>
+                                <th className="py-3">Status</th>
+                                <th className="py-3 text-right">
+                                    Action
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            {variants.map((variant: any) => (
+                                <tr
+                                    key={variant.id}
+                                    className="border-b hover:bg-slate-50"
+                                >
+                                    <td className="py-4">
+                                        <img
+                                            src={`${import.meta.env.VITE_IMAGE_URL}/files/variant_images/${variant.image}`}
+                                            className="w-14 h-14 rounded-xl object-cover border"
+                                        />
+                                    </td>
+
+                                    <td className="font-medium">
+                                        {variant.sku}
+                                    </td>
+
+                                    <td>
+                                        {variant.variant_name}
+                                    </td>
+
+                                    <td>
+                                        ₱
+                                        {Number(
+                                            variant.selling_price
+                                        ).toFixed(2)}
+                                    </td>
+
+                                    <td>
+                                        {variant.quantity_on_hand}
+                                    </td>
+
+                                    <td>
+                                        <span
+                                            className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                                variant.is_active
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-red-100 text-red-700"
+                                            }`}
+                                        >
+                                            {variant.is_active
+                                                ? "Active"
+                                                : "Inactive"}
+                                        </span>
+                                    </td>
+
+                                    <td className="text-right">
+                                        <Link
+                                            href={`/admin/products/${products.slug}/variants/${variant.id}`}
+                                            className="inline-flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-slate-100"
+                                        >
+                                            <Edit size={16} />
+                                            Details
+                                        </Link>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+
+                {/* Mobile Cards */}
+                <div className="lg:hidden space-y-4">
+                    {variants.map((variant: any) => (
+                        <div
+                            key={variant.id}
+                            className="border rounded-2xl p-4"
+                        >
+                            <div className="flex gap-4">
+
+                                <img
+                                    src={`${import.meta.env.VITE_IMAGE_URL}/files/variant_images/${variant.image}`}
+                                    className="w-20 h-20 rounded-xl object-cover border"
+                                />
+
+                                <div className="flex-1">
+
+                                    <h3 className="font-semibold">
+                                        {variant.variant_name}
+                                    </h3>
+
+                                    <p className="text-sm text-gray-500">
+                                        {variant.sku}
+                                    </p>
+
+                                    <p className="mt-2 font-medium text-sky-600">
+                                        ₱
+                                        {Number(
+                                            variant.selling_price
+                                        ).toFixed(2)}
+                                    </p>
+
+                                    <p className="text-sm text-gray-500">
+                                        Stocks:
+                                        {" "}
+                                        {variant.quantity_on_hand}
+                                    </p>
+
+                                    <span
+                                        className={`inline-block mt-2 px-3 py-1 rounded-full text-xs ${
+                                            variant.is_active
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-red-100 text-red-700"
+                                        }`}
+                                    >
+                                        {variant.is_active
+                                            ? "Active"
+                                            : "Inactive"}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <Link
+                                href={`/admin/products/${products.slug}/variants/${variant.id}`}
+                                className="mt-4 w-full flex items-center justify-center gap-2 border rounded-xl py-3 hover:bg-slate-100"
+                            >
+                                <Edit size={16} />
+                                View Details
+                            </Link>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Empty State */}
+                {variants.length === 0 && (
+                    <div className="text-center py-16">
+                        <h3 className="text-lg font-semibold text-gray-700">
+                            No variants found
+                        </h3>
+
+                        <p className="text-gray-500 mt-2">
+                            Create your first product variant.
+                        </p>
+
+                        <Link
+                            href={`/admin/products/${products.slug}/variants/add`}
+                            className="inline-flex items-center gap-2 mt-5 px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl"
+                        >
+                            <Plus size={18} />
+                            Add Variant
+                        </Link>
+                    </div>
+                )}
+
+            </div>
            
 </div>
 
@@ -570,42 +774,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                         maxLength={255}
                     />
                 </div>
-                  {/* 
-                <div className="flex items-center justify-between border rounded-xl p-4">
-
-                    <div>
-                        <h3 className="font-medium">
-                            Active Status
-                        </h3>
-
-                        <p className="text-sm text-gray-500">
-                            Category is visible.
-                        </p>
-                    </div>
-
-                    
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setCategory({...category, is_active: !category.is_active,})
-                        }
-                        className={`w-14 h-8 rounded-full transition relative ${
-                            category.is_active
-                                ? "bg-sky-500"
-                                : "bg-gray-300"
-                        }`}
-                    >
-                        <span
-                            className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition ${
-                                category.is_active
-                                    ? "translate-x-6"
-                                    : ""
-                            }`}
-                        />
-                    </button>
-
-                </div>
-                  */}
+              
             </div>
 
             <div className="border-t p-6 flex justify-end gap-3">
@@ -726,42 +895,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                         required
                         maxLength={255}
                     />
-                </div>
-                
-                          {/*
-                <div className="flex items-center justify-between border rounded-xl p-4">
-
-                    <div>
-                        <h3 className="font-medium">
-                            Active Status
-                        </h3>
-
-                        <p className="text-sm text-gray-500">
-                            Brand is visible.
-                        </p>
-                    </div>
-
-                     <button
-                        type="button"
-                        onClick={() =>
-                            setBrandActive(!brandActive)
-                        }
-                        className={`w-14 h-8 rounded-full transition ${
-                            brandActive
-                                ? "bg-sky-500"
-                                : "bg-gray-300"
-                        } relative`}
-                    >
-                        <span
-                            className={`absolute top-1 left-1 w-6 h-6 bg-white rounded-full transition ${
-                                brandActive
-                                    ? "translate-x-6"
-                                    : ""
-                            }`}
-                        />
-                    </button>
-                        
-                </div>*/}
+                </div>          
 
             </div>
 

@@ -1,42 +1,47 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { Link,usePage,router } from "@inertiajs/react";
-import { ArrowLeft, Upload, Save } from "lucide-react";
+import { ArrowLeft, Upload, Save, Edit } from "lucide-react";
 import { useState } from "react";
 
 
-export default function AddVariantPage() {
+export default function EditVariantPage() {
     const [preview, setPreview] = useState<string | null>(null);
 
-    const { products,categories } = usePage().props as any;
+    const { products,categories,variants } = usePage().props as any;
     const { errors } = usePage().props;
     const [ saving, setSaving ] = useState(false);
+    const [ editOn, setEditOn ] = useState(false);
 
     const [ product,setProduct ] = useState({
-        sku: "",
-        barcode: "",
-        cost_price: "",
-        selling_price:"",
-        variant_name:"",
-        is_active:true,
+        sku: variants.sku,
+        barcode: variants.barcode,
+        cost_price: variants.cost_price,
+        selling_price:variants.selling_price,
+        variant_name:variants.variant_name,
+        is_active: variants.is_active,
         image:  null as File | null,
-        quantity_on_hand:"",
-        reorder_level:"",
+        quantity_on_hand: variants.quantity_on_hand,
+        reorder_level: variants.reorder_level,
 
     });
+
 
     const [ errorMsg,setErrorMsg]=useState("");
 
     const submitHandle = (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true)
-        router.post(`/admin/products/${products.slug}/variants/save`,product,{
+
+        router.post(`/admin/products/${products.slug}/variants/${variants.id}/save`,{...product,_method:"put",},{
 
             onSuccess:()=>{
                 console.log('success');
                 setSaving(false);
             },
             onError:(errors)=>{
+                setSaving(false);
                 setErrorMsg(errors.errorMsg);
+                
                 console.log(errors);
             },
 
@@ -74,7 +79,7 @@ export default function AddVariantPage() {
                     </div>
 
                     <Link 
-                        href={`/admin/products/${products.slug}/variants`}
+                        href={`/admin/products/${products.slug}/details`}
                     className="flex items-center gap-2 border px-4 py-2 rounded-xl bg-white hover:bg-slate-100">
                         <ArrowLeft size={18} />
                         Back
@@ -99,11 +104,11 @@ export default function AddVariantPage() {
 
                         <div>
                             <h3 className="font-semibold text-lg">
-                               {products.name.toUpperCase()}
+                               {products.name}
                             </h3>
 
                             <p className="text-gray-500">
-                                {categories.name.toUpperCase()}
+                                {categories.name}
                             </p>
                         </div>
 
@@ -134,14 +139,14 @@ export default function AddVariantPage() {
 
                                     <input
                                         type="text"
-                                        className="w-full border rounded-xl px-4 py-3"
+                                        className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
                                         placeholder="NIKE-BLK-8"
                                         required
                                         maxLength={16}
                                         minLength={6}
                                         value={product.sku}
                                         onChange={(e) => setProduct({...product, sku: e.target.value})}
-                                    
+                                        disabled={!editOn}
                                     />
                                 </div>
 
@@ -154,12 +159,13 @@ export default function AddVariantPage() {
 
                                     <input
                                         type="text"
-                                        className="w-full border rounded-xl px-4 py-3"
+                                        className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
                                         placeholder="123456789"
                                         min={4}
                                         maxLength={50}
                                         value={product.barcode}
                                         onChange={(e) => setProduct({...product, barcode: e.target.value})}
+                                        disabled={!editOn}
                                     />
                                 </div>
 
@@ -174,13 +180,14 @@ export default function AddVariantPage() {
 
                                 <input
                                     type="text"
-                                    className="w-full border rounded-xl px-4 py-3"
+                                    className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
                                     placeholder="Black Size 8"
                                     required
                                     minLength={6}
                                     maxLength={50}
                                     value={product.variant_name}
                                     onChange={(e) => setProduct({...product, variant_name: e.target.value})}
+                                    disabled={!editOn}
                                 />
                             </div>
 
@@ -193,12 +200,13 @@ export default function AddVariantPage() {
 
                                     <input
                                         type="number"
-                                        className="w-full border rounded-xl px-4 py-3"
+                                        className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
                                         placeholder="3000.00"
                                         required
                                         maxLength={12}
                                         value={product.cost_price}
                                         onChange={(e) => setProduct({...product, cost_price: e.target.value})}
+                                        disabled={!editOn}
                                     />
                                 </div>
 
@@ -211,12 +219,13 @@ export default function AddVariantPage() {
 
                                     <input
                                         type="number"
-                                        className="w-full border rounded-xl px-4 py-3"
+                                        className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
                                         placeholder="4999.00"
                                         required
                                         maxLength={12}
                                         value={product.selling_price}
                                         onChange={(e) => setProduct({...product, selling_price: e.target.value})}
+                                        disabled={!editOn}
                                     />
                                 </div>
 
@@ -231,12 +240,13 @@ export default function AddVariantPage() {
 
                                     <input
                                         type="number"
-                                        className="w-full border rounded-xl px-4 py-3"
+                                        className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
                                         placeholder="20"
                                         maxLength={6}
                                         required
                                         value={product.quantity_on_hand}
                                         onChange={(e) => setProduct({...product, quantity_on_hand: e.target.value})}
+                                        disabled={!editOn}
                                     />
                                 </div>
 
@@ -247,12 +257,13 @@ export default function AddVariantPage() {
 
                                     <input
                                         type="number"
-                                        className="w-full border rounded-xl px-4 py-3"
+                                        className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
                                         placeholder="5"
                                         required
                                         maxLength={5}
                                         value={product.reorder_level}
                                         onChange={(e) => setProduct({...product, reorder_level: e.target.value})}
+                                        disabled={!editOn}
                                     />
                                 </div>
 
@@ -272,34 +283,62 @@ export default function AddVariantPage() {
                                     Variant Image
                                 </h2>
 
-                                <label className="border-2 border-dashed rounded-xl h-56 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500">
-
-                                    {product.image ? (
-                                        <img
-                                            src={URL.createObjectURL(product.image)}
-                                            className="w-full h-full object-cover rounded-xl"
-                                        />
-                                    ) : (
-                                        <>
-                                            <Upload
-                                                size={30}
-                                                className="text-gray-400"
-                                            />
-
-                                            <span className="mt-2 text-gray-500">
-                                                Upload Image
-                                            </span>
-                                        </>
-                                    )}
-
-                                    <input
-                                        type="file"
-                                        hidden
-                                        accept="image/*"
-                                        onChange={(e) => setProduct({...product, image: e.target.files?.[0] || null,})}
+                                 <label
+                                className={`
+                                    relative
+                                    block
+                                    h-76
+                                    overflow-hidden
+                                    rounded-xl
+                                    border-2
+                                    border-dashed
+                                    ${
+                                        !editOn
+                                            ? "bg-gray-100 cursor-not-allowed"
+                                            : "cursor-pointer hover:border-sky-500"
+                                    }
+                                `}
+                            >
+                                {!product.image ? (
+                                    <img
+                                        src={`${import.meta.env.VITE_IMAGE_URL}/files/variant_images/${variants.image}`}
+                                        alt=""
+                                        className="absolute inset-0 h-full w-full object-cover"
                                     />
+                                ) : (
+                                    <img
+                                        src={URL.createObjectURL(product.image)}
+                                        alt=""
+                                        className="absolute inset-0 h-full w-full object-cover"
+                                    />
+                                )}
 
-                                </label>
+                                {!variants.image && !product.image && (
+                                    <div className="flex h-full flex-col items-center justify-center">
+                                        <Upload
+                                            size={30}
+                                            className="text-gray-400"
+                                        />
+                                        <span className="mt-2 text-gray-500">
+                                            Upload Image
+                                        </span>
+                                    </div>
+                                )}
+
+                                <input
+                                    type="file"
+                                    hidden
+                                    accept="image/*"
+                                    disabled={!editOn}
+                                    onChange={(e) =>
+                                        setProduct({
+                                            ...product,
+                                            image:
+                                                e.target.files?.[0] || null,
+                                        })
+                                    }
+                                />
+                            </label>
 
                             </div>
 
@@ -344,7 +383,8 @@ export default function AddVariantPage() {
                                                 is_active: !product.is_active,
                                             })
                                         }
-                                        className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${
+                                        disabled={!editOn}
+                                        className={`relative h-8 w-14 ${!editOn ? 'hover:cursor-not-allowed' : 'hover:cursor-pointer'} rounded-full transition-colors duration-300 ${
                                             product.is_active
                                                 ? "bg-sky-500"
                                                 : "bg-gray-300"
@@ -399,24 +439,30 @@ export default function AddVariantPage() {
                     <div className="border-t mt-8 pt-6 flex flex-col sm:flex-row gap-3 justify-end">
 
                         <Link
-                        href={`/admin/products/${products.slug}/variants`}
+                        href={`/admin/products/${products.slug}/details`}
                         type="button"
                         className="px-6 py-3 bg-white border rounded-xl hover:bg-gray-100">
                             Cancel
                         </Link>
 
-                         {!saving ?
-                         <button className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2">
-                            <Save size={18} />
-                            Save Variant
+                        <button
+                                onClick={function(){setEditOn(true)}}
+                                type="button"
+                                className="px-6 py-3 bg-sky-500 hover:bg-sky-600 hover:cursor-pointer text-white rounded-xl flex items-center justify-center gap-2"     
+                                hidden={editOn}
+                                disabled={editOn}
+                            >
+                                <Edit size={18} />
+                                Edit
                         </button>
 
-                        :
-                        <button disabled className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2">
+                         
+                        <button disabled={saving} hidden={!editOn} className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2">
                             <Save size={18} />
-                            Saving...
+                            {!saving ? "Save Variant" : "Saving..."}
+                            
                         </button>
-                        }                       
+                                             
                         
                     </div>
 

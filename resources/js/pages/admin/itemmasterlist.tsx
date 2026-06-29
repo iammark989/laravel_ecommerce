@@ -165,8 +165,10 @@ export default function ProductMasterlist() {
 
                     <Link 
                     href={`/admin/products/${product.slug}/details`}
-                    className="p-2 rounded-lg border hover:bg-slate-100">
+                    className="inline-flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-slate-100"
+                                        >
                       <Eye size={18} />
+                      Details
                     </Link>
 
                   </div>

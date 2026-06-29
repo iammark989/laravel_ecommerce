@@ -11,6 +11,7 @@ use App\Models\VariantInventorie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 
 class ProductController extends Controller
@@ -128,55 +129,21 @@ class ProductController extends Controller
 
 
         $newProduct = Product::create($incomingFields);
-        return redirect("/admin/products/{$newProduct->slug}/variants");
+        return redirect("/admin/products/{$newProduct->slug}/details");
 
     }
 
-    // GO TO VARIANT PAGE
-        public function goToProductVariant($slug){
-            $products = Product::where('slug','=',$slug)->firstOrFail();
-            $categories = Categorie::where('id',$products->category_id)->firstOrFail();
-            $variants = DB::table('product_variants as variants')
-                        ->leftJoin('variant_inventories as inventory','inventory.product_variant_id','=','variants.id')
-                        ->leftJoin('product_images as images','images.product_variant_id','=','variants.id')
-                        ->select(
-                            'variants.id as id',
-                            'variants.sku as sku',
-                            'variants.selling_price as selling_price',
-                            'variants.variant_name as variant_name',
-                            'variants.is_active as is_active',
-                            'inventory.quantity_on_hand as quantity_on_hand',
-                            'images.image as image',
-                        )
-                        ->where('variants.product_id','=',$products->id)
-                        ->groupBy(
-                            'variants.id',
-                            'variants.sku',
-                            'variants.selling_price',
-                            'variants.variant_name',
-                            'variants.is_active',
-                            'inventory.quantity_on_hand',
-                            'images.image',
-                        )
-                        ->get();
-            
-            return Inertia::render('admin/productvariantpage',[
-                'products' => $products,
-                'variants' => $variants,
-                'categories' => $categories,
-            ]);
-        }
 
-    // GO TO CREATE VARIANT
+    // GO TO ADD VARIANT
         public function goToCreateProductVariant($slug){
             $products = Product::where('slug','=',$slug)->firstOrFail();
             $categories = Categorie::where('id',$products->category_id)->firstOrFail();
-            return Inertia::render('admin/productvariantcreate',[
+            return Inertia::render('admin/productvariantadd',[
                 'products' => $products, 'categories' => $categories,
             ]);
         }
 
-    // SAVE CREATEAD VARIANT
+    // SAVE CREATED VARIANT
         public function saveVariant(Request $request,$slug){
             $incomingFields = $request->validate([
                 'sku' => 'required|string|max:50|unique:product_variants,sku',
@@ -234,10 +201,12 @@ class ProductController extends Controller
                         'sort_order' =>$incomingFields['sort_order'],
                         ]);
                 }
+            }else{
+                $incomingFields['image'] = "fallback-image.png";
             }
 
            });
-           return redirect("/admin/products/{$slug}/variants");     
+           return redirect("/admin/products/{$slug}/details");     
 
         }
 
@@ -272,14 +241,48 @@ class ProductController extends Controller
                         )
                         ->where('product.slug','=',$slug)
                         ->firstOrFail();
+            $variants = DB::table('product_variants as variant')
+                        ->leftJoin('product_images as image','image.product_variant_id','=','variant.id')
+                        ->leftJoin('variant_inventories as inventory','inventory.product_variant_id','=','variant.id')
+                        ->select(
+                            'variant.id as id',
+                            'variant.product_id as product_id',
+                            'variant.sku as sku',
+                            'variant.barcode as barcode',
+                            'variant.selling_price as selling_price',
+                            'variant.variant_name as variant_name',
+                            'variant.is_active as is_active',
+                            'image.image as image',
+                            'inventory.quantity_on_hand as quantity_on_hand',
+                            'inventory.reorder_level as reorder_level',
+                        )
+                        ->groupBy(
+                            'variant.id',
+                            'variant.product_id',
+                            'variant.sku',
+                            'variant.barcode',
+                            'variant.selling_price',
+                            'variant.variant_name',
+                            'variant.is_active',
+                            'image.image',
+                            'inventory.quantity_on_hand',
+                            'inventory.reorder_level',
+                        )
+                        ->where('variant.product_id','=',$products->id)
+                        ->get();
+
             
             $allProducts = Product::get();
             return Inertia::render('admin/producteditpage',[
-                'products' => $products, 'brands' => $brands, 'categories' => $categories,'allProducts' => $allProducts,
+                'products' => $products,
+                'brands' => $brands,
+                'categories' => $categories,
+                'allProducts' => $allProducts,
+                'variants' => $variants,
             ]);
         }
 
-        // SAVE EDIT / UPDATE ON PRODUCT
+        // SAVE EDIT / UPDATE ON PRODUCT DETAILS PAGE
     public function saveChanges(Request $request,$slug){
             $incomingFields = $request->validate([
             'category_id' => 'required',
@@ -324,6 +327,141 @@ class ProductController extends Controller
 
         $currentDetails->update($incomingFields);
     
-
+       return redirect("/admin/products/{$currentDetails->slug}/details")->with('success','Product updated successfully.');
     }
+
+        // GO TO VARIANT DETAILS PAGE AND EDIT 
+    public function variantEditPage($slug,$variantid){
+        $products = Product::where('slug','=',$slug)->firstOrFail();
+        $categories = Categorie::where('id','=',$products->category_id)->firstOrfail();
+        $variants = DB::table('product_variants as variant')
+                        ->leftJoin('product_images as image','image.product_variant_id','=','variant.id')
+                        ->leftJoin('variant_inventories as inventory','inventory.product_variant_id','=','variant.id')
+                        ->select(
+                            'variant.id as id',
+                            'variant.product_id as product_id',
+                            'variant.sku as sku',
+                            'variant.barcode as barcode',
+                            'variant.cost_price as cost_price',
+                            'variant.selling_price as selling_price',
+                            'variant.variant_name as variant_name',
+                            'variant.is_active as is_active',
+                            'image.image as image',
+                            'inventory.quantity_on_hand as quantity_on_hand',
+                            'inventory.reorder_level as reorder_level',
+                        )
+                        ->groupBy(
+                            'variant.id',
+                            'variant.product_id',
+                            'variant.sku',
+                            'variant.barcode',
+                            'variant.cost_price',
+                            'variant.selling_price',
+                            'variant.variant_name',
+                            'variant.is_active',
+                            'image.image',
+                            'inventory.quantity_on_hand',
+                            'inventory.reorder_level',
+                        )
+                        ->where('variant.id','=',$variantid)
+                        ->firstOrFail();
+        return Inertia::render('admin/productvariantedit',[
+            'variants' => $variants,
+            'categories' => $categories,
+            'products' => $products,
+        ]);
+    }
+
+    // SAVE/UPDATE CHANGES ON VARIANT
+    public function savechangesvariant(Request $request,$slug,$variantid){
+            $products = Product::where('slug','=',$slug)->firstOrFail();
+            $currentVariant = ProductVariant::where('id','=',$variantid)->firstOrfail();
+            $currentVariantImage = ProductImage::where('product_variant_id','=',$variantid)->first();
+            $currentInventory = VariantInventorie::where('product_variant_id','=',$variantid)->firstOrFail();
+        $incomingFields = $request->validate([
+                    'sku' => [
+                        'required',
+                        'string',
+                        'max:50',
+                        Rule::unique('product_variants', 'sku')
+                            ->ignore($variantid),
+                    ],
+
+                    'barcode' => [
+                        'nullable',
+                        'alpha_num',
+                        'max:100',
+                        Rule::unique('product_variants', 'barcode')
+                            ->ignore($variantid),
+                    ],
+
+                    'variant_name' => [
+                        'required',
+                        'string',
+                        'max:100',
+                        Rule::unique('product_variants')
+                        ->where(function ($query) use ($currentVariant) {
+                            return $query->where(
+                                'product_id',
+                                $currentVariant->product_id
+                            );
+                        })
+                        ->ignore($variantid)
+                    ],
+
+                    'cost_price' => 'required|numeric|min:0',
+                    'selling_price' => 'required|numeric|min:0|gte:cost_price',
+                    'is_active' => 'required|boolean',
+                    'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                    'quantity_on_hand' => 'required|numeric|min:0',
+                    'reorder_level' => 'required|numeric|min:0',
+                ]);
+
+       
+ DB::transaction(function () use ($request, $incomingFields, $products, $currentVariant, $currentVariantImage, $currentInventory) {
+        if(!$request->hasFile('image')){
+                 $incomingFields['image'] = $currentVariantImage->image;
+            }else{
+                if (
+                        $currentVariantImage->image &&
+                        $currentVariantImage->image !== 'fallback_image.png'
+                    ) {
+                        $path = public_path(
+                            'files/variant_images/' .
+                            $currentVariantImage->image
+                        );
+
+                        if (file_exists($path)) {
+                            unlink($path);
+                        }
+                    }
+                    
+                $file = $request->file('image');
+                $extension = $file->getClientOriginalExtension();
+                $filename = Str::slug($incomingFields['variant_name']) . uniqid() ."." . $extension;
+                
+                $file->move(public_path('files/variant_images'), $filename);
+                $incomingFields['image'] = $filename;
+            }
+
+            $currentVariant->update([
+                'sku' => $incomingFields['sku'],
+                'barcode' => $incomingFields['barcode'],
+                'cost_price' => $incomingFields['cost_price'],
+                'selling_price' => $incomingFields['selling_price'],
+                'variant_name' => $incomingFields['variant_name'],
+                'is_active' => $incomingFields['is_active'],
+
+            ]);
+            $currentVariantImage->update([
+                'image' => $incomingFields['image'],
+            ]);
+            $currentInventory->update([
+                'quantity_on_hand' => $incomingFields['quantity_on_hand'],
+                'reorder_level' => $incomingFields['reorder_level'],
+            ]);
+        });
+            return redirect("/admin/products/{$slug}/details")->with('success','Product updated successfully.');
+    }
+    
 }

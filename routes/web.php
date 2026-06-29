@@ -60,16 +60,18 @@ Route::post('/admin/products/add-category',[ProductController::class,'adminAddCa
 Route::post('/admin/products/add-brand',[ProductController::class,'adminAddBrand'])->name('addbrand')->middleware('staffonly');
         // ADD PRODUCT POST
 Route::post('/admin/products/add-product',[ProductController::class,'adminAddProduct'])->name('addproduct')->middleware('staffonly');
-        // GO TO VARIANT PAGE
-Route::get('/admin/products/{slug}/variants',[ProductController::class,'goToProductVariant'])->name('gotoproductvariant')->middleware('staffonly');
-        // GO TO ADD VARIANTPAGE
-Route::get('/admin/products/{slug}/variants/create',[ProductController::class,'goToCreateProductVariant'])->name('gotocreateproductvariant')->middleware('staffonly');
+       // GO TO ADD VARIANTPAGE
+Route::get('/admin/products/{slug}/variants/add',[ProductController::class,'goToCreateProductVariant'])->name('gotocreateproductvariant')->middleware('staffonly');
        // SAVE PRODUCT VARIANT
 Route::post('/admin/products/{slug}/variants/save',[ProductController::class,'saveVariant'])->name('savevariant')->middleware('staffonly');
 
-        // EDIT PAGES PRODUCTS AND VARIANTS GO AND SAVE CHANGES
+        // PRODUCT DETAILS PAGE WITH VARIANT LIST AND EDIT PRODUCT DETAILS OPTIONS
 Route::get('/admin/products/{slug}/details',[ProductController::class,'productEditPage'])->name('productEditPage')->middleware('staffonly'); 
-
+        // VARIANT DETAILS WITH EDIT DETAILS OPTION
+Route::get('/admin/products/{slug}/variants/{variantid}',[ProductController::class,'variantEditPage'])->name('variantEditPage')->middleware('staffonly');
+        // SAVE VARIANT UPDATE
+Route::put('/admin/products/{slug}/variants/{variantid}/save',[ProductController::class,'savechangesvariant'])->name('savechangesvariant')->middleware('staffonly');
+        // SAVE PRODUCT UPDATE
 Route::put('/admin/products/{slug}/save',[ProductController::class,'saveChanges'])->name('savechanges')->middleware('staffonly');
 
 // GOTO ITEM MASTELIST
