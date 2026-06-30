@@ -38,9 +38,38 @@ const AdminLoginPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
-      <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
-        <div className="mb-8 text-center">
+
+    <div className="min-h-screen flex bg-slate-100">
+
+    {/* Left */}
+    <div className="hidden lg:flex lg:w-1/2 relative">
+      {/**
+        <img
+            src="/images/admin-login.jpg"
+            className="absolute inset-0 h-full w-full object-cover"
+        /> */}
+
+        <div className="absolute inset-0 bg-slate-900/60" />
+
+        <div className="relative z-10 flex flex-col justify-center p-16 text-white">
+            <h1 className="text-5xl font-bold">
+                Mark Shopping Spree
+            </h1>
+
+            <p className="mt-6 text-xl">
+                Manage your inventory, products,
+                and orders efficiently.
+            </p>
+        </div>
+    </div>
+
+    {/* Right */}
+    <div className="flex flex-1 items-center justify-center p-6">
+
+        <div className="w-full max-w-md bg-white rounded-3xl shadow-2xl p-8">
+          
+                      {/* Login Form */}
+             <div className="mb-8 text-center">
           <h1 className="text-3xl font-bold text-gray-800">
             Admin Login
           </h1>
@@ -98,8 +127,19 @@ const AdminLoginPage: React.FC = () => {
             Login
           </button>
         </form>
-      </div>
+        </div>
+
     </div>
+<div className="absolute inset-0 overflow-hidden pointer-events-none">
+              <div className="absolute top-20 left-20 w-20 h-20 rounded-full bg-blue-300 opacity-20 animate-bounce" />
+
+          <div className="absolute bottom-20 right-20 w-32 h-32 rounded-full bg-purple-300 opacity-20 animate-pulse" />
+
+          <div className="absolute top-1/2 right-10 w-16 h-16 rounded-full bg-sky-300 opacity-20 animate-ping" />
+          </div>
+</div>
+
+ 
   );
 };
 

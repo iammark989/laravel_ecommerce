@@ -35,14 +35,14 @@ export default function EditVariantPage() {
         router.post(`/admin/products/${products.slug}/variants/${variants.id}/save`,{...product,_method:"put",},{
 
             onSuccess:()=>{
-                console.log('success');
+               
                 setSaving(false);
             },
             onError:(errors)=>{
                 setSaving(false);
                 setErrorMsg(errors.errorMsg);
                 
-                console.log(errors);
+               
             },
 
         });
@@ -235,18 +235,18 @@ export default function EditVariantPage() {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Quantity On Hand <span className="text-red-500"> *</span>
+                                        Quantity On Hand 
                                     </label>
 
                                     <input
                                         type="number"
-                                        className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
+                                        className="w-full border rounded-xl px-4 py-3 bg-gray-100 cursor-not-allowed"
                                         placeholder="20"
                                         maxLength={6}
                                         required
                                         value={product.quantity_on_hand}
                                         onChange={(e) => setProduct({...product, quantity_on_hand: e.target.value})}
-                                        disabled={!editOn}
+                                        disabled
                                     />
                                 </div>
 

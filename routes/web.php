@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\CustomersController;
+use App\Http\Controllers\InventoryTransactionsController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
@@ -73,6 +74,15 @@ Route::get('/admin/products/{slug}/variants/{variantid}',[ProductController::cla
 Route::put('/admin/products/{slug}/variants/{variantid}/save',[ProductController::class,'savechangesvariant'])->name('savechangesvariant')->middleware('staffonly');
         // SAVE PRODUCT UPDATE
 Route::put('/admin/products/{slug}/save',[ProductController::class,'saveChanges'])->name('savechanges')->middleware('staffonly');
+
+
+        //INVENTORY TRANSACTIONS
+        // GO TO INVENTORY TRANSACTIONS
+Route::get('/admin/inventory-transactions',[InventoryTransactionsController::class,'goToInventoryTransactionsPage'])->name('gotoinventorytransactionspage')->middleware('staffonly');
+        // GO TO ADD NEW TRANSACTION
+Route::get('/admin/inventory-transactions/new-transaction',[InventoryTransactionsController::class,'goToNewInventoryTransactions'])->name('gotonewinventorytransactions')->middleware('staffonly');
+
+Route::get('/admin/variants/search',[InventoryTransactionsController::class, 'searchVariant'])->name('seasrchvariant')->middleware('staffonly');
 
 // GOTO ITEM MASTELIST
 Route::get('/admin/item-masterlist',[ProductController::class,'goToItemMasterlist'])->name('itemmasterlist')->middleware('staffonly');

@@ -26,10 +26,18 @@ return new class extends Migration
 
             $table->decimal('quantity',10,3);
 
-            $table->string('reference_type');
+            $table->string('reference_type')->nullable();
+            $table->string('invoice_no')->nullable();
             $table->string('reference_id');
+            
 
-            $table->text('remarks');
+            $table->decimal('quantity',10,3);
+            $table->decimal('stock_before',10,3);
+            $table->decimal('stock_after',10,3);
+
+            $table->text('remarks')->nullable();
+
+            $table->unsignedBigInteger('created_by');
 
             $table->timestamps();
         });

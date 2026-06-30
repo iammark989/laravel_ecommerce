@@ -143,7 +143,7 @@ class ProductController extends Controller
             ]);
         }
 
-    // SAVE CREATED VARIANT
+    // SAVE CREATED VARIANT / SAVE ADD VARIANT
         public function saveVariant(Request $request,$slug){
             $incomingFields = $request->validate([
                 'sku' => 'required|string|max:50|unique:product_variants,sku',
@@ -202,7 +202,12 @@ class ProductController extends Controller
                         ]);
                 }
             }else{
-                $incomingFields['image'] = "fallback-image.png";
+                $incomingFields['image'] = "fallback_image.png";
+                ProductImage::create([
+                        'product_variant_id' =>  $variant->id,
+                        'image' =>$incomingFields['image'],
+                        'sort_order' => 1,
+                        ]);
             }
 
            });

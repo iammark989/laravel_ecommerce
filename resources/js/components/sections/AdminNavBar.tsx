@@ -10,6 +10,7 @@ import {
   User,
   LogOut,
   UserCog,
+  Boxes,
 } from "lucide-react";
 
 export default function AdminNavbar() {
@@ -87,15 +88,15 @@ export default function AdminNavbar() {
                                   </Link>
 
                                   <Link
-                                    href="/items/search-item"
+                                    href="/admin/inventory-transactions"
                                     className="
                                       flex items-center gap-3
                                       px-4 py-3
                                       hover:bg-gray-50
                                     "
                                   >
-                                    <Package size={18} />
-                                    Search Item
+                                    <Boxes size={18} />
+                                    Inventory Transactions
                                   </Link>
 
                                   <Link
@@ -288,10 +289,10 @@ export default function AdminNavbar() {
                   </Link>
 
                   <Link
-                    href="/items/search-item"
+                    href="/admin/inventory-transactions"
                     className="px-4 py-2 hover:bg-gray-100"
                   >
-                    Search Item
+                    Inventory Transactions
                   </Link>
 
                   <Link
