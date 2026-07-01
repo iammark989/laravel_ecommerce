@@ -12,16 +12,28 @@ export default function AddTransactionPage() {
 
     const [searchResults, setSearchResults] = useState([]);
 
-    const [items, setItems] = useState<any[]>([]);
+    const [transaction, setTransaction] = useState({
+        transaction_type: "",
+        reason: "",
+        reference_type: "",
+        reference_number: "",
+        invoice_no: "",
+        remarks: "",
+    });
 
 
+    const [transactionItems, setTransactionItems] = useState<any[]>([]);
+
+
+        // remove item on the list
     const removeItem = (index: number) => {
-        setItems(items.filter((_, i) => i !== index));
+        setTransactionItems(transactionItems.filter((_, i) => i !== index));
     };
 
     const addItem = (variant: any) => {
 
-    const exists = items.some(
+            // put selected items and check duplicate on the list 
+    const exists = transactionItems.some(
         (item: any) =>
             item.variant_id === variant.id
     );
@@ -36,8 +48,8 @@ export default function AddTransactionPage() {
         return;
     }
 
-    setItems([
-        ...items,
+    setTransactionItems([
+        ...transactionItems,
         {
             variant_id: variant.id,
             sku: variant.sku,
@@ -46,8 +58,7 @@ export default function AddTransactionPage() {
             remarks: "",
             current_stock:
                 variant.quantity_on_hand,
-            new_stock:
-                variant.quantity_on_hand,
+
         },
     ]);
 
@@ -56,7 +67,7 @@ export default function AddTransactionPage() {
     setSearchResults([]);
 };
 
-
+// search items
 const searchVariants = async (value: string) => {
     setSearch(value);
 
@@ -84,6 +95,86 @@ const searchVariants = async (value: string) => {
 
     setLoading(false);
 };
+
+
+const transactionColors = {
+    stock_in: "bg-green-100 text-green-700",
+    stock_out: "bg-red-100 text-red-700",
+    adjustment: "bg-yellow-100 text-yellow-700",
+};
+
+// reason base on transaction type
+const transactionReasons = {
+    stock_in: [
+        "Supplier Delivery",
+        "Customer Return",
+        "Initial Stock",
+        "Transfer In",
+        "Correction",
+        "Other",
+    ],
+
+    stock_out: [
+        "Sale",
+        "Damage",
+        "Expired",
+        "Transfer Out",
+        "Lost",
+        "Sample",
+        "Other",
+    ],
+
+    adjustment: [
+        "Physical Count",
+        "Inventory Audit",
+        "Correction",
+    ],
+};
+
+const referenctType = {
+    stock_in :[
+            'Purchase Order',
+            'Supplier Delivery',
+            'Transfer Receipt',
+            'Opening Balance',
+    ],
+    stock_out:[
+            'Sales Order',
+            'Transfer Order',
+            'Damage Report',
+            'Disposal',
+    ],
+    adjustment:[
+            'Physical Count Sheet',
+            'Audit Report',
+            'Correction Memo',
+    ],
+}
+
+//calculate new stocks
+
+const calculateNewStock = (
+    currentStock: number,
+    quantity: number,
+    transactionType: string
+) => {
+    switch (transactionType) {
+        case "stock_in":
+            return currentStock + quantity;
+
+        case "stock_out":
+            return currentStock - quantity;
+
+        case "adjustment":
+            return quantity; // actual counted stock
+
+        default:
+            return currentStock;
+    }
+};
+
+
+
     return (
         <AdminMainLayout>
             <div className="min-h-screen bg-slate-50 p-4 md:p-6">
@@ -125,14 +216,61 @@ const searchVariants = async (value: string) => {
                                 Transaction Type *
                             </label>
 
-                            <select className="w-full border rounded-xl px-4 py-3">
-                                <option>Stock In</option>
-                                <option>Stock Out</option>
-                                <option>Sale</option>
-                                <option>Return</option>
-                                <option>Damage</option>
-                                <option>Adjustment</option>
+                            <select 
+                            value={transaction.transaction_type}
+                            onChange={(e) => setTransaction({...transaction, transaction_type: e.target.value})}
+                            className={`w-full border rounded-xl px-4 py-3 ${
+                                    transactionColors[
+                                        transaction.transaction_type as keyof typeof transactionColors
+                                    ] ?? ""
+                                }`}
+                                required
+                            >
+                                <option value="">Select Transaction</option>
+                                <option value="stock_in">Stock In</option>
+                                <option value="stock_out">Stock Out</option>
+                                <option value="adjustment">Adjustment</option>
                             </select>
+                        </div>
+
+                        <div>
+
+                            <label className="block mb-2 text-sm">
+                                Reason *
+                            </label>
+
+                            <select
+                                value={transaction.reason}
+                                disabled={!transaction.transaction_type}
+                                onChange={(e) =>
+                                    setTransaction({
+                                        ...transaction,
+                                        reason: e.target.value,
+                                    })
+                                }
+                                className="w-full border rounded-xl px-4 py-3"
+                            >
+
+                                <option value="">
+                                    Select Reason
+                                </option>
+
+                                {transaction.transaction_type &&
+                                    transactionReasons[
+                                        transaction.transaction_type as keyof typeof transactionReasons
+                                    ].map((reason) => (
+
+                                        <option
+                                            key={reason}
+                                            value={reason}
+                                        >
+                                            {reason}
+                                        </option>
+
+                                    ))}
+
+                            </select>
+
                         </div>
 
                         <div>
@@ -141,9 +279,11 @@ const searchVariants = async (value: string) => {
                             </label>
 
                             <input
+                                readOnly
+                                value={transaction.reference_number}
                                 type="text"
                                 placeholder="GR-0001"
-                                className="w-full border rounded-xl px-4 py-3"
+                                className="w-full border rounded-xl px-4 py-3 bg-gray-100"
                             />
                         </div>
 
@@ -152,11 +292,28 @@ const searchVariants = async (value: string) => {
                                 Reference Type
                             </label>
 
-                            <input
-                                type="text"
-                                placeholder="Purchase Order"
+                            <select
+                                value={transaction.reference_type}
+                                disabled={!transaction.transaction_type}
+                                onChange={(e) => setTransaction({...transaction,reference_type:e.target.value})}
                                 className="w-full border rounded-xl px-4 py-3"
-                            />
+                            >
+                                <option value="">Select Reference Type</option>
+                                    {transaction.transaction_type &&
+                                    referenctType[
+                                        transaction.transaction_type as keyof typeof referenctType
+                                    ].map((reason) => (
+
+                                        <option
+                                            key={reason}
+                                            value={reason}
+                                        >
+                                            {reason}
+                                        </option>
+
+                                    ))}
+
+                                </select>
                         </div>
 
                         <div>
@@ -165,6 +322,9 @@ const searchVariants = async (value: string) => {
                             </label>
 
                             <input
+                                value={transaction.invoice_no}
+                                onChange={(e) => setTransaction({...transaction, invoice_no: e.target.value})}
+                                maxLength={50}
                                 type="text"
                                 placeholder="INV-001"
                                 className="w-full border rounded-xl px-4 py-3"
@@ -180,6 +340,9 @@ const searchVariants = async (value: string) => {
 
                         <textarea
                             rows={3}
+                            value={transaction.remarks}
+                            onChange={(e) => setTransaction({...transaction, remarks: e.target.value})}
+                            maxLength={500}
                             className="w-full border rounded-xl px-4 py-3"
                             placeholder="Additional notes..."
                         />
@@ -261,7 +424,13 @@ const searchVariants = async (value: string) => {
                                     <tr className="border-b">
                                         <th className="text-left p-3">SKU</th>
                                         <th className="text-left p-3">Variant</th>
-                                        <th className="text-left p-3">Quantity</th>
+                                        <th>
+
+                                            {transaction.transaction_type === "adjustment"
+                                                ? "Actual Count"
+                                                : "Quantity"}
+
+                                            </th>
                                         <th className="text-left p-3">Remarks</th>
                                         <th className="text-left p-3">Current</th>
                                         <th className="text-left p-3">New</th>
@@ -271,7 +440,7 @@ const searchVariants = async (value: string) => {
 
                                 <tbody>
 
-                                    {items.map((item, index) => (
+                                    {transactionItems.map((item, index) => (
 
                                         <tr key={index} className="border-b">
 
@@ -287,21 +456,24 @@ const searchVariants = async (value: string) => {
                                                 <input
                                                     type="number"
                                                     min="0"
+                                                    maxLength={12}
                                                     value={item.quantity}
                                                     onChange={(e) => {
-                                                        const updated = [...items];
+                                                        const updated = [...transactionItems];
 
                                                         updated[index].quantity =
                                                             Number(e.target.value);
+                                                        
+                                                             
+                                                             
+                                                             if(transaction.transaction_type === 'stock_in')
+                                                                {
+                                                                    updated[index].new_stock = Number(updated[index].current_stock) + Number(e.target.value)
 
-                                                        updated[index].new_stock =
-                                                            transactionType === "stock_in"
-                                                            ? updated[index].current_stock +
-                                                            Number(e.target.value)
-                                                            : updated[index].current_stock -
-                                                            Number(e.target.value);
+                                                                }
+                                                                                                              
 
-                                                        setItems(updated);
+                                                        setTransactionItems(updated);
                                                     }}
                                                     className="w-24 border rounded-lg px-3 py-2"
                                                 />
@@ -312,12 +484,12 @@ const searchVariants = async (value: string) => {
                                                     type="text"
                                                     value={item.remarks}
                                                     onChange={(e) => {
-                                                        const updated = [...items];
+                                                        const updated = [...transactionItems];
 
                                                         updated[index].remarks =
                                                             e.target.value;
 
-                                                        setItems(updated);
+                                                        setTransactionItems(updated);
                                                     }}
                                                     className="border rounded-lg px-3 py-2"
                                                 />
@@ -327,10 +499,15 @@ const searchVariants = async (value: string) => {
                                                 {item.current_stock}
                                             </td>
 
-                                            <td className="p-3 font-semibold text-sky-600">
-                                                {item.new_stock}
-                                            </td>
+                                            <td>
 
+{calculateNewStock(
+    item.current_stock,
+    item.quantity,
+    transaction.transaction_type
+)}
+
+</td>
                                             <td className="p-3">
                                                 <button
                                                     type="button"
@@ -358,7 +535,7 @@ const searchVariants = async (value: string) => {
                     {/* Mobile */}
                     <div className="lg:hidden space-y-4">
 
-                        {items.map((item, index) => (
+                        {transactionItems.map((item, index) => (
 
                             <div
                                 key={index}

@@ -13,31 +13,43 @@ return new class extends Migration
     {
         Schema::create('inventory_transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('product_variant_id')->constrained();
 
             $table->enum('transaction_type', [
                 'stock_in',
                 'stock_out',
-                'sale',
-                'return',
-                'damage',
                 'adjustment'
             ]);
 
-            $table->decimal('quantity',10,3);
+            $table->enum('reason',[
+                'Supplier Delivery',
+                'Customer Return',
+                'Initial Stock',
+                'Transfer In',
+                'Stock Correction',
+                'Other',
+                'Sale',
+                'Damage',
+                'Expired',
+                'Transfer Out',
+                'Lost',
+                'Sample',
+                'Physical Count',
+                'Inventory Audit',
+                'Correction',
+                'System Adjustment',
+            ]);
+
+            $table->String('status');
 
             $table->string('reference_type')->nullable();
             $table->string('invoice_no')->nullable();
-            $table->string('reference_id');
+            $table->string('reference_number');
             
-
-            $table->decimal('quantity',10,3);
-            $table->decimal('stock_before',10,3);
-            $table->decimal('stock_after',10,3);
-
             $table->text('remarks')->nullable();
 
             $table->unsignedBigInteger('created_by');
+
+            $table->timestamp('posted_at');
 
             $table->timestamps();
         });

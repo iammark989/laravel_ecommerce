@@ -13,6 +13,8 @@ return new class extends Migration
     {
         Schema::create('activity_logs', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users');
+            $table->foreignId('inventory_transaction_id')->constratined('inventory_transactions');
             $table->timestamps();
         });
     }
