@@ -1,80 +1,148 @@
+import { Link } from "@inertiajs/react";
 import {
-    Facebook,
-    Instagram,
-    Linkedin,
-    Mail,
-    MapPin,
-    Phone
-} from 'lucide-react';
+    ShieldCheck,
+    FileText,
+    BookOpen,
+    Code2,
+} from "lucide-react";
 
 export default function AdminFooter() {
     return (
-        <footer className="bg-slate-900 text-white mt-20">
-            <div className="max-w-7xl mx-auto px-4 py-12 grid md:grid-cols-3 gap-10">
+        <footer className="bg-white border-t mt-auto">
+            
 
-                {/* Company */}
-                <div>
-                    <h2 className="text-2xl font-bold mb-4">
-                        GDS
-                    </h2>
+            <div className="max-w-full px-6 py-5">
 
-                    <p className="text-slate-300 leading-relaxed">
-                        Garbes Dizon Supermarket.
-                    </p>
-                </div>
+                <div className="flex flex-col lg:flex-row hidden md:flex justify-between gap-6">
 
-                {/* Contact */}
-                <div>
-                    <h3 className="text-xl font-semibold mb-4">
-                        Contact Info
-                    </h3>
+                    {/* Left */}
 
-                    <div className="space-y-3 text-slate-300">
+                    <div>
 
-                        <div className="flex items-center gap-3">
-                            <Phone size={18} />
-                            <span>+63 912 345 6789</span>
-                        </div>
+                        <h3 className="font-semibold text-slate-800">
+                            Mark Shopping Spree
+                        </h3>
 
-                        <div className="flex items-center gap-3">
-                            <Mail size={18} />
-                            <span>sample@email.com</span>
-                        </div>
+                        <p className="text-sm text-gray-500 mt-1">
+                            Inventory Management System
+                        </p>
 
-                        <div className="flex items-center gap-3">
-                            <MapPin size={18} />
-                            <span>Bulacan, Philippines</span>
+                        <p className="text-xs text-gray-400 mt-3">
+                            Version 1.0.0
+                        </p>
+
+                        <p className="text-xs text-gray-400">
+                            © {new Date().getFullYear()} Mark Shopping Spree.
+                            All rights reserved.
+                        </p>
+
+                    </div>
+
+                    {/* Center */}
+
+                    <div>
+
+                        <h4 className="font-semibold text-sm mb-3">
+                            Quick Links
+                        </h4>
+
+                        <div className="space-y-2">
+
+                            <Link
+                                href="/privacy-policy"
+                                className="flex items-center gap-2 text-sm text-gray-600 hover:text-sky-600"
+                            >
+                                <ShieldCheck size={16} />
+                                Privacy Policy
+                            </Link>
+
+                            <Link
+                                href="/terms-and-conditions"
+                                className="flex items-center gap-2 text-sm text-gray-600 hover:text-sky-600"
+                            >
+                                <FileText size={16} />
+                                Terms & Conditions
+                            </Link>
+
+                            <Link
+                                href="/documentation"
+                                className="flex items-center gap-2 text-sm text-gray-600 hover:text-sky-600"
+                            >
+                                <BookOpen size={16} />
+                                Documentation
+                            </Link>
+
                         </div>
 
                     </div>
-                </div>
 
-                {/* Social */}
-                <div>
-                    <h3 className="text-xl font-semibold mb-4">
-                        Follow Us
-                    </h3>
+                    {/* Right */}
 
-                    <div className="flex gap-5">
-                        <a href="#">
-                            <Facebook />
-                        </a>
+                    <div>
 
-                        <a href="#">
-                            <Instagram />
-                        </a>
+                        <h4 className="font-semibold text-sm mb-3">
+                            System Information
+                        </h4>
 
-                        <a href="#">
-                            <Linkedin />
-                        </a>
+                        <div className="space-y-1 text-sm text-gray-600">
+
+                            <p>
+                                Logged in as:
+                                <span className="font-medium ml-1">
+                                    Administrator
+                                </span>
+                            </p>
+
+                            <p>
+                                Last Login:
+                                <span className="font-medium ml-1">
+                                    Today 10:35 AM
+                                </span>
+                            </p>
+
+                           <div className="border-t bg-slate-50 px-6 py-3 mt-5">
+
+                            <div className="flex flex-col md:flex-row justify-between items-center text-xs text-gray-500">
+
+                                <span>
+                                    🟢 System Online
+                                </span>
+                                {/**
+                                <span>
+                                    Queue: Running
+                                </span>
+
+                                <span>
+                                    Database: Connected
+                                </span>
+
+                                <span>
+                                    Last Backup: Today 2:00 AM
+                                </span>
+                                        */}
+                            </div>
+
+                        </div>
+                        </div>
+
                     </div>
+
                 </div>
 
             </div>
+          
+            <div className="md:hidden flex justify-between items-center text-xs text-gray-500">
 
-            <div className="border-t border-slate-700 py-5 text-center text-sm text-slate-400">
-                © 2026 GDS. All rights reserved.
-            </div>
+                    <span>
+                        Administrator
+                    </span>
+
+                    <span>
+                        © {new Date().getFullYear()}
+                    </span>
+
+                </div>
+
         </footer>
     );
 }

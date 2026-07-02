@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\BusinessPartnersController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\InventoryTransactionsController;
 use App\Http\Controllers\ProductController;
@@ -82,6 +83,22 @@ Route::get('/admin/inventory-transactions',[InventoryTransactionsController::cla
         // GO TO ADD NEW TRANSACTION
 Route::get('/admin/inventory-transactions/new-transaction',[InventoryTransactionsController::class,'goToNewInventoryTransactions'])->name('gotonewinventorytransactions')->middleware('staffonly');
 
+                // PURCHASE ORDER
+        // GO TO PURCHASE ORDER PAGE
+Route::get('/admin/purchase-orders',[InventoryTransactionsController::class,'goToPurchaseOrderPage'])->name('gotopurchaseorderpage')->middleware('staffonly');
+
+
+        // BUSINESS PARTNERS
+        // GO TO SUPPLIERS PAGE
+Route::get('/admin/supplier/list',[BusinessPartnersController::class,'goToSuppliersPage'])->name('gotosupplierspage')->middleware('staffonly');
+        // GO TO ADD SUPPLIERS PAGE
+Route::get('/admin/supplier/new',[BusinessPartnersController::class,'goToSupplierAddPage'])->name('gotosupplieraddpage')->middleware('staffonly');
+        // SAVE NEW SUPPLIER
+Route::post('/admin/supplier/save',[BusinessPartnersController::class,'saveNewSupplier'])->name('savenewsupplier')->middleware('staffonly');
+        // GO TO EDIT SUPPLIERS PAGE
+Route::get('/admin/supplier/{id}/edit',[BusinessPartnersController::class,'editSupplierDetails'])->name('editsupplierdetails')->middleware('staffonly');
+
+// search variange AJAX
 Route::get('/admin/variants/search',[InventoryTransactionsController::class, 'searchVariant'])->name('seasrchvariant')->middleware('staffonly');
 
 // GOTO ITEM MASTELIST

@@ -1,373 +1,245 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Link } from "@inertiajs/react";
 import {
-  Menu,
-  X,
-  ChevronDown,
-  Package,
-  Upload,
-  FileSpreadsheet,
-  User,
-  LogOut,
-  UserCog,
-  Boxes,
+    Menu,
+    Bell,
+    UserCircle,
+    ChevronDown,
+    Settings,
+    Users,
+    LogOut,
 } from "lucide-react";
 
-export default function AdminNavbar() {
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const [itemsOpen, setItemsOpen] = useState(false);
+interface Props {
+    onMenuClick: () => void;
+}
 
-  const [open, setOpen] = useState(false);
-    const [profileOpen, setProfileOpen] = useState(false);
+export default function AdminNavbar({
+    onMenuClick,
+}: Props) {
+    const [openProfile, setOpenProfile] = useState(false);
 
-  return (
-    <nav className="bg-white shadow-sm border-b">
-      <div className="mx-auto max-w-7xl px-4">
-        <div className="flex h-16 items-center justify-between">
-          {/* Logo */}
-          <div className="flex items-center gap-2">
-            <Package className="h-6 w-6 text-blue-600" />
-            <span className="font-bold text-lg">
-              Inventory System
-            </span>
-          </div>
+    return (
+        <header className="sticky top-0 z-40 h-16 bg-white border-b shadow-sm">
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-2">
-                <Link
-                  href="/dashboard"
-                  className="px-4 py-2 rounded-lg hover:bg-gray-100"
-                >
-                  Dashboard
-                </Link>
+            <div className="h-full px-6 flex items-center justify-between">
 
-                  {/* Items Dropdown */}
-                  <div className="relative">
+                {/* Left */}
+
+                <div className="flex items-center gap-4">
+
+                    {/* Mobile Sidebar Button */}
+
                     <button
-                      onClick={() => setItemsOpen(!itemsOpen)}
-                      className="
-                        flex items-center gap-1
-                        px-4 py-2
-                        rounded-lg
-                        hover:bg-gray-100
-                      "
+                        onClick={onMenuClick}
+                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100"
                     >
-                      Items
-                      <ChevronDown
-                        size={16}
-                        className={`transition-transform ${
-                          itemsOpen ? "rotate-180" : ""
-                        }`}
-                      />
+                        <Menu size={22} />
                     </button>
 
-                              {itemsOpen && (
-                                <div
-                                  className="
+                    {/* Logo */}
+
+                    <img
+                        src="/images/logo.png"
+                        alt="Logo"
+                        className="w-10 h-10 object-contain"
+                    />
+
+                    <div>
+
+                        <h1 className="font-bold text-lg text-slate-800">
+                            Mark Shopping Spree
+                        </h1>
+
+                        <p className="text-xs text-gray-500">
+                            Inventory Management System
+                        </p>
+
+                    </div>
+
+                </div>
+
+                {/* Right */}
+
+                <div className="flex items-center gap-4">
+
+                    {/* Notification */}
+
+                    <button
+                        className="relative p-2 rounded-xl hover:bg-gray-100"
+                    >
+                        <Bell size={22} />
+
+                        <span
+                            className="
+                                absolute
+                                top-1
+                                right-1
+                                w-2.5
+                                h-2.5
+                                rounded-full
+                                bg-red-500
+                            "
+                        />
+
+                    </button>
+
+                    {/* Profile */}
+
+                    <div className="relative">
+
+                        <button
+                            onClick={() =>
+                                setOpenProfile(!openProfile)
+                            }
+                            className="
+                                flex
+                                items-center
+                                gap-2
+                                rounded-xl
+                                px-2
+                                py-1
+                                hover:bg-gray-100
+                            "
+                        >
+
+                            <UserCircle
+                                size={36}
+                                className="text-slate-600"
+                            />
+
+                            <div className="hidden md:block text-left">
+
+                                <p className="font-semibold text-sm">
+                                    Mark Arvin
+                                </p>
+
+                                <p className="text-xs text-gray-500">
+                                    Administrator
+                                </p>
+
+                            </div>
+
+                            <ChevronDown size={18} />
+
+                        </button>
+
+                        {/* Dropdown */}
+
+                        {openProfile && (
+
+                            <div
+                                className="
                                     absolute
                                     right-0
-                                    mt-2
-                                    w-64
-                                    bg-white
+                                    mt-3
+                                    w-60
+                                    rounded-2xl
                                     border
-                                    rounded-xl
-                                    shadow-lg
-                                    z-50
-                                  "
-                                >
-                                  <Link
-                                    href="/admin/item-masterlist"
-                                    className="
-                                      flex items-center gap-3
-                                      px-4 py-3
-                                      hover:bg-gray-50
-                                    "
-                                  >
-                                    <Package size={18} />
-                                    Item Masterlist
-                                  </Link>
+                                    bg-white
+                                    shadow-xl
+                                    overflow-hidden
+                                "
+                            >
 
-                                  <Link
-                                    href="/admin/inventory-transactions"
-                                    className="
-                                      flex items-center gap-3
-                                      px-4 py-3
-                                      hover:bg-gray-50
-                                    "
-                                  >
-                                    <Boxes size={18} />
-                                    Inventory Transactions
-                                  </Link>
+                                <div className="border-b p-4">
 
-                                  <Link
-                                    href="/items/upload-pricelist"
-                                    className="
-                                      flex items-center gap-3
-                                      px-4 py-3
-                                      hover:bg-gray-50
-                                    "
-                                  >
-                                    <FileSpreadsheet size={18} />
-                                    Upload Item Pricelist
-                                  </Link>
+                                    <p className="font-semibold">
+                                        Mark Arvin
+                                    </p>
 
-                                  <Link
-                                    href="/items/upload"
-                                    className="
-                                      flex items-center gap-3
-                                      px-4 py-3
-                                      hover:bg-gray-50
-                                    "
-                                  >
-                                    <Upload size={18} />
-                                    Upload
-                                  </Link>
+                                    <p className="text-sm text-gray-500">
+                                        Administrator
+                                    </p>
+
                                 </div>
-                              )}
-                            </div>
 
-                  <Link
-                    href="/sales"
-                    className="px-4 py-2 rounded-lg hover:bg-gray-100"
-                  >
-                    Sales
-                  </Link>
-
-                  <Link
-                    href="/reports"
-                    className="px-4 py-2 rounded-lg hover:bg-gray-100"
-                  >
-                    Reports
-                  </Link>
-
-           {/* Profile Dropdown */}
-                            <div className="relative">
-
-                                <button
-                                    onClick={() => {
-                                        setProfileOpen(!profileOpen);
-                                        
-                                    }}
+                                <Link
+                                    href="/admin/profile"
                                     className="
-                                        w-11
-                                        h-11
-                                        rounded-full
-                                        bg-gray-100
-                                        hover:bg-gray-200
-                                        transition
                                         flex
                                         items-center
-                                        justify-center
+                                        gap-3
+                                        px-4
+                                        py-3
+                                        hover:bg-gray-100
                                     "
                                 >
-                                    <User
-                                        size={20}
-                                        className="text-slate-700"
-                                    />
-                                </button>
+                                    <UserCircle size={18} />
 
-                                {profileOpen && (
-                                    <div
+                                    User Profile
+
+                                </Link>
+
+                                <Link
+                                    href="/admin/users"
+                                    className="
+                                        flex
+                                        items-center
+                                        gap-3
+                                        px-4
+                                        py-3
+                                        hover:bg-gray-100
+                                    "
+                                >
+                                    <Users size={18} />
+
+                                    User Maintenance
+
+                                </Link>
+
+                                <Link
+                                    href="/admin/settings/company"
+                                    className="
+                                        flex
+                                        items-center
+                                        gap-3
+                                        px-4
+                                        py-3
+                                        hover:bg-gray-100
+                                    "
+                                >
+                                    <Settings size={18} />
+
+                                    Company Settings
+
+                                </Link>
+
+                                <div className="border-t">
+
+                                    <Link
+                                        href="/admin/logout"
+                                        method="post"
+                                        as="button"
                                         className="
-                                            absolute
-                                            right-0
-                                            mt-3
-                                            w-52
-                                            bg-white
-                                            rounded-2xl
-                                            shadow-lg
-                                            border
-                                            border-gray-100
-                                            overflow-hidden
-                                            z-50
+                                            w-full
+                                            flex
+                                            items-center
+                                            gap-3
+                                            px-4
+                                            py-3
+                                            text-red-600
+                                            hover:bg-red-50
                                         "
                                     >
-                                        <Link
-                                            href="/admin/profile"
-                                            className="
-                                                flex
-                                                items-center
-                                                gap-3
-                                                px-5
-                                                py-4
-                                                hover:bg-gray-50
-                                            "
-                                        >
-                                            <User size={18} />
-                                            User Profile
-                                        </Link>
-                                        
-                                  
-                                        <Link
-                                            href="/admin/user-maintenance"
-                                            className="
-                                                flex
-                                                items-center
-                                                gap-3
-                                                px-5
-                                                py-4
-                                                hover:bg-gray-50
-                                            "
-                                        >
-                                            <UserCog size={18} />
-                                            User Maintenance
-                                        </Link>
-                                       
+                                        <LogOut size={18} />
 
-                                        <Link
-                                            href="/admin/logout"
-                                            method="post"
-                                            as="button"
-                                            className="
-                                                w-full
-                                                flex
-                                                items-center
-                                                gap-3
-                                                px-5
-                                                py-4
-                                                text-red-600
-                                                hover:bg-red-50
-                                                border-t
-                                            "
-                                        >
-                                            <LogOut size={18} />
-                                            Logout
-                                        </Link>
-                                    </div>
-                                )}
+                                        Logout
+
+                                    </Link>
+
+                                </div>
 
                             </div>
-                            
-          </div>
 
-          {/* Mobile Button */}
-          <button
-            onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden"
-          >
-            {mobileOpen ? <X /> : <Menu />}
-          </button>
-        </div>
+                        )}
 
-        {/* Mobile Menu */}
-        {mobileOpen && (
-          <div className="border-t py-3 md:hidden">
-            <div className="flex flex-col gap-1">
-              <Link
-                href="/dashboard"
-                className="px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-                Dashboard
-              </Link>
+                    </div>
 
-              {/* Mobile Items */}
-              <button
-                onClick={() => setItemsOpen(!itemsOpen)}
-                className="
-                  flex items-center justify-between
-                  px-4 py-3
-                  rounded-lg
-                  hover:bg-gray-100
-                "
-              >
-                Items
-                <ChevronDown
-                  size={16}
-                  className={`transition-transform ${
-                    itemsOpen ? "rotate-180" : ""
-                  }`}
-                />
-              </button>
-
-              {itemsOpen && (
-                <div className="ml-4 flex flex-col border-l">
-                  <Link
-                    href="/admin/item-masterlist"
-                    className="px-4 py-2 hover:bg-gray-100"
-                  >
-                    Item Masterlist
-                  </Link>
-
-                  <Link
-                    href="/admin/inventory-transactions"
-                    className="px-4 py-2 hover:bg-gray-100"
-                  >
-                    Inventory Transactions
-                  </Link>
-
-                  <Link
-                    href="/items/upload-pricelist"
-                    className="px-4 py-2 hover:bg-gray-100"
-                  >
-                    Upload Item Pricelist
-                  </Link>
-
-                  <Link
-                    href="/items/upload"
-                    className="px-4 py-2 hover:bg-gray-100"
-                  >
-                    Upload
-                  </Link>
                 </div>
-              )}
 
-              <Link
-                href="/sales"
-                className="px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-                Sales
-              </Link>
-
-              <Link
-                href="/reports"
-                className="px-4 py-3 rounded-lg hover:bg-gray-100"
-              >
-                Reports
-              </Link>
-
-              {/* Mobile Divider */}
-                        <div className="border-t border-gray-200 pt-4 flex flex-col gap-4">
-                           
-                            <Link
-                                href="/admin/profile"
-                                onClick={() => setOpen(false)}
-                                className="flex items-center gap-2 hover:text-[#D4AF37]"
-                            >
-                                <User size={18} />
-
-                                User Profile
-                            </Link>
-
-                           
-                             <Link
-                                href="/admin/user-maintenance"
-                                onClick={() => setOpen(false)}
-                                className="flex items-center gap-2 hover:text-[#D4AF37]"
-                            >
-                                <UserCog size={18} />
-
-                                User Maintenance
-                            </Link>
-                          </div>
-                       
-                                 
-
-               <Link
-                                href="/admin/logout"
-                                method="post"
-                                as="button"
-                                className="flex items-center gap-2 text-red-600"
-                            >
-                                <LogOut size={18} />
-
-                                <span className="underline">
-                                    Logout
-                                </span>
-                            </Link>
             </div>
-          </div>
-        )}
-      </div>
-    </nav>
-  );
+
+        </header>
+    );
 }

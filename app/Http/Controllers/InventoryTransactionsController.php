@@ -20,6 +20,7 @@ class InventoryTransactionsController extends Controller
         return Inertia::render('admin/inventorynewtransactions');
     }
 
+        // SEARCH VARIANT AJAX
     public function searchVariant(Request $request)
     {
        $search = $request->search;
@@ -40,6 +41,11 @@ class InventoryTransactionsController extends Controller
         ->orWhere('variant_name', 'like', "%{$search}%")
         ->limit(10)
         ->get();
+    }
+
+        // GO TO PURCHASE ORDER PAGE
+    public function goToPurchaseOrderPage(){
+        return Inertia::render('admin/inventoryPurchaseOrder');
     }
 
 }
