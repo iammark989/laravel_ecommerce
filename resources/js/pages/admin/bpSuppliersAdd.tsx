@@ -20,10 +20,12 @@ export default function AddSupplierPage() {
         is_active: true,
     });
 
+    const [ saving, setSaving ] = useState(false);
+
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-
+        setSaving(true);
         router.post('/admin/supplier/save',supplier,{
             onSuccess:()=>{
                   Swal.fire({
@@ -35,6 +37,7 @@ export default function AddSupplierPage() {
                 }).then(() => {
                     router.get("/admin/supplier/list");
                 });
+                 setSaving(false);
             },
             onError:(error)=>{
                 console.log(error);
@@ -303,11 +306,12 @@ export default function AddSupplierPage() {
                         <button
                             type="submit"
                             className="bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-6 py-3 flex items-center justify-center gap-2"
+                            disabled={saving}
                         >
 
                             <Save size={18} />
 
-                            Save Supplier
+                            {saving ? "Saving..." : "Save"}
 
                         </button>
 

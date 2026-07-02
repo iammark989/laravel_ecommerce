@@ -58,7 +58,8 @@ export default function AddTransactionPage() {
             remarks: "",
             current_stock:
                 variant.quantity_on_hand,
-
+            new_stock:
+            variant.quantity_on_hand,
         },
     ]);
 
@@ -500,14 +501,32 @@ const calculateNewStock = (
                                             </td>
 
                                             <td>
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    maxLength={12}
+                                                    value={item.new_stock}
+                                                    onChange={(e) => {
+                                                        const updated = [...transactionItems];
 
-{calculateNewStock(
-    item.current_stock,
-    item.quantity,
-    transaction.transaction_type
-)}
+                                                        updated[index].new_stock =
+                                                            Number(e.target.value);
+                                                        
+                                                             
+                                                             
+                                                             if(transaction.transaction_type === 'stock_in')
+                                                                {
+                                                                    updated[index].new_stock = Number(updated[index].current_stock) + Number(e.target.value)
 
-</td>
+                                                                }
+                                                                                                              
+
+                                                        setTransactionItems(updated);
+                                                    }}
+                                                    className="w-24 border rounded-lg px-3 py-2"
+                                                />
+
+                                            </td>
                                             <td className="p-3">
                                                 <button
                                                     type="button"
