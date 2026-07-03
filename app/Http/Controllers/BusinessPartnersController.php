@@ -75,7 +75,7 @@ class BusinessPartnersController extends Controller
                 'contact_person' => ['required','string','max:100',],
                 'contact_number' => ['required','regex:/^[0-9+\-\s()]+$/','max:25',],
                 'email' => ['nullable','email','max:150','unique:suppliers,email',],
-                'tin_number' => ['nullable','string','max:50',],
+                'tin_number' => ['nullable','string','regex:/^[0-9+\-\s()]+$/','max:50',],
                 'address' => ['nullable','string','max:255',],
                 'remarks' => ['nullable','string','max:1000',],
                 'is_active' => ['required','boolean',],
@@ -86,9 +86,39 @@ class BusinessPartnersController extends Controller
         
         }
 
+            // GO TO EDIT SUPPLIERS DETIALS
         public function editSupplierDetails($id){
             $supplierDetails = Supplier::where('id','=',$id)->firstOrFail();
+            $supplierList = Supplier::get();
+            return Inertia::render('admin/bpSuppliersEdit',[
+                'supplierDetails' => $supplierDetails,
+                'supplierList' => $supplierList,
+                ]);
+        }
 
-            return Inertia::render('admin/bpSuppliersEdit',['supplierDetails' => $supplierDetails]);
+            // SAVE UPDATE SUPPLIERS DETAILS
+        public function saveUpdateSuppliersDetails(Request $request,$id){
+                $incomingFields = $request->validate([
+                'name' => ['required','string','max:150'],
+                'contact_person' => ['required','string','max:100',],
+                'contact_number' => ['required','regex:/^[0-9+\-\s()]+$/','max:25',],
+                'email' => ['nullable','email','max:150'],
+                'tin_number' => ['nullable','string','regex:/^[0-9+\-\s()]+$/','max:50',],
+                'address' => ['nullable','string','max:255',],
+                'remarks' => ['nullable','string','max:1000',],
+                'is_active' => ['required','boolean',],
+            ]);
+            $supplier = Supplier::where('id','=',$id)->firstOrFail();
+
+            $supplier->update([
+                'name' => $incomingFields['name'],
+                'contact_person' => $incomingFields['contact_person'],
+                'contact_number' => $incomingFields['contact_number'],
+                'email' => $incomingFields['email'],
+                'tin_number' => $incomingFields['tin_number'],
+                'address' => $incomingFields['address'],
+                'remarks' => $incomingFields['remarks'],
+                'is_active' => $incomingFields['is_active'],
+            ]);
         }
 }

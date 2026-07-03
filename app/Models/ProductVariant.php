@@ -4,6 +4,7 @@ namespace App\Models;
 
 use App\Models\Product;
 use App\Models\ProductImage;
+use App\Models\PurchaseOrderItem;
 use App\Models\VariantInventorie;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -37,6 +38,10 @@ class ProductVariant extends Model
 
     public function productimages(){
         return $this->hasMany(ProductImage::class,'product_variant_id','id');
+    }
+
+    public function purchaseorderitems(){
+        return $this->hasMany(PurchaseOrderItem::class,'product_variant_id','id');
     }
 
 protected function variant_name(): Attribute

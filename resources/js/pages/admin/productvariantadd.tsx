@@ -29,7 +29,7 @@ export default function AddVariantPage() {
     const submitHandle = (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true)
-        router.post(`/admin/products/${products.slug}/variants/save`,product,{
+        router.post(`/admin/product/${products.slug}/variants/save`,product,{
 
             onSuccess:()=>{
                 setSaving(false);
@@ -74,7 +74,7 @@ export default function AddVariantPage() {
                     </div>
 
                     <Link 
-                        href={`/admin/products/${products.slug}/details`}
+                        href={`/admin/product/${products.slug}/details`}
                     className="flex items-center gap-2 border px-4 py-2 rounded-xl bg-white hover:bg-slate-100">
                         <ArrowLeft size={18} />
                         Back
@@ -399,7 +399,7 @@ export default function AddVariantPage() {
                     <div className="border-t mt-8 pt-6 flex flex-col sm:flex-row gap-3 justify-end">
 
                         <Link
-                        href={`/admin/products/${products.slug}/details`}
+                        href={`/admin/product/${products.slug}/details`}
                         type="button"
                         className="px-6 py-3 bg-white border rounded-xl hover:bg-gray-100">
                             Cancel

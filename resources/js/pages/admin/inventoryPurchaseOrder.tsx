@@ -1,10 +1,12 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
-import { Link } from "@inertiajs/react";
+import { Link,usePage } from "@inertiajs/react";
 import { ArrowLeft, Save, Send, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 export default function PurchaseOrderPage() {
-
+    const { supplierList,ponumber } = usePage().props as any;
     const [items, setItems] = useState([]);
 
     const [purchaseOrder, setPurchaseOrder] = useState({
@@ -12,10 +14,89 @@ export default function PurchaseOrderPage() {
         order_date: "",
         expected_delivery: "",
         payment_terms: "",
-        quotation_no: "",
+        suppliers_quotation_no: "",
         reference_no: "",
         remarks: "",
     });
+
+    const [transactionItems, setTransactionItems] = useState<any[]>([]);
+    
+    
+            // remove item on the list
+        const removeItem = (index: number) => {
+            setTransactionItems(transactionItems.filter((_, i) => i !== index));
+        };
+    
+        const addItem = (variant: any) => {
+    
+                // put selected items and check duplicate on the list 
+        const exists = transactionItems.some(
+            (item: any) =>
+                item.variant_id === variant.id
+        );
+    
+        if (exists) {
+            Swal.fire(
+                "Already Added",
+                "Variant already exists.",
+                "warning"
+            );
+    
+            return;
+        }
+    
+        setTransactionItems([
+            ...transactionItems,
+            {
+                variant_id: variant.id,
+                sku: variant.sku,
+                variant_name: variant.variant_name,
+                quantity: 0,
+                remarks: "",
+                current_stock:
+                    variant.quantity_on_hand,
+                new_stock:
+                variant.quantity_on_hand,
+            },
+        ]);
+    
+        setSearch("");
+    
+        setSearchResults([]);
+    };
+    
+const [loading, setLoading] = useState(false);    
+const [search, setSearch] = useState("");
+const [searchResults, setSearchResults] = useState([]);
+    // search items
+const searchVariants = async (value: string) => {
+    setSearch(value);
+
+    if (value.length < 2) {
+        setSearchResults([]);
+        return;
+    }
+
+    setLoading(true);
+
+    try {
+        const response = await axios.get(
+            "/admin/variants/search",
+            {
+                params: {
+                    search: value,
+                },
+            }
+        );
+
+        setSearchResults(response.data);
+    } catch (error) {
+        console.log(error);
+    }
+
+    setLoading(false);
+};
+
 
     return (
 
@@ -64,13 +145,22 @@ export default function PurchaseOrderPage() {
                         <div>
 
                             <label className="block mb-2">
-                                Supplier *
+                                Supplier <span></span>
                             </label>
 
-                            <select className="w-full border rounded-xl px-4 py-3">
+                            <select 
+                            className="w-full border rounded-xl px-4 py-3"
+                            required
+                            value={purchaseOrder.supplier_id}
+                            onChange={(e) => setPurchaseOrder({...purchaseOrder, supplier_id: e.target.value})}
+                            >
 
-                                <option>Select Supplier</option>
-
+                                <option value="">Select Supplier</option>
+                                {supplierList.map((supplier: any) => (
+                                    <option key={supplier.id} value={supplier.id}>
+                                    {supplier.name}
+                                    </option>
+                                        ))}
                             </select>
 
                         </div>
@@ -82,7 +172,7 @@ export default function PurchaseOrderPage() {
                             </label>
 
                             <input
-                                value="PO-20260702-00001"
+                                value={ponumber}
                                 readOnly
                                 className="w-full bg-gray-100 border rounded-xl px-4 py-3"
                             />
@@ -111,7 +201,10 @@ export default function PurchaseOrderPage() {
 
                             <input
                                 type="date"
+                                value={purchaseOrder.order_date}
+                                onChange={(e)=>setPurchaseOrder({...purchaseOrder,order_date:e.target.value})}
                                 className="w-full border rounded-xl px-4 py-3"
+                                required
                             />
 
                         </div>
@@ -124,6 +217,8 @@ export default function PurchaseOrderPage() {
 
                             <input
                                 type="date"
+                                value={purchaseOrder.expected_delivery}
+                                onChange={(e)=>setPurchaseOrder({...purchaseOrder,expected_delivery:e.target.value})}
                                 className="w-full border rounded-xl px-4 py-3"
                             />
 
@@ -135,15 +230,17 @@ export default function PurchaseOrderPage() {
                                 Payment Terms
                             </label>
 
-                            <select className="w-full border rounded-xl px-4 py-3">
-
-                                <option>Cash</option>
-
-                                <option>COD</option>
-
-                                <option>Net 15</option>
-
-                                <option>Net 30</option>
+                            <select 
+                            className="w-full border rounded-xl px-4 py-3"
+                            value={purchaseOrder.payment_terms}
+                            onChange={(e) => setPurchaseOrder({...purchaseOrder,payment_terms:e.target.value})}
+                            required
+                            >
+                                <option value="">Select Payment Terms</option>
+                                <option value="cash">Cash</option>
+                                <option value="cod">COD</option>
+                                <option value="net15">Net 15</option>
+                                <option value="net30">Net 30</option>
 
                             </select>
 
@@ -171,6 +268,8 @@ export default function PurchaseOrderPage() {
 
                             <input
                                 className="w-full border rounded-xl px-4 py-3"
+                                value={purchaseOrder.suppliers_quotation_no}
+                                onChange={(e) => setPurchaseOrder({...purchaseOrder,suppliers_quotation_no:e.target.value})}
                             />
 
                         </div>
@@ -183,6 +282,8 @@ export default function PurchaseOrderPage() {
 
                             <input
                                 className="w-full border rounded-xl px-4 py-3"
+                                value={purchaseOrder.reference_no}
+                                onChange={(e)=>setPurchaseOrder({...purchaseOrder,reference_no:e.target.value})}
                             />
 
                         </div>
@@ -198,6 +299,8 @@ export default function PurchaseOrderPage() {
                         <textarea
                             rows={3}
                             className="w-full border rounded-xl px-4 py-3"
+                            value={purchaseOrder.remarks}
+                            onChange={(e)=>setPurchaseOrder({...purchaseOrder,remarks:e.target.value})}
                         />
 
                     </div>
@@ -206,27 +309,54 @@ export default function PurchaseOrderPage() {
 
                 {/* Search */}
 
-                <div className="bg-white rounded-2xl shadow-sm p-6">
+                    <div className="bg-white rounded-2xl shadow-sm p-6">
 
-                    <h2 className="font-semibold text-lg mb-4">
-                        Add Products
-                    </h2>
+                        <h2 className="font-semibold text-lg mb-4">
+                            Add Products
+                        </h2>
 
-                    <div className="relative">
+                        <div className="relative">
 
-                        <Search
-                            className="absolute left-4 top-3.5 text-gray-400"
-                            size={18}
-                        />
+                            <input
+                                type="text"
+                                value={search}
+                                onChange={(e) => searchVariants(e.target.value)}
+                                placeholder="Search SKU or Variant"
+                                className="w-full border rounded-xl px-4 py-3"
+                            />
 
-                        <input
-                            placeholder="Search SKU or Product Variant..."
-                            className="w-full border rounded-xl pl-11 pr-4 py-3"
-                        />
+                            {searchResults.length > 0 && (
+
+                                <div className="absolute left-0 right-0 top-full mt-2 z-50 bg-white border rounded-xl shadow-xl max-h-72 overflow-y-auto">
+
+                                    {searchResults.map((variant: any) => (
+
+                                        <button
+                                            key={variant.id}
+                                            type="button"
+                                            onClick={() => addItem(variant)}
+                                            className="w-full text-left px-4 py-3 hover:bg-slate-50 border-b last:border-b-0"
+                                         >
+
+                                            <div className="font-medium">
+                                                {variant.sku}
+                                            </div>
+
+                                            <div className="text-sm text-gray-500">
+                                                {variant.variant_name}
+                                            </div>
+
+                                        </button>
+
+                                    ))}
+
+                                </div>
+
+                            )}
+
+                        </div>
 
                     </div>
-
-                </div>
 
                 {/* Table */}
 

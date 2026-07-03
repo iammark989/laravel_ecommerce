@@ -200,7 +200,7 @@ export default function AdminSidebar() {
                     >
 
                         <SidebarChild
-                            href="/admin/item-masterlist"
+                            href="/admin/product/list"
                             icon={<Package size={18} />}
                             label="Item Masterlist"
                         />

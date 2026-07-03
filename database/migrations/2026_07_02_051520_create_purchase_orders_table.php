@@ -29,6 +29,9 @@ return new class extends Migration
                 'completed',
                 'cancelled'
             ]);
+            $table->string('suppliers_quotation_no')->nullable();
+            $table->string('reference_no')->nullable();
+
             $table->decimal('total_amount',12,2)->default(0);
             $table->text('remarks')->nullable();
             $table->foreignId('created_by')->constrained('users');

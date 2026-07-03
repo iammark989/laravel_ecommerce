@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\ProductVariant;
+use App\Models\PurchaseOrder;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 
@@ -43,9 +45,25 @@ class InventoryTransactionsController extends Controller
         ->get();
     }
 
+
+         //Generate the next supplier code.
+    private function generatePOnumber(): string {
+        $lastPO = PurchaseOrder::latest('id')->first();
+        $today = date("Ymd");
+        if (!$lastPO) {
+            return 'PO-'.$today."-00001";
+        }
+        // Get last 5 digits
+        $lastNumber = (int) substr($lastPO->po_number, -5);
+        return "PO-{$today}-" . str_pad($lastNumber + 1, 5, '0', STR_PAD_LEFT);
+    }
         // GO TO PURCHASE ORDER PAGE
     public function goToPurchaseOrderPage(){
-        return Inertia::render('admin/inventoryPurchaseOrder');
+        $supplierList = Supplier::orderBy('name','asc')->get();
+        return Inertia::render('admin/inventoryPurchaseOrder',[
+            'supplierList' => $supplierList,
+            'ponumber' => $this->generatePOnumber(),
+        ]);
     }
 
 }

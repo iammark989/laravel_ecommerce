@@ -18,8 +18,8 @@ class ProductController extends Controller
 {
     //////////////      PRODUCT / ITEMS CONTROLLER //////////
 
-    // GO TO ITEM MASTERLIST
-    public function goToItemMasterlist(){
+    // GO TO PRODUCTS
+    public function goToProductList(){
         $products = DB::table('products as product')
             ->leftJoin('categories as category', 'category.id', '=', 'product.category_id')
             ->leftJoin('brands as brand', 'brand.id', '=', 'product.brand_id')
@@ -54,7 +54,7 @@ class ProductController extends Controller
             ->get();
 
         
-        return Inertia::render('admin/itemmasterlist',[
+        return Inertia::render('admin/productlist',[
             'products' => $products,
         ]);
     }
@@ -129,7 +129,7 @@ class ProductController extends Controller
 
 
         $newProduct = Product::create($incomingFields);
-        return redirect("/admin/products/{$newProduct->slug}/details");
+        return redirect("/admin/product/{$newProduct->slug}/details");
 
     }
 
@@ -211,7 +211,7 @@ class ProductController extends Controller
             }
 
            });
-           return redirect("/admin/products/{$slug}/details");     
+           return redirect("/admin/product/{$slug}/details");     
 
         }
 
@@ -332,7 +332,7 @@ class ProductController extends Controller
 
         $currentDetails->update($incomingFields);
     
-       return redirect("/admin/products/{$currentDetails->slug}/details")->with('success','Product updated successfully.');
+       return redirect("/admin/product/{$currentDetails->slug}/details")->with('success','Product updated successfully.');
     }
 
         // GO TO VARIANT DETAILS PAGE AND EDIT 
@@ -466,7 +466,7 @@ class ProductController extends Controller
                 'reorder_level' => $incomingFields['reorder_level'],
             ]);
         });
-            return redirect("/admin/products/{$slug}/details")->with('success','Product updated successfully.');
+            return redirect("/admin/product/{$slug}/details")->with('success','Product updated successfully.');
     }
     
 }

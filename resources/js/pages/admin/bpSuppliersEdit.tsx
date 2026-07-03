@@ -6,9 +6,11 @@ import Swal from "sweetalert2";
 
 export default function EditSupplierPage() {
 
-    const { supplierDetails } = usePage().props as any;
+    const [ saving, setSaving ] = useState(false);
+    const { supplierDetails,supplierList } = usePage().props as any;
 
     const [supplier, setSupplier] = useState({
+        id: supplierDetails.id,
         supplier_code: supplierDetails.supplier_code,
         name: supplierDetails.name,
         contact_person: supplierDetails.contact_person,
@@ -16,15 +18,32 @@ export default function EditSupplierPage() {
         email: supplierDetails.email,
         tin_number: supplierDetails.tin_number,
         address: supplierDetails.address,
-        remarks: supplierDetails.remarks,
+        remarks: supplierDetails.remarks ?? "",
         is_active: supplierDetails.is_active,
     });
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        setSaving(true);
 
+        // CHECK DUPLICATE
+              const productExist = supplierList.some(
+            (d: any) =>
+                d.id !== supplier.id &&
+                d.name.toLowerCase() === supplier.name.toLowerCase()
+                );
+        
+                if (productExist) {
+                Swal.fire(
+                    "Duplicate",
+                    "Suppliers Name Already Exist!.",
+                    "warning"
+                );
+                setSaving(false);
+                return;
+                }
 
-        router.post('/admin/supplier/save',supplier,{
+        router.put(`/admin/supplier/${supplierDetails.id}/save-update`,supplier,{
             onSuccess:()=>{
                   Swal.fire({
                     icon: "success",
@@ -35,6 +54,7 @@ export default function EditSupplierPage() {
                 }).then(() => {
                     router.get("/admin/supplier/list");
                 });
+                setSaving(false);
             },
             onError:(error)=>{
                 console.log(error);
@@ -55,11 +75,11 @@ export default function EditSupplierPage() {
                     <div>
 
                         <h1 className="text-3xl font-bold">
-                            Add Supplier
+                            Suppliers Information
                         </h1>
 
                         <p className="text-gray-500">
-                            Register a new supplier for purchasing transactions.
+                            Update supplier information for purchasing transactions.
                         </p>
 
                     </div>
@@ -85,9 +105,70 @@ export default function EditSupplierPage() {
 
                     <div className="bg-white rounded-2xl shadow-sm p-6">
 
-                        <h2 className="text-lg font-semibold mb-5">
-                            Supplier Information
-                        </h2>
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+
+                        <div>
+
+                            <h2 className="text-xl font-semibold">
+                                <span>{supplierDetails.name} </span>
+                            </h2>
+
+                            <p className="text-sm text-gray-500 mt-1">
+                                Supplier Code: <span>{supplierDetails.supplier_code} </span>
+                            </p>
+
+                            <p className="text-sm text-gray-500 mt-1">
+                                Created : <span>{new Intl.DateTimeFormat("en-PH", {year: "numeric",month: "long",day: "numeric",}).format(new Date(supplierDetails.created_at))}</span>
+                            </p>
+
+                        </div>
+
+                        {/* Status */}
+
+                        <div className="flex items-center gap-3 mt-4 md:mt-0">
+
+                            <span
+                                className={`text-sm font-medium ${
+                                    supplier.is_active
+                                        ? "text-green-600"
+                                        : "text-red-600"
+                                }`}
+                            >
+                                {supplier.is_active
+                                    ? "Active"
+                                    : "Inactive"}
+                            </span>
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setSupplier({
+                                        ...supplier,
+                                        is_active: !supplier.is_active,
+                                    })
+                                }
+                                className={`relative inline-flex h-7 w-14 rounded-full transition
+                                    ${
+                                        supplier.is_active
+                                            ? "bg-green-500"
+                                            : "bg-gray-300"
+                                    }`}
+                            >
+
+                                <span
+                                    className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white transition-transform
+                                        ${
+                                            supplier.is_active
+                                                ? "translate-x-7"
+                                                : ""
+                                        }`}
+                                />
+
+                            </button>
+
+                        </div>
+
+                    </div>
 
                         <div className="grid md:grid-cols-2 gap-5">
 
@@ -237,39 +318,13 @@ export default function EditSupplierPage() {
 
                     </div>
 
-                    {/* Status */}
-
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
-
-                        <h2 className="text-lg font-semibold mb-5">
-                            Status
-                        </h2>
-
-                        <label className="flex items-center gap-3">
-
-                            <input
-                                type="checkbox"
-                                checked={supplier.is_active}
-                                onChange={(e)=>
-                                    setSupplier({
-                                        ...supplier,
-                                        is_active:e.target.checked
-                                    })
-                                }
-                            />
-
-                            Active Supplier
-
-                        </label>
-
-                    </div>
 
                     {/* Remarks */}
 
                     <div className="bg-white rounded-2xl shadow-sm p-6">
 
                         <h2 className="text-lg font-semibold mb-5">
-                            Additional Information
+                            Notes
                         </h2>
 
                         <textarea
@@ -283,7 +338,7 @@ export default function EditSupplierPage() {
                             }
                             placeholder="Remarks..."
                             className="w-full border rounded-xl px-4 py-3"
-                            maxLength={255}
+                            maxLength={500}
                         />
 
                     </div>
@@ -303,11 +358,12 @@ export default function EditSupplierPage() {
                         <button
                             type="submit"
                             className="bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-6 py-3 flex items-center justify-center gap-2"
+                            disabled={saving}
                         >
 
                             <Save size={18} />
 
-                            Save Supplier
+                            {saving ? "Saving..." : "Save Update"}
 
                         </button>
 

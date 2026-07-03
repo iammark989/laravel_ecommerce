@@ -88,9 +88,62 @@ export default function AddSupplierPage() {
 
                     <div className="bg-white rounded-2xl shadow-sm p-6">
 
-                        <h2 className="text-lg font-semibold mb-5">
-                            Supplier Information
-                        </h2>
+                        <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-6">
+
+                        <div>
+
+                            <h2 className="text-xl font-semibold">
+                                Supplier Information
+                            </h2>
+
+                        </div>
+
+                        {/* Status */}
+
+                        <div className="flex items-center gap-3 mt-4 md:mt-0">
+
+                            <span
+                                className={`text-sm font-medium ${
+                                    supplier.is_active
+                                        ? "text-green-600"
+                                        : "text-red-600"
+                                }`}
+                            >
+                                {supplier.is_active
+                                    ? "Active"
+                                    : "Inactive"}
+                            </span>
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setSupplier({
+                                        ...supplier,
+                                        is_active: !supplier.is_active,
+                                    })
+                                }
+                                className={`relative inline-flex h-7 w-14 rounded-full transition
+                                    ${
+                                        supplier.is_active
+                                            ? "bg-green-500"
+                                            : "bg-gray-300"
+                                    }`}
+                            >
+
+                                <span
+                                    className={`absolute top-1 left-1 h-5 w-5 rounded-full bg-white transition-transform
+                                        ${
+                                            supplier.is_active
+                                                ? "translate-x-7"
+                                                : ""
+                                        }`}
+                                />
+
+                            </button>
+
+                        </div>
+
+                    </div>
 
                         <div className="grid md:grid-cols-2 gap-5">
 
@@ -240,39 +293,12 @@ export default function AddSupplierPage() {
 
                     </div>
 
-                    {/* Status */}
-
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
-
-                        <h2 className="text-lg font-semibold mb-5">
-                            Status
-                        </h2>
-
-                        <label className="flex items-center gap-3">
-
-                            <input
-                                type="checkbox"
-                                checked={supplier.is_active}
-                                onChange={(e)=>
-                                    setSupplier({
-                                        ...supplier,
-                                        is_active:e.target.checked
-                                    })
-                                }
-                            />
-
-                            Active Supplier
-
-                        </label>
-
-                    </div>
-
                     {/* Remarks */}
 
                     <div className="bg-white rounded-2xl shadow-sm p-6">
 
                         <h2 className="text-lg font-semibold mb-5">
-                            Additional Information
+                            Notes
                         </h2>
 
                         <textarea

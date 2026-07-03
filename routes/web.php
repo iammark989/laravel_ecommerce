@@ -54,27 +54,26 @@ Route::post('/admin/loginattempt',[AdminController::class,'login'])->name('admin
         // ADMIN LOGOUT
 Route::post('/admin/logout',[AdminController::class,'adminlogout'])->name('adminlogout');
 
-        // ADD CATEGORY AND BRAND AND ADD PRODUCT
-        
+        // PRODUCT / ITEMS
         // ADD CATEGORY POST
-Route::post('/admin/products/add-category',[ProductController::class,'adminAddCategory'])->name('addcategory')->middleware('staffonly');
+Route::post('/admin/product/add-category',[ProductController::class,'adminAddCategory'])->name('addcategory')->middleware('staffonly');
         // ADD BRAND POST
-Route::post('/admin/products/add-brand',[ProductController::class,'adminAddBrand'])->name('addbrand')->middleware('staffonly');
+Route::post('/admin/product/add-brand',[ProductController::class,'adminAddBrand'])->name('addbrand')->middleware('staffonly');
         // ADD PRODUCT POST
-Route::post('/admin/products/add-product',[ProductController::class,'adminAddProduct'])->name('addproduct')->middleware('staffonly');
+Route::post('/admin/product/add-product',[ProductController::class,'adminAddProduct'])->name('addproduct')->middleware('staffonly');
        // GO TO ADD VARIANTPAGE
-Route::get('/admin/products/{slug}/variants/add',[ProductController::class,'goToCreateProductVariant'])->name('gotocreateproductvariant')->middleware('staffonly');
+Route::get('/admin/product/{slug}/variants/add',[ProductController::class,'goToCreateProductVariant'])->name('gotocreateproductvariant')->middleware('staffonly');
        // SAVE PRODUCT VARIANT
-Route::post('/admin/products/{slug}/variants/save',[ProductController::class,'saveVariant'])->name('savevariant')->middleware('staffonly');
+Route::post('/admin/product/{slug}/variants/save',[ProductController::class,'saveVariant'])->name('savevariant')->middleware('staffonly');
 
         // PRODUCT DETAILS PAGE WITH VARIANT LIST AND EDIT PRODUCT DETAILS OPTIONS
-Route::get('/admin/products/{slug}/details',[ProductController::class,'productEditPage'])->name('productEditPage')->middleware('staffonly'); 
+Route::get('/admin/product/{slug}/details',[ProductController::class,'productEditPage'])->name('productEditPage')->middleware('staffonly'); 
         // VARIANT DETAILS WITH EDIT DETAILS OPTION
-Route::get('/admin/products/{slug}/variants/{variantid}',[ProductController::class,'variantEditPage'])->name('variantEditPage')->middleware('staffonly');
+Route::get('/admin/product/{slug}/variants/{variantid}',[ProductController::class,'variantEditPage'])->name('variantEditPage')->middleware('staffonly');
         // SAVE VARIANT UPDATE
-Route::put('/admin/products/{slug}/variants/{variantid}/save',[ProductController::class,'savechangesvariant'])->name('savechangesvariant')->middleware('staffonly');
+Route::put('/admin/product/{slug}/variants/{variantid}/save',[ProductController::class,'savechangesvariant'])->name('savechangesvariant')->middleware('staffonly');
         // SAVE PRODUCT UPDATE
-Route::put('/admin/products/{slug}/save',[ProductController::class,'saveChanges'])->name('savechanges')->middleware('staffonly');
+Route::put('/admin/product/{slug}/save',[ProductController::class,'saveChanges'])->name('savechanges')->middleware('staffonly');
 
 
         //INVENTORY TRANSACTIONS
@@ -97,12 +96,14 @@ Route::get('/admin/supplier/new',[BusinessPartnersController::class,'goToSupplie
 Route::post('/admin/supplier/save',[BusinessPartnersController::class,'saveNewSupplier'])->name('savenewsupplier')->middleware('staffonly');
         // GO TO EDIT SUPPLIERS PAGE
 Route::get('/admin/supplier/{id}/edit',[BusinessPartnersController::class,'editSupplierDetails'])->name('editsupplierdetails')->middleware('staffonly');
+        // SAVE UPDATE ON SUPPLIERS DETAILS
+Route::put('/admin/supplier/{id}/save-update',[BusinessPartnersController::class,'saveUpdateSuppliersDetails'])->name('saveupdatesuppliersdetails')->middleware('staffonly');
 
 // search variange AJAX
 Route::get('/admin/variants/search',[InventoryTransactionsController::class, 'searchVariant'])->name('seasrchvariant')->middleware('staffonly');
 
 // GOTO ITEM MASTELIST
-Route::get('/admin/item-masterlist',[ProductController::class,'goToItemMasterlist'])->name('itemmasterlist')->middleware('staffonly');
+Route::get('/admin/product/list',[ProductController::class,'goToProductList'])->name('gotoproductlist')->middleware('staffonly');
 
 Route::get('/admin/product/create',[ProductController::class,'addproduct'])->name('addproduct')->middleware('staffonly');
 

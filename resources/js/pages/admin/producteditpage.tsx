@@ -55,7 +55,7 @@ const handleSubmitCategory = (e: React.FormEvent) => {
       return;
     }
 
-      router.post('/admin/products/add-category',category,{
+      router.post('/admin/product/add-category',category,{
       preserveScroll: true,
         onSuccess: () => {
           setCategory({
@@ -94,7 +94,7 @@ const handleSubmitBrand = (e: React.FormEvent) => {
       return;
     }
 
-      router.post('/admin/products/add-brand',brand,{
+      router.post('/admin/product/add-brand',brand,{
       preserveScroll: true,
         onSuccess: () => {
           setBrand({
@@ -141,7 +141,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
         }
 
     setSaving(true);
-  router.post(`/admin/products/${products.slug}/save`,{...product,_method: "put",},{
+  router.post(`/admin/product/${products.slug}/save`,{...product,_method: "put",},{
     forceFormData: true,
     
     onSuccess: () =>{
@@ -193,7 +193,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
         </div>
 
         <Link
-          href="/admin/item-masterlist"
+          href="/admin/product/list"
           className="flex items-center gap-2 border px-4 py-2 rounded-xl bg-white hover:bg-slate-100"
         >
           <ArrowLeft size={18} />
@@ -493,7 +493,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
         <div className="border-t mt-8 pt-6 flex flex-col sm:flex-row gap-3 justify-end">
            
            <Link
-          href="/admin/item-masterlist"
+          href="/admin/product/list"
             className="px-6 py-3 border rounded-xl hover:bg-gray-100"
           >
             Cancel
@@ -544,7 +544,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                     </div>
 
                     <Link
-                        href={`/admin/products/${products.slug}/variants/add`}
+                        href={`/admin/product/${products.slug}/variants/add`}
                         className="inline-flex items-center gap-2 px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl"
                     >
                         <Plus size={18} />
@@ -617,7 +617,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
 
                                     <td className="text-right">
                                         <Link
-                                            href={`/admin/products/${products.slug}/variants/${variant.id}`}
+                                            href={`/admin/product/${products.slug}/variants/${variant.id}`}
                                             className="inline-flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-slate-100"
                                         >
                                             <Edit size={16} />
@@ -682,7 +682,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                             </div>
 
                             <Link
-                                href={`/admin/products/${products.slug}/variants/${variant.id}`}
+                                href={`/admin/product/${products.slug}/variants/${variant.id}`}
                                 className="mt-4 w-full flex items-center justify-center gap-2 border rounded-xl py-3 hover:bg-slate-100"
                             >
                                 <Edit size={16} />
@@ -704,7 +704,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                         </p>
 
                         <Link
-                            href={`/admin/products/${products.slug}/variants/add`}
+                            href={`/admin/product/${products.slug}/variants/add`}
                             className="inline-flex items-center gap-2 mt-5 px-5 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl"
                         >
                             <Plus size={18} />
