@@ -1,7 +1,9 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { Link,usePage,router } from "@inertiajs/react";
-import { ArrowLeft, Upload, Save } from "lucide-react";
+import { ArrowLeft, Upload, Save, Plus } from "lucide-react";
 import { useState } from "react";
+import FormCard from "@/components/ui/FormCard";
+import PageHeader from "@/components/ui/PageHeader";
 
 
 export default function AddVariantPage() {
@@ -10,6 +12,7 @@ export default function AddVariantPage() {
     const { products,categories } = usePage().props as any;
     const { errors } = usePage().props;
     const [ saving, setSaving ] = useState(false);
+    const [ showUomModal, setShowUomModal] = useState(false);
 
     const [ product,setProduct ] = useState({
         sku: "",
@@ -60,29 +63,16 @@ export default function AddVariantPage() {
             <div className="min-h-screen bg-slate-50 p-4 md:p-6">
 
                 {/* Header */}
-
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
-
-                    <div>
-                        <h1 className="text-3xl font-bold text-slate-800">
-                            Add Product Variant
-                        </h1>
-
-                        <p className="text-gray-500">
-                            Create a new product variant.
-                        </p>
-                    </div>
-
+                <PageHeader title="Add Product Variant" description="Create a new product variant.">
                     <Link 
-                        href={`/admin/product/${products.slug}/details`}
-                    className="flex items-center gap-2 border px-4 py-2 rounded-xl bg-white hover:bg-slate-100">
-                        <ArrowLeft size={18} />
-                        Back
-                    </Link>
+                    className="flex items-center gap-2 border px-4 py-2 rounded-xl bg-white hover:bg-slate-100"
+                    href={`/admin/product/${products.slug}/details`}
+                    >
+                        <ArrowLeft size={18} />Back
+                        </Link> 
+                </PageHeader>
 
-                </div>
-
-                {/* Product Card */}
+               
 
                 <div className="bg-white rounded-2xl shadow-sm p-5 mb-6">
 
@@ -112,17 +102,20 @@ export default function AddVariantPage() {
                 </div>
 
                 {/* Form */}
+                
                 <form onSubmit={submitHandle}>
-                <div className="bg-white rounded-2xl shadow-sm p-6">
-
+                <div className="space-y-6">
+                <FormCard
+                    title="Variant Information"
+                    
+                >
                     <div className="grid lg:grid-cols-3 gap-6">
 
                         {/* Left Side */}
-
+                        
                         <div className="lg:col-span-2 space-y-5">
-
+                                               
                             <div className="grid md:grid-cols-2 gap-4">
-
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
                                         SKU <span className="text-red-500"> *</span>
@@ -222,41 +215,10 @@ export default function AddVariantPage() {
 
                             </div>
 
-                            <div className="grid md:grid-cols-2 gap-4">
+                            
 
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">
-                                        Quantity On Hand <span className="text-red-500"> *</span>
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        className="w-full border rounded-xl px-4 py-3"
-                                        placeholder="20"
-                                        maxLength={6}
-                                        required
-                                        value={product.quantity_on_hand}
-                                        onChange={(e) => setProduct({...product, quantity_on_hand: e.target.value})}
-                                    />
-                                </div>
-
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">
-                                        Reorder Level <span className="text-red-500"> *</span>
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        className="w-full border rounded-xl px-4 py-3"
-                                        placeholder="5"
-                                        required
-                                        maxLength={5}
-                                        value={product.reorder_level}
-                                        onChange={(e) => setProduct({...product, reorder_level: e.target.value})}
-                                    />
-                                </div>
-
-                            </div>
+                           
+                           
 
                         </div>
 
@@ -264,7 +226,52 @@ export default function AddVariantPage() {
 
                         <div className="space-y-5">
 
-                            {/* Image Upload */}
+                            {/* Status */}
+                            <div className="flex items-center justify-between rounded-xl border bg-gray-50 p-4">
+                                <div>
+                                    <p className="font-medium text-gray-800">
+                                        Product Status
+                                    </p>
+                                    
+                                </div>
+
+                                <div className="flex items-center gap-4">
+                                    <span
+                                        className={`rounded-full px-3 py-1 text-sm font-medium ${
+                                            product.is_active
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-red-100 text-red-700"
+                                        }`}
+                                    >
+                                        {product.is_active ? "Active" : "Inactive"}
+                                    </span>
+
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setProduct({
+                                                ...product,
+                                                is_active: !product.is_active,
+                                            })
+                                        }
+                                        className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${
+                                            product.is_active
+                                                ? "bg-sky-500"
+                                                : "bg-gray-300"
+                                        }`}
+                                    >
+                                        <span
+                                            className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow transition-transform duration-300 ${
+                                                product.is_active
+                                                    ? "translate-x-6"
+                                                    : ""
+                                            }`}
+                                        />
+                                    </button>
+                                </div>
+                            </div>
+
+                         {/* Image Upload */}
 
                             <div className="border rounded-2xl p-5">
 
@@ -303,66 +310,12 @@ export default function AddVariantPage() {
 
                             </div>
 
-                            {/* Status */}
+                            
 
-                        <div className="rounded-2xl border bg-white p-5 shadow-sm">
-                            <div className="mb-4">
-                                <h2 className="text-lg font-semibold text-gray-900">
-                                    Product Status
-                                </h2>
-                                <p className="text-sm text-gray-500">
-                                    Enable or disable this product from appearing on the website.
-                                </p>
-                            </div>
+                            
+                       
 
-                            <div className="flex items-center justify-between rounded-xl border bg-gray-50 p-4">
-                                <div>
-                                    <p className="font-medium text-gray-800">
-                                        Visibility
-                                    </p>
-                                    <p className="text-sm text-gray-500">
-                                        Control whether this product is active.
-                                    </p>
-                                </div>
-
-                                <div className="flex items-center gap-4">
-                                    <span
-                                        className={`rounded-full px-3 py-1 text-sm font-medium ${
-                                            product.is_active
-                                                ? "bg-green-100 text-green-700"
-                                                : "bg-red-100 text-red-700"
-                                        }`}
-                                    >
-                                        {product.is_active ? "Active" : "Inactive"}
-                                    </span>
-
-                                    <button
-                                        type="button"
-                                        onClick={() =>
-                                            setProduct({
-                                                ...product,
-                                                is_active: !product.is_active,
-                                            })
-                                        }
-                                        className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${
-                                            product.is_active
-                                                ? "bg-sky-500"
-                                                : "bg-gray-300"
-                                        }`}
-                                    >
-                                        <span
-                                            className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow transition-transform duration-300 ${
-                                                product.is_active
-                                                    ? "translate-x-6"
-                                                    : ""
-                                            }`}
-                                        />
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                            {/* Information */}
+                            {/* Information 
 
                             <div className="border rounded-2xl p-5 bg-sky-50">
 
@@ -382,17 +335,359 @@ export default function AddVariantPage() {
                                     <li>
                                         • Images can be unique.
                                     </li>
-
                                     <li>
                                         • Each variant requires a unique SKU.
                                     </li>
                                 </ul>
-
-                            </div>
+                            </div>*/}
 
                         </div>
 
                     </div>
+                     </FormCard>                       
+                    <FormCard
+                        title="Inventory Configuration"
+                    >
+                         {/* Warehouse */}
+                         <div className="grid lg:grid-cols-3 gap-6">
+                             <div className="lg:col-span-2 space-y-5">
+
+                                 {/** LEFT SIDE */}           
+                                 <div className="grid md:grid-cols-2 gap-4">
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Quantity On Hand <span className="text-red-500"> *</span>
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        className="w-full border rounded-xl px-4 py-3"
+                                        placeholder="20"
+                                        maxLength={6}
+                                        required
+                                        value={product.quantity_on_hand}
+                                        onChange={(e) => setProduct({...product, quantity_on_hand: e.target.value})}
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium mb-2">
+                                        Reorder Level <span className="text-red-500"> *</span>
+                                    </label>
+
+                                    <input
+                                        type="number"
+                                        className="w-full border rounded-xl px-4 py-3"
+                                        placeholder="5"
+                                        required
+                                        maxLength={5}
+                                        value={product.reorder_level}
+                                        onChange={(e) => setProduct({...product, reorder_level: e.target.value})}
+                                    />
+                                </div>
+                            </div>
+                              {/* Unit of Measure */}
+
+                            <div className="bg-slate-50 border rounded-2xl p-5">
+
+                                <div className="mb-5">
+
+                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-5">
+
+                                    <div>
+
+                                        <h3 className="text-lg font-semibold">
+                                            Unit of Measure (UoM)
+                                        </h3>
+
+                                        <p className="text-sm text-gray-500">
+                                            Configure the default selling and purchasing units for this variant.
+                                        </p>
+
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowUomModal(true)}
+                                        className="mt-3 md:mt-0 inline-flex items-center gap-2 bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl transition"
+                                    >
+
+                                        <Plus size={18} />
+
+                                        Add UoM
+
+                                    </button>
+
+                                </div>
+
+                                </div>
+
+                                {/* Base Unit */}
+
+                                <div className="mb-6">
+
+                                    <label className="block text-sm font-medium mb-2">
+                                        Base Unit <span className="text-red-500">*</span>
+                                    </label>
+
+                                    <select
+                                        className="w-full border rounded-xl px-4 py-3"
+                                        value={product.base_uom}
+                                        onChange={(e) =>
+                                            setProduct({
+                                                ...product,
+                                                base_uom: e.target.value,
+                                            })
+                                        }
+                                    >
+
+                                        <option value="">Select Base Unit</option>
+
+                                        <option value="Pc">Piece (Pc)</option>
+
+                                        <option value="Box">Box</option>
+
+                                        <option value="Case">Case</option>
+
+                                        <option value="Pack">Pack</option>
+
+                                        <option value="Dozen">Dozen</option>
+
+                                    </select>
+
+                                </div>
+
+                                <div className="grid lg:grid-cols-2 gap-6">
+
+                                    {/* Selling */}
+
+                                    <div className="border rounded-xl p-4">
+
+                                        <h4 className="font-semibold mb-4">
+                                            Selling Unit
+                                        </h4>
+
+                                        <div className="grid grid-cols-2 gap-4">
+
+                                            <div>
+
+                                                <label className="block text-sm mb-2">
+                                                    Unit
+                                                </label>
+
+                                                <select
+                                                    className="w-full border rounded-xl px-4 py-3"
+                                                    value={product.selling_uom}
+                                                    onChange={(e) =>
+                                                        setProduct({
+                                                            ...product,
+                                                            selling_uom: e.target.value,
+                                                        })
+                                                    }
+                                                >
+
+                                                    <option value="Pc">Piece</option>
+
+                                                    <option value="Box">Box</option>
+
+                                                    <option value="Case">Case</option>
+
+                                                    <option value="Pack">Pack</option>
+
+                                                    <option value="Dozen">Dozen</option>
+
+                                                </select>
+
+                                            </div>
+
+                                            <div>
+
+                                                <label className="block text-sm mb-2">
+                                                    Quantity
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    className="w-full border rounded-xl px-4 py-3"
+                                                    value={product.selling_qty}
+                                                    onChange={(e) =>
+                                                        setProduct({
+                                                            ...product,
+                                                            selling_qty: e.target.value,
+                                                        })
+                                                    }
+                                                />
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    {/* Purchasing */}
+
+                                    <div className="border rounded-xl p-4">
+
+                                        <h4 className="font-semibold mb-4">
+                                            Purchasing Unit
+                                        </h4>
+
+                                        <div className="grid grid-cols-2 gap-4">
+
+                                            <div>
+
+                                                <label className="block text-sm mb-2">
+                                                    Unit
+                                                </label>
+
+                                                <select
+                                                    className="w-full border rounded-xl px-4 py-3"
+                                                    value={product.purchasing_uom}
+                                                    onChange={(e) =>
+                                                        setProduct({
+                                                            ...product,
+                                                            purchasing_uom: e.target.value,
+                                                        })
+                                                    }
+                                                >
+
+                                                    <option value="Pc">Piece</option>
+
+                                                    <option value="Box">Box</option>
+
+                                                    <option value="Case">Case</option>
+
+                                                    <option value="Pack">Pack</option>
+
+                                                    <option value="Dozen">Dozen</option>
+
+                                                </select>
+
+                                            </div>
+
+                                            <div>
+
+                                                <label className="block text-sm mb-2">
+                                                    Quantity
+                                                </label>
+
+                                                <input
+                                                    type="number"
+                                                    min="1"
+                                                    className="w-full border rounded-xl px-4 py-3"
+                                                    value={product.purchasing_qty}
+                                                    onChange={(e) =>
+                                                        setProduct({
+                                                            ...product,
+                                                            purchasing_qty: e.target.value,
+                                                        })
+                                                    }
+                                                />
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+
+                                <div className="mt-5 rounded-xl bg-blue-50 border border-blue-200 p-4">
+
+                                    <p className="text-sm text-blue-700">
+
+                                        <strong>Example:</strong>
+
+                                        Base Unit: <strong>Piece</strong><br />
+
+                                        Selling: <strong>1 Piece</strong><br />
+
+                                        Purchasing: <strong>1 Case = 48 Pieces</strong>
+
+                                    </p>
+
+                                </div>
+
+                            </div>                   
+                            
+                   
+                </div>
+              {/** right side */}
+                 <div className="space-y-5">
+                                
+
+                                    <div className="rounded-2xl border bg-white p-6 shadow-sm">
+
+                                    <div className="flex items-center justify-between mb-5">
+
+                                    <div>
+
+                                        <h2 className="text-lg font-semibold text-gray-900">
+                                            Warehouse
+                                        </h2>
+
+                                        <p className="text-sm text-gray-500">
+                                            Select where this inventory will be stored.
+                                        </p>
+
+                                    </div>
+
+                                    <button
+                                        type="button"
+                                        className="rounded-xl border px-4 py-2 text-sm hover:bg-gray-50"
+                                    >
+                                        Manage Warehouses
+                                    </button>
+
+                                </div>
+
+                                <label className="block text-sm font-medium mb-2">
+                                    Default Warehouse <span className="text-red-500">*</span>
+                                </label>
+
+                                <select
+                                    className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+                                >
+                                    <option value="">Select Warehouse</option>
+                                    <option value="WH-001">
+                                        WH-001 - Main Warehouse
+                                    </option>
+                                </select>
+
+                                <div className="mt-4 rounded-xl bg-slate-50 p-4 border">
+
+                                    <div className="flex justify-between">
+
+                                        <span className="text-gray-500">
+                                            Warehouse Code
+                                        </span>
+
+                                        <span className="font-medium">
+                                            WH-001
+                                        </span>
+
+                                    </div>
+
+                                    <div className="flex justify-between mt-2">
+
+                                        <span className="text-gray-500">
+                                            Location
+                                        </span>
+
+                                        <span className="font-medium">
+                                            Main Warehouse
+                                        </span>
+
+                                    </div>
+
+                                </div>
+                            </div>       
+                             </div>
+                
+                    </div>
+                    </FormCard>
 
                     {/* Buttons */}
 
@@ -419,10 +714,131 @@ export default function AddVariantPage() {
                         }                       
                         
                     </div>
+                    
 
                 </div>
-                      </form>                          
+                      </form>     
+                                    
             </div>
+
+            
+            {/** MODAL ADD UOM */}
+                {showUomModal && (
+
+                <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
+
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg">
+
+                        {/* Header */}
+
+                        <div className="flex justify-between items-center border-b p-5">
+
+                            <div>
+
+                                <h2 className="text-xl font-semibold">
+                                    Add Unit of Measure
+                                </h2>
+
+                                <p className="text-sm text-gray-500">
+                                    Create a new Unit of Measure.
+                                </p>
+
+                            </div>
+
+                            <button
+                                onClick={() => setShowUomModal(false)}
+                                className="text-gray-500 hover:text-red-500"
+                            >
+                                ✕
+                            </button>
+
+                        </div>
+
+                        {/* Body */}
+
+                        <div className="p-6 space-y-5">
+
+                            <div>
+
+                                <label className="block mb-2 font-medium">
+                                    UoM Code <span className="text-red-500">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    placeholder="PC"
+                                    className="w-full border rounded-xl px-4 py-3 uppercase"
+                                />
+
+                            </div>
+
+                            <div>
+
+                                <label className="block mb-2 font-medium">
+                                    Description <span className="text-red-500">*</span>
+                                </label>
+
+                                <input
+                                    type="text"
+                                    placeholder="Piece"
+                                    className="w-full border rounded-xl px-4 py-3"
+                                />
+
+                            </div>
+
+                            <div className="flex items-center justify-between rounded-xl border p-4">
+
+                                <div>
+
+                                    <h4 className="font-medium">
+                                        Status
+                                    </h4>
+
+                                    <p className="text-sm text-gray-500">
+                                        Enable this Unit of Measure.
+                                    </p>
+
+                                </div>
+
+                                <button
+                                    type="button"
+                                    className="relative inline-flex h-7 w-14 rounded-full bg-green-500"
+                                >
+
+                                    <span className="absolute top-1 left-8 h-5 w-5 rounded-full bg-white shadow"/>
+
+                                </button>
+
+                            </div>
+
+                        </div>
+
+                        {/* Footer */}
+
+                        <div className="flex justify-end gap-3 border-t p-5">
+
+                            <button
+                                type="button"
+                                onClick={() => setShowUomModal(false)}
+                                className="border rounded-xl px-5 py-2"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                type="button"
+                                className="bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-5 py-2"
+                            >
+                                Save UoM
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                )}
         </AdminMainLayout>
     );
 }

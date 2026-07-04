@@ -7,9 +7,9 @@ import { Head, useForm } from '@inertiajs/react';
 import { FormEventHandler, useRef } from 'react';
 
 import HeadingSmall from '@/components/old/heading-small';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/oldui/button';
+import { Input } from '@/components/oldui/input';
+import { Label } from '@/components/oldui/label';
 
 const breadcrumbs: BreadcrumbItem[] = [
     {

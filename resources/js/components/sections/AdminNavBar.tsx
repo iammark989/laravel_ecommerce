@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@inertiajs/react";
+import { Link,usePage } from "@inertiajs/react";
 import {
     Menu,
     Bell,
@@ -18,6 +18,10 @@ export default function AdminNavbar({
     onMenuClick,
 }: Props) {
     const [openProfile, setOpenProfile] = useState(false);
+
+    const { auth } = usePage().props as any;
+
+    const user = auth?.user;
 
     return (
         <header className="sticky top-0 z-40 h-16 bg-white border-b shadow-sm">
@@ -40,7 +44,7 @@ export default function AdminNavbar({
                     {/* Logo */}
 
                     <img
-                        src="/images/logo.png"
+                        src={`${import.meta.env.VITE_IMAGE_URL}/files/user_images/${user.image}`}
                         alt="Logo"
                         className="w-10 h-10 object-contain"
                     />

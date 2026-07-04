@@ -3,6 +3,7 @@
 namespace App\Http\Middleware;
 
 use App\Models\Categorie;
+use App\Models\Role;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -46,6 +47,7 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
+            'role' => $request->user() ? Role::find($request->user()->role_id) : null,
         ]);
     }
 }

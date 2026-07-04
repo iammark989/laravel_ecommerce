@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "@inertiajs/react";
+import { Link,usePage } from "@inertiajs/react";
 import {
     LayoutDashboard,
     Boxes,
@@ -34,6 +34,9 @@ import {
 } from "lucide-react";
 
 export default function AdminSidebar() {
+
+    const { auth,role } = usePage().props as any;
+    const user = auth?.user;
 
     const [open, setOpen] = useState(false);
 
@@ -129,20 +132,24 @@ export default function AdminSidebar() {
 
                     <div className="flex items-center gap-3">
 
-                        <div className="w-14 h-14 rounded-full bg-slate-700 flex items-center justify-center">
+                        <div className="w-14 h-14 rounded-full overflow-hidden border-2 border-slate-200 shadow-sm bg-slate-100 flex items-center justify-center">
 
-                            <UserCircle size={40} />
+                        <img
+                            src={`${import.meta.env.VITE_IMAGE_URL}/files/user_images/${user.image}`}
+                            alt={user.name}
+                            className="w-full h-full object-cover"
+                        />
 
-                        </div>
+                    </div>
 
                         <div>
 
                             <p className="font-semibold">
-                                Mark Arvin
+                                {user.first_name}
                             </p>
 
                             <p className="text-sm text-slate-400">
-                                Administrator
+                                {role.name}
                             </p>
 
                         </div>

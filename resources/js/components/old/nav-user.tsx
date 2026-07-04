@@ -1,5 +1,5 @@
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/ui/sidebar';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/oldui/dropdown-menu';
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/components/oldui/sidebar';
 import { UserInfo } from '@/components/old/user-info';
 import { UserMenuContent } from '@/components/old/user-menu-content';
 import { useIsMobile } from '@/hooks/use-mobile';

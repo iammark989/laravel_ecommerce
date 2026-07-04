@@ -6,6 +6,7 @@ namespace App\Models;
 use App\Models\Addresse;
 use App\Models\Product;
 use App\Models\Role;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -44,6 +45,25 @@ class User extends Authenticatable
 
     public function products(){
         return $this->hasMany(Product::class,'created_by','id');
+    }
+
+    protected function firstName(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => ucwords(strtolower($value)),
+        );
+    }
+    protected function middleName(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => ucwords(strtolower($value)),
+        );
+    }
+    protected function lastName(): Attribute
+    {
+        return Attribute::make(
+            set: fn ($value) => ucwords(strtolower($value)),
+        );
     }
 
    

@@ -6,9 +6,9 @@ import { FormEventHandler } from 'react';
 import DeleteUser from '@/components/old/delete-user';
 import HeadingSmall from '@/components/old/heading-small';
 import InputError from '@/components/old/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/oldui/button';
+import { Input } from '@/components/oldui/input';
+import { Label } from '@/components/oldui/label';
 import AppLayout from '@/layouts/app-layout';
 import SettingsLayout from '@/layouts/settings/layout';
 

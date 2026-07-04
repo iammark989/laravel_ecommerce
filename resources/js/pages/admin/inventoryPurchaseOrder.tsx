@@ -52,11 +52,8 @@ export default function PurchaseOrderPage() {
                 sku: variant.sku,
                 variant_name: variant.variant_name,
                 quantity: 0,
-                remarks: "",
-                current_stock:
-                    variant.quantity_on_hand,
-                new_stock:
-                variant.quantity_on_hand,
+                cost_price: "",
+                amount: "",
             },
         ]);
     

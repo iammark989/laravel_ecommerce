@@ -22,6 +22,7 @@ return new class extends Migration
             $table->string('mobile');
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->string('image')->nullable()->default('fallback_image.png');
 
             $table->foreignID('role_id')->constrained('roles')->cascadeOnDelete()->default('1');
 

@@ -5,9 +5,9 @@ import { FormEventHandler } from 'react';
 
 import InputError from '@/components/old/input-error';
 import TextLink from '@/components/old/text-link';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/oldui/button';
+import { Input } from '@/components/oldui/input';
+import { Label } from '@/components/oldui/label';
 import AuthLayout from '@/layouts/auth-layout';
 
 export default function ForgotPassword({ status }: { status?: string }) {

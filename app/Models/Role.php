@@ -21,10 +21,10 @@ class Role extends Model
     }
 
     protected function name(): Attribute
-{
-    return Attribute::make(
-        set: fn ($value) => ucwords(strtolower($value)),
-    );
-}
+    {
+        return Attribute::make(
+            set: fn ($value) => ucwords(strtolower($value)),
+        );
+    }
 
 }

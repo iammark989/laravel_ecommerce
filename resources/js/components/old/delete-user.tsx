@@ -3,13 +3,13 @@ import { FormEventHandler, useRef } from 'react';
 
 // Components...
 import InputError from '@/components/old/input-error';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/oldui/button';
+import { Input } from '@/components/oldui/input';
+import { Label } from '@/components/oldui/label';
 
 import HeadingSmall from '@/components/old/heading-small';
 
-import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '@/components/oldui/dialog';
 
 export default function DeleteUser() {
     const passwordInput = useRef<HTMLInputElement>(null);
