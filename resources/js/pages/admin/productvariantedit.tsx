@@ -4,7 +4,7 @@ import { ArrowLeft, Upload, Save, Edit } from "lucide-react";
 import { useState } from "react";
 
 
-export default function EditVariantPage() {
+export default function ProductVariantEditPage() {
     const [preview, setPreview] = useState<string | null>(null);
 
     const { products,categories,variants } = usePage().props as any;
@@ -16,7 +16,7 @@ export default function EditVariantPage() {
         sku: variants.sku,
         barcode: variants.barcode,
         cost_price: variants.cost_price,
-        selling_price:variants.selling_price,
+        warehouse_id:variants.warehouse_id,
         variant_name:variants.variant_name,
         is_active: variants.is_active,
         image:  null as File | null,
@@ -210,24 +210,7 @@ export default function EditVariantPage() {
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">
-                                        Selling Price <span className="text-red-500"> *</span> 
-                                                    {errors.selling_price && (  <span className="text-red-500 text-sm mt-2"> {errors.selling_price}
-                                                         </span> )}
-                                    </label>
-
-                                    <input
-                                        type="number"
-                                        className={`w-full border rounded-xl px-4 py-3 ${!editOn ? 'bg-gray-100 cursor-not-allowed' : 'bg-white'}`}
-                                        placeholder="4999.00"
-                                        required
-                                        maxLength={12}
-                                        value={product.selling_price}
-                                        onChange={(e) => setProduct({...product, selling_price: e.target.value})}
-                                        disabled={!editOn}
-                                    />
-                                </div>
+                                
 
                             </div>
 

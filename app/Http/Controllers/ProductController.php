@@ -4,9 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\Brand;
 use App\Models\Categorie;
+use App\Models\PriceList;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\ProductVariant;
+use App\Models\Uom;
 use App\Models\VariantInventorie;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -61,11 +63,11 @@ class ProductController extends Controller
 
     // GO TO ADD PRODUCT / ITEM
     public function addproduct(){
-    $categories = Categorie::orderBy('name','asc')->get();
-    $brands = Brand::orderBy('name','asc')->get();
-    $products = Product::orderBy('name','asc')->get();
-    return Inertia::render('admin/productcreatepage',
-    [ 'categories' => $categories, 'brands' => $brands, 'products' => $products]);
+        $categories = Categorie::orderBy('name','asc')->get();
+        $brands = Brand::orderBy('name','asc')->get();
+        $products = Product::orderBy('name','asc')->get();
+        return Inertia::render('admin/productcreatepage',
+        [ 'categories' => $categories, 'brands' => $brands, 'products' => $products]);
     }
 
     // ADD CATEGORY
@@ -138,10 +140,47 @@ class ProductController extends Controller
         public function goToCreateProductVariant($slug){
             $products = Product::where('slug','=',$slug)->firstOrFail();
             $categories = Categorie::where('id',$products->category_id)->firstOrFail();
+            $priceList = PriceList::orderBy('code','asc')->get();
             return Inertia::render('admin/productvariantadd',[
-                'products' => $products, 'categories' => $categories,
+                'products' => $products, 'categories' => $categories, 'priceLists' => $priceList,
             ]);
         }
+
+        // add price list
+        public function addPriceList(Request $request){
+        $incomingFields = $request->validate([
+                'code' => [
+                    'required',
+                    'string',
+                    'alpha_dash',
+                    'max:25',
+                    'unique:price_lists,code',
+                ],
+
+                'description' => [
+                    'required',
+                    'string',
+                    'max:50',
+                    'unique:price_lists,description',
+                ],
+
+                'is_active' => [
+                    'required',
+                    'boolean',
+                ],
+            ]); 
+            }
+
+    // ADD UOM / SAVE UOM
+
+    public function saveUom(Request $request){
+        $incomingFields = $request->validate([
+                    'code' => ['required','string','alpha_dash','max:10',Rule::unique('uoms', 'code'),],
+                    'description' => ['required','string','max:50',Rule::unique('uoms', 'description'),],
+                    'is_active' => ['required','boolean',],
+        ]);
+        Uom::create($incomingFields);
+    }
 
     // SAVE CREATED VARIANT / SAVE ADD VARIANT
         public function saveVariant(Request $request,$slug){
@@ -216,7 +255,7 @@ class ProductController extends Controller
         }
 
         // GO TO PRODUCT DETAILS PAGE
-        public function productEditPage($slug){
+        public function goToProductVariantDetails($slug){
             $categories = Categorie::orderBy('name','asc')->get();
             $brands = Brand::orderBy('name','asc')->get();
             $products = DB::table('products as product')
@@ -254,7 +293,7 @@ class ProductController extends Controller
                             'variant.product_id as product_id',
                             'variant.sku as sku',
                             'variant.barcode as barcode',
-                            'variant.selling_price as selling_price',
+                            'variant.warehouse_id as warehouse_id',
                             'variant.variant_name as variant_name',
                             'variant.is_active as is_active',
                             'image.image as image',
@@ -266,7 +305,7 @@ class ProductController extends Controller
                             'variant.product_id',
                             'variant.sku',
                             'variant.barcode',
-                            'variant.selling_price',
+                            'variant.warehouse_id',
                             'variant.variant_name',
                             'variant.is_active',
                             'image.image',
@@ -278,7 +317,7 @@ class ProductController extends Controller
 
             
             $allProducts = Product::get();
-            return Inertia::render('admin/producteditpage',[
+            return Inertia::render('admin/productvariantdetails',[
                 'products' => $products,
                 'brands' => $brands,
                 'categories' => $categories,

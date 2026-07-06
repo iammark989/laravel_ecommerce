@@ -19,7 +19,23 @@ return new class extends Migration
             $table->string('barcode')->nullable()->unique();
 
             $table->decimal('cost_price',10,2);
-            $table->decimal('selling_price',10,2);
+            $table->foreignId('warehouse_id')->constrained('warehouses');
+
+            $table->enum('tax_type', [
+                'vatable',
+                'vat_exempt',
+                'zero_rated',
+            ])->default('vatable');
+
+            $table->foreignId('base_uom_id')->constrained('uoms');
+
+            $table->foreignId('selling_uom_id')->constrained('uoms');
+
+            $table->decimal('selling_qty',12,3)->default(1);
+
+            $table->foreignId('purchasing_uom_id')->constrained('uoms');
+
+            $table->decimal('purchasing_qty',12,3)->default(1);
 
             $table->string('variant_name')->unique();
 

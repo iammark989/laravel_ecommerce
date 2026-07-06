@@ -6,6 +6,8 @@ use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\PurchaseOrderItem;
 use App\Models\VariantInventorie;
+use App\Models\VariantPrice;
+use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -21,7 +23,8 @@ class ProductVariant extends Model
         'sku',
         'barcode',
         'cost_price',
-        'selling_price',
+        'warehouse_id',
+        'tax_type',
         'variant_name',
         'is_active',
 
@@ -30,6 +33,14 @@ class ProductVariant extends Model
 
     public function product(){
         return $this->belongsTo(Product::class,'product_id','id');
+    }
+
+    public function warehouse(){
+        return $this->belongsTo(Warehouse::class,'warehouse_id','id');
+    }
+
+    public function variantprices(){
+        return $this->hasMany(VariantPrice::class,'product_variant_id','id');
     }
 
      public function productinventories(){

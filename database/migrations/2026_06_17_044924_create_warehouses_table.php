@@ -26,15 +26,9 @@ return new class extends Migration
 
             $table->boolean('is_active')->default(true);
 
-            $table->foreignId('created_by')
-                ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
+            $table->string('created_by')->nullable();
 
-            $table->foreignId('updated_by')
-                ->nullable()
-                ->constrained('users')
-                ->nullOnDelete();
+            $table->string('updated_by')->nullable();
 
             $table->timestamps();
         });

@@ -1,6 +1,6 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { Link,usePage,router } from "@inertiajs/react";
-import { ArrowLeft, Upload, Save, Plus } from "lucide-react";
+import { ArrowLeft, Upload, Save, Plus, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
 import FormCard from "@/components/ui/FormCard";
 import PageHeader from "@/components/ui/PageHeader";
@@ -9,22 +9,56 @@ import PageHeader from "@/components/ui/PageHeader";
 export default function AddVariantPage() {
     const [preview, setPreview] = useState<string | null>(null);
 
-    const { products,categories } = usePage().props as any;
+    const { products,categories,priceLists } = usePage().props as any;
     const { errors } = usePage().props;
     const [ saving, setSaving ] = useState(false);
     const [ showUomModal, setShowUomModal] = useState(false);
+    const [showPriceLists, setShowPriceLists] = useState(false);
+    
 
+    interface VariantPrice {
+    price_list_id: number;
+    description: string;
+    price: string;
+    }
+    // form inputs variant price
+    const [variantPrices, setVariantPrices] = useState<VariantPrice[]>(
+        priceLists.map((price: any) => ({
+            price_list_id: price.id,
+            description: price.description,
+            price: "",
+        }))
+    );
+
+    const handlePriceChange = (
+    priceListId: number,
+    value: string
+    ) => {
+
+        setVariantPrices((prev) =>
+            prev.map((item) =>
+                item.price_list_id === priceListId
+                    ? {
+                        ...item,
+                        price: value,
+                    }
+                    : item
+            )
+        );
+
+    };
+    // form inputs product variant
     const [ product,setProduct ] = useState({
         sku: "",
         barcode: "",
         cost_price: "",
-        selling_price:"",
+        warehouse_id:"",
         variant_name:"",
         is_active:true,
         image:  null as File | null,
         quantity_on_hand:"",
         reorder_level:"",
-
+        
     });
 
     const [ errorMsg,setErrorMsg]=useState("");
@@ -195,30 +229,190 @@ export default function AddVariantPage() {
                                     />
                                 </div>
 
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">
-                                        Selling Price <span className="text-red-500"> *</span> 
-                                                    {errors.selling_price && (  <span className="text-red-500 text-sm mt-2"> {errors.selling_price}
-                                                         </span> )}
-                                    </label>
+                                {/* Pricing */}
 
-                                    <input
-                                        type="number"
-                                        className="w-full border rounded-xl px-4 py-3"
-                                        placeholder="4999.00"
-                                        required
-                                        maxLength={12}
-                                        value={product.selling_price}
-                                        onChange={(e) => setProduct({...product, selling_price: e.target.value})}
-                                    />
+                                <div className="rounded-2xl border bg-white shadow-sm">
+
+                                    {/* Header */}
+
+                                    <div className="flex flex-col md:flex-row md:items-center md:justify-between p-5 border-b">
+
+                                        <div>
+
+                                            <h2 className="text-lg font-semibold">
+                                                Selling Price Lists
+                                            </h2>
+
+                                            <p className="text-sm text-gray-500">
+                                                Configure multiple selling prices for this product variant.
+                                            </p>
+
+                                        </div>
+
+                                        <button
+                                            type="button"
+                                            onClick={() => setShowPriceLists(!showPriceLists)}
+                                            className="mt-4 md:mt-0 inline-flex items-center gap-2 rounded-xl bg-sky-600 hover:bg-sky-700 px-4 py-2 text-white transition"
+                                        >
+
+                                            {showPriceLists ? (
+                                                <>
+                                                    Hide Price Lists
+                                                    <ChevronUp size={18} />
+                                                </>
+                                            ) : (
+                                                <>
+                                                    Manage Price Lists
+                                                    <ChevronDown size={18} />
+                                                </>
+                                            )}
+
+                                        </button>
+
+                                    </div>
+
+                                    {/* Summary */}
+
+                                    <div className="p-5">
+
+                                        <div className="space-y-2 text-sm">
+
+                                            <div className="flex justify-between">
+
+                                                <span className="text-gray-500">
+                                                    Retail
+                                                </span>
+
+                                                <span className="font-medium">
+                                                    ₱500.00
+                                                </span>
+
+                                            </div>
+
+                                            <div className="flex justify-between">
+
+                                                <span className="text-gray-500">
+                                                    Wholesale
+                                                </span>
+
+                                                <span className="font-medium">
+                                                    ₱470.00
+                                                </span>
+
+                                            </div>
+
+                                            <div className="flex justify-between">
+
+                                                <span className="text-gray-500">
+                                                    Terms
+                                                </span>
+
+                                                <span className="font-medium">
+                                                    ₱480.00
+                                                </span>
+
+                                            </div>
+
+                                        </div>
+
+                                    </div>
+
+                                    {/* Collapsible Section */}
+
+                                    <div
+                                        className={`overflow-hidden transition-all duration-300 ${
+                                            showPriceLists
+                                                ? "max-h-[700px] opacity-100 border-t"
+                                                : "max-h-0 opacity-0"
+                                        }`}
+                                    >
+
+                                        <div className="p-5">
+
+                                            {/* Header */}
+
+                                            <div className="flex items-center justify-between mb-5">
+
+                                                <div>
+
+                                                    <h3 className="font-semibold">
+                                                        Price List
+                                                    </h3>
+
+                                                    <p className="text-sm text-gray-500">
+                                                        Add or update selling prices.
+                                                    </p>
+
+                                                </div>
+
+                                                <button
+                                                    type="button"
+                                                    className="inline-flex items-center gap-2 rounded-xl bg-green-600 hover:bg-green-700 px-4 py-2 text-white transition"
+                                                >
+
+                                                    <Plus size={18} />
+
+                                                    Price Type
+
+                                                </button>
+
+                                            </div>
+
+                                            {/* Price Inputs */}
+
+                                            <div className="space-y-4">
+
+                                                {priceLists.map((price: any) => {
+
+                                                const currentPrice = variantPrices.find(
+                                                    p => p.price_list_id === price.id
+                                                );
+
+                                                return (
+
+                                                    <div
+                                                        key={price.id}
+                                                        className="grid md:grid-cols-2 gap-4 items-center"
+                                                    >
+
+                                                        <div className="font-medium">
+
+                                                            {price.description}
+
+                                                        </div>
+
+                                                        <input
+                                                            type="number"
+                                                            placeholder="0.00"
+                                                            value={currentPrice?.price ?? ""}
+                                                            onChange={(e) =>
+                                                                handlePriceChange(
+                                                                    price.id,
+                                                                    e.target.value
+                                                                )
+                                                            }
+                                                            className="border rounded-xl px-4 py-3"
+                                                        />
+
+                                                    </div>
+
+                                                );
+
+                                            })}
+                                                
+
+                                            </div>
+                                             
+
+                                        </div>
+
+                                    </div>
+
                                 </div>
 
+                                
+
                             </div>
-
-                            
-
-                           
-                           
 
                         </div>
 
@@ -230,7 +424,7 @@ export default function AddVariantPage() {
                             <div className="flex items-center justify-between rounded-xl border bg-gray-50 p-4">
                                 <div>
                                     <p className="font-medium text-gray-800">
-                                        Product Status
+                                        Variant Status
                                     </p>
                                     
                                 </div>
@@ -755,7 +949,7 @@ export default function AddVariantPage() {
                         </div>
 
                         {/* Body */}
-
+                        <form onSubmit={saveModal}>
                         <div className="p-6 space-y-5">
 
                             <div>
@@ -833,9 +1027,9 @@ export default function AddVariantPage() {
                             </button>
 
                         </div>
-
+                           </form>
                     </div>
-
+                        
                 </div>
 
                 )}
