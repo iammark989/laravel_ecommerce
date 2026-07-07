@@ -29,5 +29,12 @@ class Warehouse extends Model
         return $this->hasMany(ProductVariant::class,'warehouse_id','id');
     }
 
+    protected function name(): Attribute
+{
+    return Attribute::make(
+        set: fn ($value) => ucwords(strtolower($value)),
+    );
+}
+
 
 }

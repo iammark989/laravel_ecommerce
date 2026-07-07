@@ -10,6 +10,8 @@ use App\Models\ProductImage;
 use App\Models\ProductVariant;
 use App\Models\Uom;
 use App\Models\VariantInventorie;
+use App\Models\VariantPrice;
+use App\Models\Warehouse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -141,8 +143,14 @@ class ProductController extends Controller
             $products = Product::where('slug','=',$slug)->firstOrFail();
             $categories = Categorie::where('id',$products->category_id)->firstOrFail();
             $priceList = PriceList::orderBy('code','asc')->get();
+            $uoms = Uom::orderBy('description')->get();
+            $warehouses = Warehouse::orderBy('warehouse_code')->get();
             return Inertia::render('admin/productvariantadd',[
-                'products' => $products, 'categories' => $categories, 'priceLists' => $priceList,
+                'products' => $products,
+                'categories' => $categories,
+                'priceLists' => $priceList,
+                'uoms' => $uoms,
+                'warehouses' => $warehouses,
             ]);
         }
 
@@ -185,29 +193,39 @@ class ProductController extends Controller
     // SAVE CREATED VARIANT / SAVE ADD VARIANT
         public function saveVariant(Request $request,$slug){
             $incomingFields = $request->validate([
-                'sku' => 'required|string|max:50|unique:product_variants,sku',
+                'sku' => 'required|string|min:6|max:50|unique:product_variants,sku',
                 'barcode' => 'nullable|string|max:100|unique:product_variants,barcode',
                 'cost_price' => 'required|numeric|min:0',
-                'selling_price' => 'required|numeric|min:0|gte:cost_price',
+                'warehouse_id' => 'required|exists:warehouses,id',
                 'variant_name' => 'required|string|max:100|unique:product_variants,variant_name',
                 'is_active' => 'required|boolean',
-                'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+                'image' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+                //'tax_type' => 'required|in:vatable,vat_exempt,zero_rated',
                 'quantity_on_hand' => 'required|numeric|min:0',
                 'reorder_level' => 'required|numeric|min:0',
+                //'base_uom_id' => 'required|exists:uoms,id',
+                'selling_uom_id' => 'required|exists:uoms,id',
+                'purchasing_uom_id' => 'required|exists:uoms,id',
+                'selling_qty' => 'required|numeric|gt:0',
+                'purchasing_qty' => 'required|numeric|gt:0',
             ]);
-                $product = Product::where('slug','=',$slug)->firstOrFail();
-                $incomingFields['product_id'] = $product->id;
+                $product = Product::whereSlug($slug)->firstOrFail();              
 
             DB::transaction(function () use ($request, $incomingFields, $product) {
             
             $variant = ProductVariant::create([
-                'product_id' => $incomingFields['product_id'],
+                'product_id' => $product->id,
                 'sku' => $incomingFields['sku'],
                 'barcode' => $incomingFields['barcode'],
                 'cost_price' => $incomingFields['cost_price'],
-                'selling_price' => $incomingFields['selling_price'],
+                'warehouse_id' => $incomingFields['warehouse_id'],
                 'variant_name' => $incomingFields['variant_name'],
                 'is_active' => $incomingFields['is_active'],
+                'selling_uom_id' => $incomingFields['selling_uom_id'],
+                'purchasing_uom_id' => $incomingFields['purchasing_uom_id'],
+                'selling_qty' => $incomingFields['selling_qty'],
+                'purchasing_qty' => $incomingFields['purchasing_qty'],
+                'base_uom_id' => $incomingFields['selling_uom_id'],
             ]);
 
             VariantInventorie::create([
@@ -223,23 +241,11 @@ class ProductController extends Controller
                 $filename = Str::slug($incomingFields['variant_name']).uniqid().".".$extension;
                 
                 $file->move(public_path('files/variant_images'), $filename);
-                $incomingFields['image'] = $filename;
-
-                $imageCheck = ProductImage::where('product_variant_id',$variant->id)->latest()->first();
-                if(!$imageCheck){
                     ProductImage::create([
                         'product_variant_id' =>  $variant->id,
-                        'image' =>$incomingFields['image'],
+                        'image' => $filename,
                         'sort_order' => 1,
                         ]);
-                }else{
-                    $incomingFields['sort_order'] = $imageCheck->sort_order + 1;
-                    ProductImage::create([
-                        'product_variant_id' =>  $variant->id,
-                        'image' => $incomingFields['image'],
-                        'sort_order' =>$incomingFields['sort_order'],
-                        ]);
-                }
             }else{
                 $incomingFields['image'] = "fallback_image.png";
                 ProductImage::create([
@@ -247,6 +253,20 @@ class ProductController extends Controller
                         'image' =>$incomingFields['image'],
                         'sort_order' => 1,
                         ]);
+            }
+
+            foreach ($request->sellingPrices as $price) {
+
+                if ($price['price'] === null || $price['price'] === '') {
+                    continue;
+                }
+
+                VariantPrice::create([
+                    'product_variant_id' => $variant->id,
+                    'price_list_id'      => $price['price_list_id'],
+                    'price'              => $price['price'],
+                ]);
+
             }
 
            });

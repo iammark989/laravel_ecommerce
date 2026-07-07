@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\Product;
 use App\Models\ProductImage;
 use App\Models\PurchaseOrderItem;
+use App\Models\Uom;
 use App\Models\VariantInventorie;
 use App\Models\VariantPrice;
 use App\Models\Warehouse;
@@ -27,9 +28,24 @@ class ProductVariant extends Model
         'tax_type',
         'variant_name',
         'is_active',
-
+        'base_uom_id',
+        'selling_uom_id',
+        'selling_qty',
+        'purchasing_uom_id',
+        'purchasing_qty',
     ];
 
+    public function baseuom(){
+        return $this->belongsTo(Uom::class,'base_uom_id','id');
+    }
+
+    public function sellinguom(){
+        return $this->belongsTo(Uom::class,'selling_uom_id','id');
+    }
+
+    public function purchasinguom(){
+        return $this->belongsTo(Uom::class,'purchasing_uom_id','id');
+    }
 
     public function product(){
         return $this->belongsTo(Product::class,'product_id','id');

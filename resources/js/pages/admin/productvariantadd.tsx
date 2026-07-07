@@ -4,28 +4,29 @@ import { ArrowLeft, Upload, Save, Plus, ChevronDown, ChevronUp } from "lucide-re
 import { useState } from "react";
 import FormCard from "@/components/ui/FormCard";
 import PageHeader from "@/components/ui/PageHeader";
+import type { FormDataConvertible } from "@inertiajs/core";
 
 
 export default function AddVariantPage() {
     const [preview, setPreview] = useState<string | null>(null);
 
-    const { products,categories,priceLists } = usePage().props as any;
+    const { products,categories,priceLists,uoms,warehouses } = usePage().props as any;
     const { errors } = usePage().props;
     const [ saving, setSaving ] = useState(false);
     const [ showUomModal, setShowUomModal] = useState(false);
     const [showPriceLists, setShowPriceLists] = useState(false);
     
 
-    interface VariantPrice {
+    interface SellingPrice {
     price_list_id: number;
-    description: string;
     price: string;
+    [key: string]: FormDataConvertible;
     }
+
     // form inputs variant price
-    const [variantPrices, setVariantPrices] = useState<VariantPrice[]>(
+    const [sellingPrices, setSellingPrices] = useState<SellingPrice[]>(
         priceLists.map((price: any) => ({
             price_list_id: price.id,
-            description: price.description,
             price: "",
         }))
     );
@@ -35,7 +36,7 @@ export default function AddVariantPage() {
     value: string
     ) => {
 
-        setVariantPrices((prev) =>
+        setSellingPrices((prev) =>
             prev.map((item) =>
                 item.price_list_id === priceListId
                     ? {
@@ -48,7 +49,7 @@ export default function AddVariantPage() {
 
     };
     // form inputs product variant
-    const [ product,setProduct ] = useState({
+    const [ variant,setVariant ] = useState({
         sku: "",
         barcode: "",
         cost_price: "",
@@ -58,7 +59,11 @@ export default function AddVariantPage() {
         image:  null as File | null,
         quantity_on_hand:"",
         reorder_level:"",
-        
+        //base_uom_id:"",
+        selling_uom_id:"",
+        purchasing_uom_id:"",
+        selling_qty:"",
+        purchasing_qty:"",
     });
 
     const [ errorMsg,setErrorMsg]=useState("");
@@ -66,7 +71,13 @@ export default function AddVariantPage() {
     const submitHandle = (e: React.FormEvent) => {
         e.preventDefault();
         setSaving(true)
-        router.post(`/admin/product/${products.slug}/variants/save`,product,{
+
+        const payload = {
+        ...variant,
+        sellingPrices,
+        };
+
+        router.post(`/admin/product/${products.slug}/variants/save`,payload,{
 
             onSuccess:()=>{
                 setSaving(false);
@@ -74,12 +85,10 @@ export default function AddVariantPage() {
             onError:(errors)=>{
                 setSaving(false);
                 setErrorMsg(errors.errorMsg);
-                //console.log(errors);
+                console.log(errors);
             },
 
         });
-
-
     }
 
     const handleImage = (
@@ -90,6 +99,36 @@ export default function AddVariantPage() {
         if (file) {
             setPreview(URL.createObjectURL(file));
         }
+    };
+
+
+    
+// UOM
+const [ uom, setUom] = useState({
+    code:"",
+    description:"",
+    is_active:true,
+});
+const saveUom = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    router.post('/admin/product/create-uom',uom,{
+
+        onSuccess: () => {
+            console.log('success');
+            setShowUomModal(false);
+            setUom({
+                code:"",
+                description:"",
+                is_active:true,
+            });
+        },
+        onError: (error) => {
+            console.log(error);
+        },
+
+    });
+
     };
 
     return (
@@ -166,8 +205,8 @@ export default function AddVariantPage() {
                                         required
                                         maxLength={16}
                                         minLength={6}
-                                        value={product.sku}
-                                        onChange={(e) => setProduct({...product, sku: e.target.value})}
+                                        value={variant.sku}
+                                        onChange={(e) => setVariant({...variant, sku: e.target.value})}
                                     
                                     />
                                 </div>
@@ -185,8 +224,8 @@ export default function AddVariantPage() {
                                         placeholder="123456789"
                                         min={4}
                                         maxLength={50}
-                                        value={product.barcode}
-                                        onChange={(e) => setProduct({...product, barcode: e.target.value})}
+                                        value={variant.barcode}
+                                        onChange={(e) => setVariant({...variant, barcode: e.target.value})}
                                     />
                                 </div>
 
@@ -206,8 +245,8 @@ export default function AddVariantPage() {
                                     required
                                     minLength={6}
                                     maxLength={50}
-                                    value={product.variant_name}
-                                    onChange={(e) => setProduct({...product, variant_name: e.target.value})}
+                                    value={variant.variant_name}
+                                    onChange={(e) => setVariant({...variant, variant_name: e.target.value})}
                                 />
                             </div>
 
@@ -224,8 +263,8 @@ export default function AddVariantPage() {
                                         placeholder="3000.00"
                                         required
                                         maxLength={12}
-                                        value={product.cost_price}
-                                        onChange={(e) => setProduct({...product, cost_price: e.target.value})}
+                                        value={variant.cost_price}
+                                        onChange={(e) => setVariant({...variant, cost_price: e.target.value})}
                                     />
                                 </div>
 
@@ -271,7 +310,7 @@ export default function AddVariantPage() {
 
                                     </div>
 
-                                    {/* Summary */}
+                                    {/* Summary 
 
                                     <div className="p-5">
 
@@ -315,7 +354,7 @@ export default function AddVariantPage() {
 
                                         </div>
 
-                                    </div>
+                                    </div>*/}
 
                                     {/* Collapsible Section */}
 
@@ -364,7 +403,7 @@ export default function AddVariantPage() {
 
                                                 {priceLists.map((price: any) => {
 
-                                                const currentPrice = variantPrices.find(
+                                                const currentPrice = sellingPrices.find(
                                                     p => p.price_list_id === price.id
                                                 );
 
@@ -392,6 +431,7 @@ export default function AddVariantPage() {
                                                                 )
                                                             }
                                                             className="border rounded-xl px-4 py-3"
+                                                            required
                                                         />
 
                                                     </div>
@@ -432,31 +472,31 @@ export default function AddVariantPage() {
                                 <div className="flex items-center gap-4">
                                     <span
                                         className={`rounded-full px-3 py-1 text-sm font-medium ${
-                                            product.is_active
+                                            variant.is_active
                                                 ? "bg-green-100 text-green-700"
                                                 : "bg-red-100 text-red-700"
                                         }`}
                                     >
-                                        {product.is_active ? "Active" : "Inactive"}
+                                        {variant.is_active ? "Active" : "Inactive"}
                                     </span>
 
                                     <button
                                         type="button"
                                         onClick={() =>
-                                            setProduct({
-                                                ...product,
-                                                is_active: !product.is_active,
+                                            setVariant({
+                                                ...variant,
+                                                is_active: !variant.is_active,
                                             })
                                         }
                                         className={`relative h-8 w-14 rounded-full transition-colors duration-300 ${
-                                            product.is_active
+                                            variant.is_active
                                                 ? "bg-sky-500"
                                                 : "bg-gray-300"
                                         }`}
                                     >
                                         <span
                                             className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow transition-transform duration-300 ${
-                                                product.is_active
+                                                variant.is_active
                                                     ? "translate-x-6"
                                                     : ""
                                             }`}
@@ -475,9 +515,9 @@ export default function AddVariantPage() {
 
                                 <label className="border-2 border-dashed rounded-xl h-56 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500">
 
-                                    {product.image ? (
+                                    {variant.image ? (
                                         <img
-                                            src={URL.createObjectURL(product.image)}
+                                            src={URL.createObjectURL(variant.image)}
                                             className="w-full h-full object-cover rounded-xl"
                                         />
                                     ) : (
@@ -497,17 +537,12 @@ export default function AddVariantPage() {
                                         type="file"
                                         hidden
                                         accept="image/*"
-                                        onChange={(e) => setProduct({...product, image: e.target.files?.[0] || null,})}
+                                        onChange={(e) => setVariant({...variant, image: e.target.files?.[0] || null,})}
                                     />
 
                                 </label>
 
                             </div>
-
-                            
-
-                            
-                       
 
                             {/* Information 
 
@@ -560,8 +595,8 @@ export default function AddVariantPage() {
                                         placeholder="20"
                                         maxLength={6}
                                         required
-                                        value={product.quantity_on_hand}
-                                        onChange={(e) => setProduct({...product, quantity_on_hand: e.target.value})}
+                                        value={variant.quantity_on_hand}
+                                        onChange={(e) => setVariant({...variant, quantity_on_hand: e.target.value})}
                                     />
                                 </div>
 
@@ -576,8 +611,8 @@ export default function AddVariantPage() {
                                         placeholder="5"
                                         required
                                         maxLength={5}
-                                        value={product.reorder_level}
-                                        onChange={(e) => setProduct({...product, reorder_level: e.target.value})}
+                                        value={variant.reorder_level}
+                                        onChange={(e) => setVariant({...variant, reorder_level: e.target.value})}
                                     />
                                 </div>
                             </div>
@@ -617,40 +652,37 @@ export default function AddVariantPage() {
 
                                 </div>
 
-                                {/* Base Unit */}
+                                {/* Base Unit 
 
                                 <div className="mb-6">
 
                                     <label className="block text-sm font-medium mb-2">
                                         Base Unit <span className="text-red-500">*</span>
+                                        
+                                       
                                     </label>
 
                                     <select
                                         className="w-full border rounded-xl px-4 py-3"
-                                        value={product.base_uom}
+                                        value={variant.base_uom_id}
                                         onChange={(e) =>
-                                            setProduct({
-                                                ...product,
-                                                base_uom: e.target.value,
+                                            setVariant({
+                                                ...variant,
+                                                base_uom_id: e.target.value,
                                             })
                                         }
+                                        required
                                     >
-
                                         <option value="">Select Base Unit</option>
-
-                                        <option value="Pc">Piece (Pc)</option>
-
-                                        <option value="Box">Box</option>
-
-                                        <option value="Case">Case</option>
-
-                                        <option value="Pack">Pack</option>
-
-                                        <option value="Dozen">Dozen</option>
-
+                                        {uoms.map((uom: any) => (
+                                         <option key={uom.id} value={uom.id}>
+                                            {uom.description}
+                                            </option>       
+                                        ))}
+                                       
                                     </select>
 
-                                </div>
+                                </div>*/}
 
                                 <div className="grid lg:grid-cols-2 gap-6">
 
@@ -672,24 +704,21 @@ export default function AddVariantPage() {
 
                                                 <select
                                                     className="w-full border rounded-xl px-4 py-3"
-                                                    value={product.selling_uom}
+                                                    value={variant.selling_uom_id}
                                                     onChange={(e) =>
-                                                        setProduct({
-                                                            ...product,
-                                                            selling_uom: e.target.value,
+                                                        setVariant({
+                                                            ...variant,
+                                                            selling_uom_id: e.target.value,
                                                         })
                                                     }
+                                                    required
                                                 >
 
-                                                    <option value="Pc">Piece</option>
+                                                    <option value="">Select Unit</option>
 
-                                                    <option value="Box">Box</option>
-
-                                                    <option value="Case">Case</option>
-
-                                                    <option value="Pack">Pack</option>
-
-                                                    <option value="Dozen">Dozen</option>
+                                                    {uoms.map((uom: any) => (
+                                                        <option key={uom.id} value={uom.id}>{uom.description}</option>
+                                                    ))}
 
                                                 </select>
 
@@ -705,13 +734,14 @@ export default function AddVariantPage() {
                                                     type="number"
                                                     min="1"
                                                     className="w-full border rounded-xl px-4 py-3"
-                                                    value={product.selling_qty}
+                                                    value={variant.selling_qty}
                                                     onChange={(e) =>
-                                                        setProduct({
-                                                            ...product,
+                                                        setVariant({
+                                                            ...variant,
                                                             selling_qty: e.target.value,
                                                         })
                                                     }
+                                                    required
                                                 />
 
                                             </div>
@@ -738,24 +768,21 @@ export default function AddVariantPage() {
 
                                                 <select
                                                     className="w-full border rounded-xl px-4 py-3"
-                                                    value={product.purchasing_uom}
+                                                    value={variant.purchasing_uom_id}
                                                     onChange={(e) =>
-                                                        setProduct({
-                                                            ...product,
-                                                            purchasing_uom: e.target.value,
+                                                        setVariant({
+                                                            ...variant,
+                                                            purchasing_uom_id: e.target.value,
                                                         })
                                                     }
+                                                    required
                                                 >
 
-                                                    <option value="Pc">Piece</option>
+                                                    <option value="Pc">Select Unit</option>
 
-                                                    <option value="Box">Box</option>
-
-                                                    <option value="Case">Case</option>
-
-                                                    <option value="Pack">Pack</option>
-
-                                                    <option value="Dozen">Dozen</option>
+                                                   {uoms.map((uom: any)=>(
+                                                    <option key={uom.id} value={uom.id}>{uom.description}</option>
+                                                   ))}
 
                                                 </select>
 
@@ -771,13 +798,14 @@ export default function AddVariantPage() {
                                                     type="number"
                                                     min="1"
                                                     className="w-full border rounded-xl px-4 py-3"
-                                                    value={product.purchasing_qty}
+                                                    value={variant.purchasing_qty}
                                                     onChange={(e) =>
-                                                        setProduct({
-                                                            ...product,
+                                                        setVariant({
+                                                            ...variant,
                                                             purchasing_qty: e.target.value,
                                                         })
                                                     }
+                                                    required
                                                 />
 
                                             </div>
@@ -843,14 +871,18 @@ export default function AddVariantPage() {
 
                                 <select
                                     className="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 focus:border-sky-500 focus:ring-2 focus:ring-sky-200"
+                                   required
+                                   value={variant.warehouse_id}    
+                                   onChange={(e) => setVariant({...variant, warehouse_id: e.target.value})}             
                                 >
                                     <option value="">Select Warehouse</option>
-                                    <option value="WH-001">
-                                        WH-001 - Main Warehouse
-                                    </option>
+                                    {warehouses.map((warehouse:any)=>(
+                                        <option key={warehouse.id} value={warehouse.id}>
+                                            {warehouse.warehouse_code} - {warehouse.name}</option>
+                                    ))}
                                 </select>
 
-                                <div className="mt-4 rounded-xl bg-slate-50 p-4 border">
+                                {/*<div className="mt-4 rounded-xl bg-slate-50 p-4 border">
 
                                     <div className="flex justify-between">
 
@@ -876,7 +908,7 @@ export default function AddVariantPage() {
 
                                     </div>
 
-                                </div>
+                                </div>*/}
                             </div>       
                              </div>
                 
@@ -917,7 +949,7 @@ export default function AddVariantPage() {
 
             
             {/** MODAL ADD UOM */}
-                {showUomModal && (
+{showUomModal && (
 
                 <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
 
@@ -949,7 +981,7 @@ export default function AddVariantPage() {
                         </div>
 
                         {/* Body */}
-                        <form onSubmit={saveModal}>
+                        <form onSubmit={saveUom}>
                         <div className="p-6 space-y-5">
 
                             <div>
@@ -961,6 +993,8 @@ export default function AddVariantPage() {
                                 <input
                                     type="text"
                                     placeholder="PC"
+                                    value={uom.code}
+                                    onChange={(e) => setUom({...uom, code: e.target.value})}
                                     className="w-full border rounded-xl px-4 py-3 uppercase"
                                 />
 
@@ -974,6 +1008,8 @@ export default function AddVariantPage() {
 
                                 <input
                                     type="text"
+                                    value={uom.description}
+                                    onChange={(e) => setUom({...uom, description: e.target.value})}
                                     placeholder="Piece"
                                     className="w-full border rounded-xl px-4 py-3"
                                 />
@@ -994,14 +1030,41 @@ export default function AddVariantPage() {
 
                                 </div>
 
-                                <button
-                                    type="button"
-                                    className="relative inline-flex h-7 w-14 rounded-full bg-green-500"
-                                >
+                                <div className="flex items-center gap-4">
+                                        <span
+                                            className={`rounded-full px-3 py-1 text-sm font-medium ${
+                                                uom.is_active
+                                                    ? "bg-green-100 text-green-700"
+                                                    : "bg-red-100 text-red-700"
+                                            }`}
+                                        >
+                                            {uom.is_active ? "Active" : "Inactive"}
+                                        </span>
 
-                                    <span className="absolute top-1 left-8 h-5 w-5 rounded-full bg-white shadow"/>
-
-                                </button>
+                                        <button
+                                            type="button"
+                                            onClick={() =>
+                                                setUom({
+                                                    ...uom,
+                                                    is_active: !uom.is_active,
+                                                })
+                                            }
+                                            className={`relative h-8 w-14 rounded-full transition-colors duration-300 hover:cursor-pointer ${
+                                                uom.is_active
+                                                    ? "bg-sky-500"
+                                                    : "bg-gray-300"
+                                            }`}
+                                        >
+                                            <span
+                                                className={`absolute left-1 top-1 h-6 w-6 rounded-full bg-white shadow transition-transform duration-300 ${
+                                                    uom.is_active
+                                                        ? "translate-x-6"
+                                                        : ""
+                                                }`}
+                                            />
+                                            
+                                        </button>
+                                    </div>
 
                             </div>
 
@@ -1020,7 +1083,7 @@ export default function AddVariantPage() {
                             </button>
 
                             <button
-                                type="button"
+                                type="submit"
                                 className="bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-5 py-2"
                             >
                                 Save UoM
