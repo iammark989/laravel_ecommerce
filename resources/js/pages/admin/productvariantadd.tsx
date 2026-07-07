@@ -926,18 +926,12 @@ const saveUom = (e: React.FormEvent) => {
                             Cancel
                         </Link>
 
-                         {!saving ?
-                         <button className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2">
+                       
+                        <button disabled={saving} className="hover:cursor-pointer px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2">
                             <Save size={18} />
-                            Save Variant
+                            {saving ? "Saving..." : "Save Variant"}
                         </button>
-
-                        :
-                        <button disabled className="px-6 py-3 bg-sky-500 hover:bg-sky-600 text-white rounded-xl flex items-center justify-center gap-2">
-                            <Save size={18} />
-                            Saving...
-                        </button>
-                        }                       
+                                             
                         
                     </div>
                     
@@ -1084,7 +1078,7 @@ const saveUom = (e: React.FormEvent) => {
 
                             <button
                                 type="submit"
-                                className="bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-5 py-2"
+                                className="bg-sky-600 hover:bg-sky-700 hover:cursor-pointer text-white rounded-xl px-5 py-2"
                             >
                                 Save UoM
                             </button>

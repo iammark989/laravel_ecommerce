@@ -68,11 +68,9 @@ Route::post('/admin/product/{slug}/variants/save',[ProductController::class,'sav
         // SAVE UOM / ADD UOM / CREATE UOM
 Route::post('/admin/product/create-uom',[ProductController::class,'saveUom'])->name('adduom')->middleware('staffonly');
 
-
-
-        // PRODUCT DETAILS PAGE WITH VARIANT LIST AND EDIT PRODUCT DETAILS OPTIONS
+        // GO TO PRODUCT DETAILS PAGE WITH VARIANT LIST AND EDIT PRODUCT DETAILS OPTIONS
 Route::get('/admin/product/{slug}/details',[ProductController::class,'goToProductVariantDetails'])->name('gotoproductvariantdetails')->middleware('staffonly'); 
-        // VARIANT DETAILS WITH EDIT DETAILS OPTION
+        // GO TO VARIANT DETAILS WITH EDIT DETAILS OPTION
 Route::get('/admin/product/{slug}/variants/{variantid}',[ProductController::class,'variantEditPage'])->name('variantEditPage')->middleware('staffonly');
         // SAVE VARIANT UPDATE
 Route::put('/admin/product/{slug}/variants/{variantid}/save',[ProductController::class,'savechangesvariant'])->name('savechangesvariant')->middleware('staffonly');

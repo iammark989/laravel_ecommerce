@@ -398,6 +398,10 @@ class ProductController extends Controller
     public function variantEditPage($slug,$variantid){
         $products = Product::where('slug','=',$slug)->firstOrFail();
         $categories = Categorie::where('id','=',$products->category_id)->firstOrfail();
+        $variantPrices = VariantPrice::where('product_variant_id','=',$variantid);
+        $uoms = Uom::orderBy('description')->get();
+        $priceList = PriceList::orderBy('code','asc')->get();
+        $warehouses = Warehouse::orderBy('warehouse_code')->get();
         $variants = DB::table('product_variants as variant')
                         ->leftJoin('product_images as image','image.product_variant_id','=','variant.id')
                         ->leftJoin('variant_inventories as inventory','inventory.product_variant_id','=','variant.id')
@@ -407,9 +411,13 @@ class ProductController extends Controller
                             'variant.sku as sku',
                             'variant.barcode as barcode',
                             'variant.cost_price as cost_price',
-                            'variant.selling_price as selling_price',
+                            'variant.warehouse_id as warehouse_id',
                             'variant.variant_name as variant_name',
                             'variant.is_active as is_active',
+                            'variant.selling_uom_id as selling_uom_id',
+                            'variant.selling_qty as selling_qty',
+                            'variant.purchasing_uom_id as purchasing_uom_id',
+                            'variant.purchasing_qty as purchasing_qty',
                             'image.image as image',
                             'inventory.quantity_on_hand as quantity_on_hand',
                             'inventory.reorder_level as reorder_level',
@@ -420,7 +428,11 @@ class ProductController extends Controller
                             'variant.sku',
                             'variant.barcode',
                             'variant.cost_price',
-                            'variant.selling_price',
+                            'variant.warehouse_id',
+                            'variant.selling_uom_id',
+                            'variant.selling_qty',
+                            'variant.purchasing_uom_id',
+                            'variant.purchasing_qty',
                             'variant.variant_name',
                             'variant.is_active',
                             'image.image',
@@ -433,6 +445,10 @@ class ProductController extends Controller
             'variants' => $variants,
             'categories' => $categories,
             'products' => $products,
+            'variantPrices' => $variantPrices,
+            'uoms' => $uoms,
+            'warehouses' => $warehouses,
+            'priceLists' => $priceList,
         ]);
     }
 
