@@ -85,7 +85,7 @@ export default function AddVariantPage() {
             onError:(errors)=>{
                 setSaving(false);
                 setErrorMsg(errors.errorMsg);
-                console.log(errors);
+                //console.log(errors);
             },
 
         });
@@ -115,7 +115,7 @@ const saveUom = (e: React.FormEvent) => {
     router.post('/admin/product/create-uom',uom,{
 
         onSuccess: () => {
-            console.log('success');
+            //console.log('success');
             setShowUomModal(false);
             setUom({
                 code:"",
@@ -124,7 +124,7 @@ const saveUom = (e: React.FormEvent) => {
             });
         },
         onError: (error) => {
-            console.log(error);
+            //console.log(error);
         },
 
     });
@@ -207,7 +207,6 @@ const saveUom = (e: React.FormEvent) => {
                                         minLength={6}
                                         value={variant.sku}
                                         onChange={(e) => setVariant({...variant, sku: e.target.value})}
-                                    
                                     />
                                 </div>
 

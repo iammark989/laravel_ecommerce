@@ -23,7 +23,6 @@ export default function EditVariantPage() {
             ? "bg-white hover:border-sky-500 cursor-text"
             : "bg-gray-100 cursor-not-allowed"
     }`;
-    
 
     interface SellingPrice {
     price_list_id: number;
@@ -33,10 +32,20 @@ export default function EditVariantPage() {
 
     // form inputs variant price
     const [sellingPrices, setSellingPrices] = useState<SellingPrice[]>(
-        priceLists.map((price: any) => ({
-            price_list_id: price.id,
-            price: "",
-        }))
+         priceLists.map((priceList: any) => {
+
+        const existing = variantPrices.find(
+            (vp: any) => vp.price_list_id === priceList.id
+        );
+
+        return {
+
+            price_list_id: priceList.id,
+
+            price: existing?.price ?? "",
+
+        };
+        })
     );
 
     const handlePriceChange = (
@@ -84,11 +93,12 @@ export default function EditVariantPage() {
         ...variant,
         sellingPrices,
         };
-
-        router.post(`/admin/product/${products.slug}/variants/save`,payload,{
+        console.log(payload);
+        router.post(`/admin/product/${products.slug}/variants/${variants.id}/save`,{...payload,_method:"put",},{
 
             onSuccess:()=>{
                 setSaving(false);
+                setEditOn(false);
             },
             onError:(errors)=>{
                 setSaving(false);
@@ -144,7 +154,7 @@ const saveUom = (e: React.FormEvent) => {
             <div className="min-h-screen bg-slate-50 p-4 md:p-6">
 
                 {/* Header */}
-                <PageHeader title="Add Product Variant" description="Create a new product variant.">
+                <PageHeader title="Product Variant" description="View and edit variant details.">
                     <Link 
                     className="flex items-center gap-2 border px-4 py-2 rounded-xl bg-white hover:bg-slate-100"
                     href={`/admin/product/${products.slug}/details`}
@@ -214,7 +224,8 @@ const saveUom = (e: React.FormEvent) => {
                                         required
                                         maxLength={16}
                                         minLength={6}
-                                        value={variant.sku}  
+                                        value={variant.sku}
+                                        onChange={(e) => setVariant({...variant, sku: e.target.value})}  
                                     />
                                 </div>
 
@@ -526,31 +537,33 @@ const saveUom = (e: React.FormEvent) => {
                                     Variant Image
                                 </h2>
 
-                                <label className="border-2 border-dashed rounded-xl h-56 flex flex-col items-center justify-center cursor-pointer hover:border-sky-500">
+                                <label className={`${editOn ? 'cursor-pointer' : 'cursor-not-allowed'} relative border-2 border-dashed rounded-xl h-56 overflow-hidden  group`}>
 
-                                    {variant.image ? (
-                                        <img
-                                            src={URL.createObjectURL(variant.image)}
-                                            className="w-full h-full object-cover rounded-xl"
-                                        />
-                                    ) : (
-                                        <>
-                                            <Upload
-                                                size={30}
-                                                className="text-gray-400"
-                                            />
+                                {variant.image ? (
+                                    <img
+                                        src={URL.createObjectURL(variant.image)}
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <img
+                                        src={`${import.meta.env.VITE_IMAGE_URL}/files/variant_images/${variants.image}`}
+                                        className="w-full h-full object-cover"
+                                    />
+                                )}
 
-                                            <span className="mt-2 text-gray-500">
-                                                Upload Image
-                                            </span>
-                                        </>
-                                    )}
+                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition flex items-end justify-center">
+                                    <div className="w-full text-center bg-black/60 text-white py-2 opacity-0 group-hover:opacity-100 transition">
+                                        📷 Click to change image
+                                    </div>
+                                </div>
+
 
                                     <input
                                         type="file"
                                         hidden
                                         accept="image/*"
                                         onChange={(e) => setVariant({...variant, image: e.target.files?.[0] || null,})}
+                                        disabled={!editOn}
                                     />
 
                                 </label>
@@ -599,13 +612,13 @@ const saveUom = (e: React.FormEvent) => {
 
                                 <div>
                                     <label className="block text-sm font-medium mb-2">
-                                        Quantity On Hand <span className="text-red-500"> *</span>
+                                        Quantity On Hand 
                                     </label>
 
                                     <input
                                         type="number"
-                                        className={classInput}
-                                        disabled={!editOn}
+                                        className="w-full rounded-xl border px-4 py-3 transition-colors bg-gray-100"
+                                        disabled
                                         placeholder="20"
                                         maxLength={6}
                                         required

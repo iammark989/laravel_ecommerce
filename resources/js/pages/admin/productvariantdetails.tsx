@@ -363,33 +363,19 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                     Featured Image
                 </h2>
 
-                <label
-                    className={`
-                        relative
-                        block
-                        h-76
-                        overflow-hidden
-                        rounded-xl
-                        border-2
-                        border-dashed
-                        ${
-                            !editOn
-                                ? "bg-gray-100 cursor-not-allowed"
-                                : "cursor-pointer hover:border-sky-500"
-                        }
-                    `}
-                >
+                 <label className={`${editOn ? 'cursor-pointer' : 'cursor-not-allowed'} relative border-2 border-dashed rounded-xl h-56 overflow-hidden  group`}>
+
                     {!product.featured_image ? (
                         <img
                             src={`${import.meta.env.VITE_IMAGE_URL}/files/product_images/${products.featured_image}`}
                             alt=""
-                            className="absolute inset-0 h-full w-full object-cover"
+                            className="w-full h-full object-cover"
                         />
                     ) : (
                         <img
                             src={URL.createObjectURL(product.featured_image)}
                             alt=""
-                            className="absolute inset-0 h-full w-full object-cover"
+                            className="w-full h-full object-cover"
                         />
                     )}
 
@@ -593,7 +579,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                                     <td>
                                         ₱
                                         {Number(
-                                            variant.selling_price
+                                            variant.price
                                         ).toFixed(2)}
                                     </td>
 

@@ -37,7 +37,17 @@ return new class extends Migration
 
             $table->decimal('purchasing_qty',12,3)->default(1);
 
-            $table->string('variant_name')->unique();
+            $table->string('variant_name');
+            $table->unique(['product_id', 'variant_name']);
+            $table->text('remarks')->nullable();
+
+            $table->foreignId('created_by')
+                ->nullable()
+                ->constrained('users');
+
+            $table->foreignId('updated_by')
+                ->nullable()
+                ->constrained('users');
 
             $table->boolean('is_active')->default(true);
 

@@ -3,9 +3,9 @@
 namespace App\Models;
 
 use App\Models\Product;
-use App\Models\ProductImage;
 use App\Models\PurchaseOrderItem;
 use App\Models\Uom;
+use App\Models\VariantImage;
 use App\Models\VariantInventorie;
 use App\Models\VariantPrice;
 use App\Models\Warehouse;
@@ -33,7 +33,15 @@ class ProductVariant extends Model
         'selling_qty',
         'purchasing_uom_id',
         'purchasing_qty',
+        'remarks',
+        'created_by',
+        'updated_by',
     ];
+
+    public function prices()
+    {
+        return $this->hasMany(VariantPrice::class);
+    }
 
     public function baseuom(){
         return $this->belongsTo(Uom::class,'base_uom_id','id');
@@ -63,8 +71,8 @@ class ProductVariant extends Model
         return $this->hasMany(VariantInventorie::class,'product_variant_id','id');
     }
 
-    public function productimages(){
-        return $this->hasMany(ProductImage::class,'product_variant_id','id');
+    public function variantimages(){
+        return $this->hasMany(VariantImage::class,'product_variant_id','id');
     }
 
     public function purchaseorderitems(){

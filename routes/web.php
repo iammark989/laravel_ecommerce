@@ -59,7 +59,7 @@ Route::post('/admin/logout',[AdminController::class,'adminlogout'])->name('admin
 Route::post('/admin/product/add-category',[ProductController::class,'adminAddCategory'])->name('addcategory')->middleware('staffonly');
         // ADD BRAND POST
 Route::post('/admin/product/add-brand',[ProductController::class,'adminAddBrand'])->name('addbrand')->middleware('staffonly');
-        // ADD PRODUCT POST
+        // SAVE NEW PRODUCT
 Route::post('/admin/product/add-product',[ProductController::class,'adminAddProduct'])->name('addproduct')->middleware('staffonly');
        // GO TO ADD VARIANTPAGE
 Route::get('/admin/product/{slug}/variants/add',[ProductController::class,'goToCreateProductVariant'])->name('gotocreateproductvariant')->middleware('staffonly');
