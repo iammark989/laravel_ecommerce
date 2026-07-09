@@ -37,6 +37,7 @@ class InventoryTransactionsController extends Controller
             'product_variants.id',
             'product_variants.sku',
             'product_variants.variant_name',
+            'product_variants.cost_price',
             'variant_inventories.quantity_on_hand'
         )
         ->where('sku', 'like', "%{$search}%")

@@ -5,6 +5,7 @@ import { useState } from "react";
 import FormCard from "@/components/ui/FormCard";
 import PageHeader from "@/components/ui/PageHeader";
 import type { FormDataConvertible } from "@inertiajs/core";
+import Swal from "sweetalert2";
 
 
 export default function EditVariantPage() {
@@ -93,17 +94,21 @@ export default function EditVariantPage() {
         ...variant,
         sellingPrices,
         };
-        console.log(payload);
+
         router.post(`/admin/product/${products.slug}/variants/${variants.id}/save`,{...payload,_method:"put",},{
 
             onSuccess:()=>{
                 setSaving(false);
                 setEditOn(false);
+                Swal.fire({
+                            title:"Variant updated successfully.",
+                             timer: 1500,
+                      });
             },
             onError:(errors)=>{
                 setSaving(false);
                 setErrorMsg(errors.errorMsg);
-                console.log(errors);
+                //console.log(errors);
             },
 
         });
@@ -133,7 +138,7 @@ const saveUom = (e: React.FormEvent) => {
     router.post('/admin/product/create-uom',uom,{
 
         onSuccess: () => {
-            console.log('success');
+            //console.log('success');
             setShowUomModal(false);
             setUom({
                 code:"",
@@ -142,7 +147,7 @@ const saveUom = (e: React.FormEvent) => {
             });
         },
         onError: (error) => {
-            console.log(error);
+           // console.log(error);
         },
 
     });

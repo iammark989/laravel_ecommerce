@@ -1,6 +1,6 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { Link,usePage } from "@inertiajs/react";
-import { ArrowLeft, Save, Send, Search, Trash2 } from "lucide-react";
+import { ArrowLeft, Save, Send, Search, Trash2, PackageSearch } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
@@ -11,12 +11,18 @@ export default function PurchaseOrderPage() {
 
     const [purchaseOrder, setPurchaseOrder] = useState({
         supplier_id: "",
+        warehouse_id:"",
         order_date: "",
         expected_delivery: "",
         payment_terms: "",
+        status:"",
         suppliers_quotation_no: "",
         reference_no: "",
         remarks: "",
+        discount: "",
+        tax: "",    
+        subtotal: "",   
+        grand_total: "",  
     });
 
     const [transactionItems, setTransactionItems] = useState<any[]>([]);
@@ -52,8 +58,9 @@ export default function PurchaseOrderPage() {
                 sku: variant.sku,
                 variant_name: variant.variant_name,
                 quantity: 0,
-                cost_price: "",
-                amount: "",
+                cost_price: variant.cost_price,
+                amount: 0,
+                remarks:"",
             },
         ]);
     
@@ -388,30 +395,129 @@ const searchVariants = async (value: string) => {
                                     </th>
 
                                     <th className="p-4">
+                                        Remarks
+                                    </th>
+
+                                    <th className="p-4">
                                         Action
                                     </th>
 
                                 </tr>
 
                             </thead>
-
+                            
                             <tbody>
 
-                                <tr>
-
+                                  {transactionItems.length === 0 ? <tr>
                                     <td
                                         colSpan={6}
-                                        className="text-center py-10 text-gray-400"
+                                        className="py-12 text-center"
                                     >
+                                        <div className="flex flex-col items-center gap-2">
+                                            <PackageSearch className="w-10 h-10 text-gray-300" />
 
-                                        No products added.
+                                            <p className="text-gray-500 font-medium">
+                                                No products added yet
+                                            </p>
 
+                                            <p className="text-sm text-gray-400">
+                                                Search and add product variants to begin this purchase order.
+                                            </p>
+                                        </div>
                                     </td>
+                                </tr> : ''}
 
-                                </tr>
+                                {transactionItems.map((item, index) => (
+
+                                        <tr key={index} className="border-b">
+
+                                            <td className="p-3">
+                                                {item.sku}
+                                            </td>
+
+                                            <td className="p-3">
+                                                {item.variant_name}
+                                            </td>
+
+                                            <td className="p-3">
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    maxLength={12}
+                                                    value={item.quantity}
+                                                    onChange={(e) => {
+                                                        const updated = [...transactionItems];
+
+                                                        updated[index].quantity =
+                                                            Number(e.target.value);
+                    
+                                                        setTransactionItems(updated);
+                                                    }}
+                                                    className="w-24 border rounded-lg px-3 py-2"
+                                                />
+                                            </td>
+
+                                            <td className="p-3">
+                                                {item.cost_price}
+                                            </td>
+
+                                            <td className="p-3">
+                                                <input
+                                                    type="number"
+                                                    min="0"
+                                                    maxLength={12}
+                                                    value={item.quantity}
+                                                    onChange={(e) => {
+                                                        const updated = [...transactionItems];
+
+                                                        updated[index].quantity =
+                                                            Number(e.target.value);
+                                                        
+                                                             
+                                                                                               
+
+                                                        setTransactionItems(updated);
+                                                    }}
+                                                    className="w-24 border rounded-lg px-3 py-2"
+                                                />
+                                            </td>
+
+                                            <td className="p-3">
+                                                <input
+                                                    type="text"
+                                                    value={item.remarks}
+                                                    onChange={(e) => {
+                                                        const updated = [...transactionItems];
+
+                                                        updated[index].remarks =
+                                                            e.target.value;
+
+                                                        setTransactionItems(updated);
+                                                    }}
+                                                    className="border rounded-lg px-3 py-2"
+                                                />
+                                            </td>
+
+                                            
+                                            <td className="p-3">
+                                                <button
+                                                    type="button"
+                                                    onClick={() =>
+                                                        removeItem(index)
+                                                    }
+                                                    className="text-red-500"
+                                                >
+                                                    Remove
+                                                </button>
+                                            </td>
+
+                                        </tr>
+
+                                    ))}  
+                                 
 
                             </tbody>
-
+                          
                         </table>
 
                     </div>

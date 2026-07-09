@@ -44,7 +44,7 @@ Route::post('/logout-customer',[CustomersController::class,'logout'])->name('cus
 
         // GO TO HOME
 Route::get('/admin/',[AdminController::class,'home'])->name('adminhome')->middleware('staffonly');
-Route::get('/admin/home',[AdminController::class,'home'])->name('adminhome')->middleware('staffonly');
+Route::get('/admin/dashboard',[AdminController::class,'home'])->name('admindashboard')->middleware('staffonly');
 
         // GO TO LOGIN PAGE
 Route::get('/admin/login',[AdminController::class,'gotologin'])->name('admin-login');

@@ -22,7 +22,7 @@ class AdminController extends Controller
 
     // GO TO ADMIN HOME
     public function home(){
-        return Inertia::render('admin/home');
+        return Inertia::render('admin/dashboard');
     }
 
     // GO TO ADMIN LOGIN PAGE
