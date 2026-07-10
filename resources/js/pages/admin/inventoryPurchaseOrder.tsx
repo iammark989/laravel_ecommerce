@@ -1,5 +1,5 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
-import { Link,usePage } from "@inertiajs/react";
+import { Link,usePage,router } from "@inertiajs/react";
 import { ArrowLeft, Save, Send, Search, Trash2, PackageSearch } from "lucide-react";
 import { useState } from "react";
 import axios from "axios";
@@ -9,32 +9,27 @@ export default function PurchaseOrderPage() {
     const { supplierList,ponumber } = usePage().props as any;
     const [items, setItems] = useState([]);
 
+    const today = () => {
+    return new Date().toISOString().split("T")[0];
+    };
     const [purchaseOrder, setPurchaseOrder] = useState({
         supplier_id: "",
-        warehouse_id:"",
-        order_date: "",
+        order_date: today(),
         expected_delivery: "",
         payment_terms: "",
         status:"",
         suppliers_quotation_no: "",
         reference_no: "",
         remarks: "",
-        discount: "",
-        tax: "",    
-        subtotal: "",   
-        grand_total: "",  
     });
 
-    const [transactionItems, setTransactionItems] = useState<any[]>([]);
-    
-    
+        // ADD / REMOVE ITEMS ON THE LIST
+    const [transactionItems, setTransactionItems] = useState<any[]>([]);    
             // remove item on the list
         const removeItem = (index: number) => {
             setTransactionItems(transactionItems.filter((_, i) => i !== index));
-        };
-    
-        const addItem = (variant: any) => {
-    
+        };   
+        const addItem = (variant: any) => {  
                 // put selected items and check duplicate on the list 
         const exists = transactionItems.some(
             (item: any) =>
@@ -50,7 +45,6 @@ export default function PurchaseOrderPage() {
     
             return;
         }
-    
         setTransactionItems([
             ...transactionItems,
             {
@@ -61,13 +55,22 @@ export default function PurchaseOrderPage() {
                 cost_price: variant.cost_price,
                 amount: 0,
                 remarks:"",
+                uom_code:variant.code,
             },
         ]);
-    
         setSearch("");
-    
         setSearchResults([]);
     };
+        const totalQuantity = transactionItems.reduce(
+        (total, item) => total + Number(item.quantity || 0),
+        0
+    );
+    const totalAmount = transactionItems.reduce(
+        (total, item) => total + Number(item.amount || 0),
+        0
+    );
+
+    
     
 const [loading, setLoading] = useState(false);    
 const [search, setSearch] = useState("");
@@ -101,6 +104,31 @@ const searchVariants = async (value: string) => {
     setLoading(false);
 };
 
+const [action, setAction] = useState<"draft" | "submitted">("draft");
+
+const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+        const payload = {
+
+            ...purchaseOrder,
+
+            transactionItems,
+
+            action,
+
+        };
+
+        router.post("/admin/purchase-order/save",payload,{
+            onSuccess:() =>{
+                console.log('success');
+            },
+            onError:(error) =>{
+                console.log(error);
+            },
+        });
+
+};
 
     return (
 
@@ -137,7 +165,8 @@ const searchVariants = async (value: string) => {
                 </div>
 
                 {/* Supplier Information */}
-
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    
                 <div className="bg-white rounded-2xl shadow-sm p-6">
 
                     <h2 className="font-semibold text-lg mb-5">
@@ -149,7 +178,7 @@ const searchVariants = async (value: string) => {
                         <div>
 
                             <label className="block mb-2">
-                                Supplier <span></span>
+                                Supplier <span className="text-red-500">*</span>
                             </label>
 
                             <select 
@@ -200,7 +229,7 @@ const searchVariants = async (value: string) => {
                         <div>
 
                             <label className="block mb-2">
-                                Order Date
+                                Order Date <span className="text-red-500">*</span>
                             </label>
 
                             <input
@@ -231,7 +260,7 @@ const searchVariants = async (value: string) => {
                         <div>
 
                             <label className="block mb-2">
-                                Payment Terms
+                                Payment Terms <span className="text-red-500">*</span>
                             </label>
 
                             <select 
@@ -274,6 +303,8 @@ const searchVariants = async (value: string) => {
                                 className="w-full border rounded-xl px-4 py-3"
                                 value={purchaseOrder.suppliers_quotation_no}
                                 onChange={(e) => setPurchaseOrder({...purchaseOrder,suppliers_quotation_no:e.target.value})}
+                                maxLength={25}
+                                minLength={2}
                             />
 
                         </div>
@@ -288,6 +319,8 @@ const searchVariants = async (value: string) => {
                                 className="w-full border rounded-xl px-4 py-3"
                                 value={purchaseOrder.reference_no}
                                 onChange={(e)=>setPurchaseOrder({...purchaseOrder,reference_no:e.target.value})}
+                                maxLength={50}
+                                minLength={2}
                             />
 
                         </div>
@@ -305,6 +338,7 @@ const searchVariants = async (value: string) => {
                             className="w-full border rounded-xl px-4 py-3"
                             value={purchaseOrder.remarks}
                             onChange={(e)=>setPurchaseOrder({...purchaseOrder,remarks:e.target.value})}
+                            maxLength={500}
                         />
 
                     </div>
@@ -387,6 +421,10 @@ const searchVariants = async (value: string) => {
                                     </th>
 
                                     <th className="p-4">
+                                        UoM
+                                    </th>
+
+                                    <th className="p-4">
                                         Cost Price
                                     </th>
 
@@ -452,9 +490,17 @@ const searchVariants = async (value: string) => {
                                                             Number(e.target.value);
                     
                                                         setTransactionItems(updated);
+                                                        const totalamount = [...transactionItems];
+                                                        totalamount[index].amount =
+                                                            Number(e.target.value) * item.cost_price;                                                     
+                                                        setTransactionItems(totalamount);
                                                     }}
                                                     className="w-24 border rounded-lg px-3 py-2"
                                                 />
+                                            </td>
+
+                                             <td className="p-3">
+                                               {item.uom_code.toUpperCase()}
                                             </td>
 
                                             <td className="p-3">
@@ -462,25 +508,9 @@ const searchVariants = async (value: string) => {
                                             </td>
 
                                             <td className="p-3">
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    maxLength={12}
-                                                    value={item.quantity}
-                                                    onChange={(e) => {
-                                                        const updated = [...transactionItems];
-
-                                                        updated[index].quantity =
-                                                            Number(e.target.value);
-                                                        
-                                                             
-                                                                                               
-
-                                                        setTransactionItems(updated);
-                                                    }}
-                                                    className="w-24 border rounded-lg px-3 py-2"
-                                                />
-                                            </td>
+                                                {item.amount.toLocaleString()}
+                                            </td>            
+                                           
 
                                             <td className="p-3">
                                                 <input
@@ -495,6 +525,7 @@ const searchVariants = async (value: string) => {
                                                         setTransactionItems(updated);
                                                     }}
                                                     className="border rounded-lg px-3 py-2"
+                                                    maxLength={255}
                                                 />
                                             </td>
 
@@ -535,7 +566,7 @@ const searchVariants = async (value: string) => {
                         </p>
 
                         <h2 className="text-3xl font-bold">
-                            0
+                            {transactionItems.length.toLocaleString()}
                         </h2>
 
                     </div>
@@ -547,7 +578,7 @@ const searchVariants = async (value: string) => {
                         </p>
 
                         <h2 className="text-3xl font-bold">
-                            0
+                            {totalQuantity.toLocaleString()}
                         </h2>
 
                     </div>
@@ -559,7 +590,7 @@ const searchVariants = async (value: string) => {
                         </p>
 
                         <h2 className="text-3xl font-bold">
-                            ₱0.00
+                            ₱{totalAmount.toLocaleString()}
                         </h2>
 
                     </div>
@@ -577,6 +608,8 @@ const searchVariants = async (value: string) => {
                     </button>
 
                     <button
+                        type="submit"
+                        onClick={() => setAction("draft")}
                         className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl px-6 py-3 flex items-center justify-center gap-2"
                     >
 
@@ -587,6 +620,8 @@ const searchVariants = async (value: string) => {
                     </button>
 
                     <button
+                        type='submit'
+                        onClick={() => setAction("submitted")}
                         className="bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-6 py-3 flex items-center justify-center gap-2"
                     >
 
@@ -597,7 +632,7 @@ const searchVariants = async (value: string) => {
                     </button>
 
                 </div>
-
+                       </form>             
             </section>
 
         </AdminMainLayout>

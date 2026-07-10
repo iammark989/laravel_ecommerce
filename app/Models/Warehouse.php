@@ -3,7 +3,9 @@
 namespace App\Models;
 
 use App\Models\ProductVariant;
+use App\Models\PurchaseOrder;
 use App\Models\User;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
@@ -27,6 +29,10 @@ class Warehouse extends Model
 
     public function productvariants(){
         return $this->hasMany(ProductVariant::class,'warehouse_id','id');
+    }
+
+    public function warehouses(){
+        return $this->hasMany(PurchaseOrder::class,'warehouse_id','id');
     }
 
     protected function name(): Attribute

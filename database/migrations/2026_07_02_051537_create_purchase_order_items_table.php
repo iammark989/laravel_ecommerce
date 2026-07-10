@@ -19,6 +19,7 @@ return new class extends Migration
             $table->decimal('quantity',12,3);
             $table->decimal('cost_price',12,3);
             $table->decimal('amount',12,3);
+            $table->decimal('conversion_qty',10,3);
             $table->decimal('received_qty',12,3)->default(0);
             $table->enum('tax_type',[
                 'vatable',

@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Addresse;
 use App\Models\Product;
+use App\Models\PurchaseOrder;
 use App\Models\Role;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -45,6 +46,18 @@ class User extends Authenticatable
 
     public function products(){
         return $this->hasMany(Product::class,'created_by','id');
+    }
+
+     public function createdbyusers(){
+        return $this->hasMany(PurchaseOrder::class,'created_by','id');
+    }
+
+    public function approvebyusers(){
+        return $this->hasMany(PurchaseOrder::class,'approved_by','id');
+    }
+
+    public function updatedbyusers(){
+        return $this->hasMany(PurchaseOrder::class,'updated_by','id');
     }
 
     protected function firstName(): Attribute
