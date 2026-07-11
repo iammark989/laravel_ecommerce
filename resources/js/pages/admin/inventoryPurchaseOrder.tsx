@@ -4,6 +4,7 @@ import { ArrowLeft, Save, Send, Search, Trash2, PackageSearch } from "lucide-rea
 import { useState } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
+import SummaryLine from "@/components/ui/SummaryLine";
 
 export default function PurchaseOrderPage() {
     const { supplierList,ponumber } = usePage().props as any;
@@ -21,6 +22,7 @@ export default function PurchaseOrderPage() {
         suppliers_quotation_no: "",
         reference_no: "",
         remarks: "",
+        discount:"",
     });
 
         // ADD / REMOVE ITEMS ON THE LIST
@@ -33,7 +35,7 @@ export default function PurchaseOrderPage() {
                 // put selected items and check duplicate on the list 
         const exists = transactionItems.some(
             (item: any) =>
-                item.variant_id === variant.id
+                item.product_variant_id === variant.id
         );
     
         if (exists) {
@@ -48,7 +50,7 @@ export default function PurchaseOrderPage() {
         setTransactionItems([
             ...transactionItems,
             {
-                variant_id: variant.id,
+                product_variant_id: variant.id,
                 sku: variant.sku,
                 variant_name: variant.variant_name,
                 quantity: 0,
@@ -56,6 +58,8 @@ export default function PurchaseOrderPage() {
                 amount: 0,
                 remarks:"",
                 uom_code:variant.code,
+                uom_id:variant.uom_id,
+                purchasing_qty:variant.purchasing_qty,
             },
         ]);
         setSearch("");
@@ -65,10 +69,13 @@ export default function PurchaseOrderPage() {
         (total, item) => total + Number(item.quantity || 0),
         0
     );
-    const totalAmount = transactionItems.reduce(
+    const subtotalAmount = transactionItems.reduce(
         (total, item) => total + Number(item.amount || 0),
         0
     );
+
+    const grandTotal = subtotalAmount - Number(purchaseOrder.discount);
+    
 
     
     
@@ -154,7 +161,7 @@ const handleSubmit = (e: React.FormEvent) => {
 
                     <Link
                         href="/admin/purchase-orders"
-                        className="border rounded-xl px-5 py-3 flex items-center gap-2"
+                        className="border rounded-xl px-5 py-3 flex items-center gap-2 bg-white hover:bg-gray-300"
                     >
                         <ArrowLeft size={18} />
 
@@ -557,55 +564,82 @@ const handleSubmit = (e: React.FormEvent) => {
 
                 {/* Summary */}
 
-                <div className="grid lg:grid-cols-3 gap-5">
+                <div className="flex justify-end mt-8">
 
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
+                <div className="w-full md:w-[420px] bg-white rounded-2xl shadow-sm border p-6">
 
-                        <p className="text-gray-500">
-                            Total Items
-                        </p>
+                    <h2 className="text-lg font-semibold mb-5">
+                        Financial Summary
+                    </h2>
 
-                        <h2 className="text-3xl font-bold">
-                            {transactionItems.length.toLocaleString()}
-                        </h2>
+                    <div className="space-y-4">
 
-                    </div>
+                        <SummaryLine
+                            label="Total Items"
+                           value={`${transactionItems.length}`}
+                           
+                        />
 
-                    <div className="bg-white rounded-2xl shadow-sm p-6">
+                        <SummaryLine
+                            label="Total Quantity"
+                           value={`${totalQuantity.toLocaleString()}`}                         
+                        />
 
-                        <p className="text-gray-500">
-                            Total Quantity
-                        </p>
+                        <SummaryLine
+                                label="Subtotal"
+                                value={`₱${subtotalAmount.toLocaleString()}`}
+                        />
 
-                        <h2 className="text-3xl font-bold">
-                            {totalQuantity.toLocaleString()}
-                        </h2>
+                        <div className="flex items-center justify-between">
 
-                    </div>
+                            <span className="text-gray-600">
+                                Discount
+                            </span>
+                            <input
+                                type="number"
+                                className="w-28 border rounded-lg px-3 py-2 text-right"
+                                placeholder="0.00"
+                                maxLength={12}
+                                value={purchaseOrder.discount}
+                                onChange={(e) => setPurchaseOrder({...purchaseOrder, discount: e.target.value})}
+                            />
+                        </div>
 
-                    <div className="bg-sky-600 text-white rounded-2xl shadow-sm p-6">
+                        <SummaryLine
+                            label="Tax"
+                                value="₱0.00"
+                        />
 
-                        <p>
-                            Grand Total
-                        </p>
+                        <hr />
 
-                        <h2 className="text-3xl font-bold">
-                            ₱{totalAmount.toLocaleString()}
-                        </h2>
+                        <div className="flex justify-between items-center">
+
+                            <span className="text-lg font-semibold">
+                                Grand Total
+                            </span>
+
+                            <span className="text-2xl font-bold text-sky-600">
+                                ₱{grandTotal.toLocaleString()}
+                            </span>
+
+                        </div>
 
                     </div>
 
                 </div>
 
+            </div>
+
                 {/* Buttons */}
 
                 <div className="flex flex-col sm:flex-row justify-end gap-3">
 
-                    <button
-                        className="border rounded-xl px-6 py-3"
+                    <Link
+                        href="/admin/purchase-orders"
+                        className="border rounded-xl px-6 py-3 bg-white hover:bg-gray-300"
                     >
                         Cancel
-                    </button>
+                    </Link>
 
                     <button
                         type="submit"

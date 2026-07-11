@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\ProductVariant;
 use App\Models\PurchaseOrder;
+use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -40,6 +41,7 @@ class InventoryTransactionsController extends Controller
             'variant.purchasing_qty as purchasing_qty',
             'inventory.quantity_on_hand as quantity_on_hand',
             'uom.code as code',
+            'uom.id as uom_id'
         )
         ->groupBy(
             'variant.id',
@@ -49,6 +51,7 @@ class InventoryTransactionsController extends Controller
             'variant.purchasing_qty',
             'inventory.quantity_on_hand',
             'uom.code',
+             'uom.id'
         )
         ->where('sku', 'like', "%{$search}%")
         ->orWhere('variant_name', 'like', "%{$search}%")
@@ -118,67 +121,81 @@ class InventoryTransactionsController extends Controller
                 'suppliers_quotation_no' => 'nullable|max:25',
                 'reference_no' => 'nullable|max:50',
                 'remarks' => 'nullable|string|max:500',
+                'discount' => 'required|numeric|min:0',
 
                 'transactionItems' => 'required|array|min:1',
                 'transactionItems.*.sku' => 'required|string|max:50',
-                'transactionItems.*.variant_id' => 'required|exists:product_variants,id',
+                'transactionItems.*.product_variant_id' => 'required|exists:product_variants,id',
                 'transactionItems.*.quantity' => 'required|numeric|gt:0',
                 'transactionItems.*.cost_price' => 'required|numeric|min:0',
-                //'transactionItems.*.amount' => '',
+                'transactionItems.*.product_variant_id' => '',
                 //'transactionItems.*.warehouse_id' => '',
-                //'transactionItems.*.uom_code' => '',
+                'transactionItems.*.uom_id' => 'nullable',
+                'transactionItems.*.purchasing_qty' => 'nullable',
                 'transactionItems.*.remarks' => 'nullable|string|max:255',
         ]);
 
             if ($request->action === 'draft') {
-
                 $status = 'draft';
-
             }
-
             if ($request->action === 'submitted') {
-
                 $status = 'submitted';
-
             }
 
             $subtotal = 0;
-
             foreach ($request->transactionItems as $item) {
-
                 $subtotal +=
                     $item['quantity']
                     *
                     $item['cost_price'];
-
             }
 
             $discount = $request->discount;
 
-            $tax = $request->tax;
+            $tax = 0;
 
-            $grandTotal =
-            $subtotal
-            -
-            $discount
-            +
-            $tax;
+            $grandTotal = $subtotal - $discount + $tax;
 
             $warehouse = Warehouse::where('id','=','1')->firstOrFail();
+            $user = auth()->user();
 
-        $purchaseOrder = PurchaseOrder::create([
-            'po_number' =>  $this->generatePOnumber(),
-            'supplier_id' => $incomingFields['supplier_id'],
-            'order_date' => $incomingFields['order_date'],
-            'expected_delivery' => $incomingFields['expected_delivery'],
-            'payment_terms' => $incomingFields['payment_terms'],
-            'suppliers_quotation_no' => $incomingFields['suppliers_quotation_no'],
-            'reference_no' => $incomingFields['reference_no'],
-            'remarks' => $incomingFields['remarks'],
-            'status' => $status,
-            'warehouse_id' => $warehouse->id,
+          DB::transaction(function () use ($request, $incomingFields, $warehouse, $user, $grandTotal, $subtotal,$status) { 
+                    $purchaseOrder = PurchaseOrder::create([
+                        'po_number' =>  $this->generatePOnumber(),
+                        'supplier_id' => $incomingFields['supplier_id'],
+                        'order_date' => $incomingFields['order_date'],
+                        'expected_delivery' => $incomingFields['expected_delivery'],
+                        'payment_terms' => $incomingFields['payment_terms'],
+                        'suppliers_quotation_no' => $incomingFields['suppliers_quotation_no'],
+                        'reference_no' => $incomingFields['reference_no'],
+                        'remarks' => $incomingFields['remarks'],
+                        'status' => $status,
+                        'warehouse_id' => $warehouse->id,
+                        'created_by' => $user->id,
+                        'discount' => $incomingFields['discount'],
+                        'subtotal' => $subtotal,
+                        'grandtotal' => $grandTotal,
+                        'tax' => 0,
+                    ]);
+                    foreach ($incomingFields['transactionItems'] as $items) {
+                        PurchaseOrderItem::create(
+                            [
+                                'purchase_order_id' => $purchaseOrder->id,
+                                'product_variant_id' => $items['product_variant_id'],
+                                'uom_id' => $items['uom_id'],
+                                'quantity' => $items['quantity'],
+                                'cost_price' => $items['cost_price'],
+                                'amount' => $items['quantity'] * $items['cost_price'],
+                                'conversion_qty' => $items['purchasing_qty'],
+                                'remarks' => $items['remarks'],
+                            ],
 
-        ]);
+                        );
+                        }
+                    $puchaseOrderItems = PurchaseOrderItem::create([
+                        'purchase_order_id' => $purchaseOrder->id,
+                    ]);
+                });
     }
 
     

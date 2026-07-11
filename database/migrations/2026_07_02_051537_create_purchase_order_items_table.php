@@ -26,7 +26,7 @@ return new class extends Migration
                 'vat_exempt',
                 'zero_rated'
             ])->default('vatable');
-            $table->foreignId('warehouse_id')->constrained('warehouses');
+            $table->foreignId('warehouse_id')->nullable()->constrained('warehouses');
             $table->text('remarks')->nullable();
             $table->timestamps();
         });
