@@ -111,17 +111,20 @@ const [ uom, setUom] = useState({
 });
 const saveUom = (e: React.FormEvent) => {
     e.preventDefault();
+    setSaving(true);
 
     router.post('/admin/product/create-uom',uom,{
 
         onSuccess: () => {
             //console.log('success');
+            setSaving(false);
             setShowUomModal(false);
             setUom({
                 code:"",
                 description:"",
                 is_active:true,
             });
+            
         },
         onError: (error) => {
             //console.log(error);
@@ -1078,8 +1081,9 @@ const saveUom = (e: React.FormEvent) => {
                             <button
                                 type="submit"
                                 className="bg-sky-600 hover:bg-sky-700 hover:cursor-pointer text-white rounded-xl px-5 py-2"
-                            >
-                                Save UoM
+                                disabled={saving}
+                           >
+                                {saving ? "Saving..." : "Save UoM"}
                             </button>
 
                         </div>

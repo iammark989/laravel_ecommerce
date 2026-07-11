@@ -643,7 +643,7 @@ const handleSubmitProduct = (e: React.FormEvent) => {
                                     <p className="mt-2 font-medium text-sky-600">
                                         ₱
                                         {Number(
-                                            variant.selling_price
+                                            variant.price
                                         ).toFixed(2)}
                                     </p>
 
