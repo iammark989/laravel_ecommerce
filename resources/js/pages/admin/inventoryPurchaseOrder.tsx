@@ -111,6 +111,7 @@ const searchVariants = async (value: string) => {
     setLoading(false);
 };
 
+const { errors } = usePage().props;
 const [action, setAction] = useState<"draft" | "submitted">("draft");
 
 const handleSubmit = (e: React.FormEvent) => {
@@ -130,8 +131,8 @@ const handleSubmit = (e: React.FormEvent) => {
             onSuccess:() =>{
                 console.log('success');
             },
-            onError:(error) =>{
-                console.log(error);
+            onError:(errors) =>{
+                console.log(errors);
             },
         });
 
@@ -252,7 +253,8 @@ const handleSubmit = (e: React.FormEvent) => {
                         <div>
 
                             <label className="block mb-2">
-                                Expected Delivery
+                                Expected Delivery {errors.expected_delivery && (  <span className="text-red-500 text-sm mt-2"> {errors.expected_delivery} 
+                                         </span>  )}
                             </label>
 
                             <input

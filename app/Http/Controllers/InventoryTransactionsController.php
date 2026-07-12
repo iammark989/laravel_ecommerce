@@ -64,21 +64,28 @@ class InventoryTransactionsController extends Controller
     public function goToPurchaseOrderList(){
         $poDetails = DB::table('purchase_orders as po')
                         ->leftjoin('suppliers as supplier','supplier.id','=','po.supplier_id')
+                        ->leftJoin('users as user','user.id','=','po.created_by')
                         ->select(
+                            'po.id as id',
                             'po.po_number as po_number',
                             'po.order_date as po_date',
                             'po.status as status',
                             'po.grand_total as grand_total',
                             'po.created_by as created_by',
                             'supplier.name as supplier_name',
+                            'user.first_name as first_name',
+                            'user.last_name as last_name',
                             )
                             ->groupBy(
+                            'po.id',
                             'po.po_number',
                             'po.order_date',
                             'po.status',
                             'po.grand_total',
                             'po.created_by',
                             'supplier.name',
+                            'user.first_name',
+                            'user.last_name',
                             )
                             ->get();
 
@@ -174,7 +181,7 @@ class InventoryTransactionsController extends Controller
                         'created_by' => $user->id,
                         'discount' => $incomingFields['discount'],
                         'subtotal' => $subtotal,
-                        'grandtotal' => $grandTotal,
+                        'grand_total' => $grandTotal,
                         'tax' => 0,
                     ]);
                     foreach ($incomingFields['transactionItems'] as $items) {
@@ -192,9 +199,7 @@ class InventoryTransactionsController extends Controller
 
                         );
                         }
-                    $puchaseOrderItems = PurchaseOrderItem::create([
-                        'purchase_order_id' => $purchaseOrder->id,
-                    ]);
+                
                 });
     }
 

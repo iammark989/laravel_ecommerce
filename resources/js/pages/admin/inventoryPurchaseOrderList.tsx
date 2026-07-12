@@ -2,6 +2,7 @@ import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { Plus, Search, Edit, Eye } from "lucide-react";
 import { useState } from "react";
 import { Link,usePage } from "@inertiajs/react";
+import StatusBadge from "@/components/ui/StatusBadge";
 
 export default function PuchaseOrderList() {
   const [search, setSearch] = useState("");
@@ -9,7 +10,7 @@ export default function PuchaseOrderList() {
   const { poDetails } = usePage().props as any;
 
   
-
+  
   return (
 
     <AdminMainLayout><section>
@@ -106,20 +107,20 @@ export default function PuchaseOrderList() {
                 </td>
 
                 <td className="p-4">
-                  {po.oder_date}
+                  {po.po_date}
                 </td>
 
                 <td className="p-4">
-                  {po.grand_total}
+                  {Number(po.grand_total).toLocaleString()}
                 </td>
 
                 <td className="p-4">
-                  {po.status}
+                  <StatusBadge status={po.status} />
                 </td>
 
                 <td className="p-4">
 
-                 {po.created_by}
+                 {po.first_name} {po.last_name}
 
                 </td>
 
@@ -173,19 +174,19 @@ export default function PuchaseOrderList() {
                 </p>
 
                 <p className="text-sm text-gray-500">
-                  {po.oder_date}
+                  {po.po_date}
                 </p>
 
                 <p className="text-sm text-gray-500">
-                  {po.total_amount}
+                  {Number(po.grand_total).toLocaleString()}
                 </p>
 
                 <p className="text-sm text-gray-500">
-                   {po.status}
+                  <StatusBadge status={po.status} />
                 </p>
 
                 <p className="text-sm text-gray-500">
-                  {po.created_by}
+                  {po.first_name} {po.last_name}
                 </p>
  
               </div>

@@ -196,7 +196,6 @@ const saveUom = (e: React.FormEvent) => {
                                     <label className="block text-sm font-medium mb-2">
                                         SKU <span className="text-red-500"> *</span>
                                          {errors.sku && (  <span className="text-red-500 text-sm mt-2"> {errors.sku} 
-                                            
                                          </span>  )}
                                     </label>
                                     
