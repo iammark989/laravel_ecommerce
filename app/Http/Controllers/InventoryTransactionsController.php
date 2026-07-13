@@ -63,31 +63,21 @@ class InventoryTransactionsController extends Controller
     // GO TO PURCHASE LIST
     public function goToPurchaseOrderList(){
         $poDetails = DB::table('purchase_orders as po')
-                        ->leftjoin('suppliers as supplier','supplier.id','=','po.supplier_id')
-                        ->leftJoin('users as user','user.id','=','po.created_by')
-                        ->select(
-                            'po.id as id',
-                            'po.po_number as po_number',
-                            'po.order_date as po_date',
-                            'po.status as status',
-                            'po.grand_total as grand_total',
-                            'po.created_by as created_by',
-                            'supplier.name as supplier_name',
-                            'user.first_name as first_name',
-                            'user.last_name as last_name',
-                            )
-                            ->groupBy(
-                            'po.id',
-                            'po.po_number',
-                            'po.order_date',
-                            'po.status',
-                            'po.grand_total',
-                            'po.created_by',
-                            'supplier.name',
-                            'user.first_name',
-                            'user.last_name',
-                            )
-                            ->get();
+            ->leftJoin('suppliers as supplier', 'supplier.id', '=', 'po.supplier_id')
+            ->leftJoin('users as user', 'user.id', '=', 'po.created_by')
+            ->select(
+                'po.id',
+                'po.po_number',
+                'po.order_date as po_date',
+                'po.status',
+                'po.grand_total',
+                'supplier.name as supplier_name',
+                'user.first_name',
+                'user.last_name',
+            )
+            ->orderByDesc('po.created_at')
+            ->paginate(15);
+                            
 
         return Inertia::render('admin/inventoryPurchaseOrderList',[
                 'poDetails' => $poDetails,
@@ -116,6 +106,19 @@ class InventoryTransactionsController extends Controller
         ]);
     }
 
+     // GO TO EDIT PURCHASE ORDER PAGE --- FOR DRAFT STATUS ONLY ---
+    public function goToEditPurchaseOrder($id){
+        $supplierList = Supplier::orderBy('name','asc')->get();
+        $poDetails = PurchaseOrder::where('id','=',$id)->firstOrFail();
+        $poItems = PurchaseOrderItem::where('purchase_order_id','=',$id)->get();
+        return Inertia::render('admin/inventoryPurchaseOrderEdit',[
+            'supplierList' => $supplierList,
+            'poDetails' => $poDetails,
+            'poItems' => $poItems,
+        ]);
+    }
+
+
     // SAVE PURCHASE ORDER
     public function savePurchaseOrder(Request $request){
         $incomingFields = $request->validate([
@@ -128,7 +131,7 @@ class InventoryTransactionsController extends Controller
                 'suppliers_quotation_no' => 'nullable|max:25',
                 'reference_no' => 'nullable|max:50',
                 'remarks' => 'nullable|string|max:500',
-                'discount' => 'required|numeric|min:0',
+                'discount' => 'numeric|min:0',
 
                 'transactionItems' => 'required|array|min:1',
                 'transactionItems.*.sku' => 'required|string|max:50',

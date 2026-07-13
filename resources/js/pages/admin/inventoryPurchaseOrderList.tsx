@@ -1,7 +1,7 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
-import { Plus, Search, Edit, Eye } from "lucide-react";
+import { Plus, Search, Edit, Eye,Trash2 } from "lucide-react";
 import { useState } from "react";
-import { Link,usePage } from "@inertiajs/react";
+import { Link,usePage,router } from "@inertiajs/react";
 import StatusBadge from "@/components/ui/StatusBadge";
 
 export default function PuchaseOrderList() {
@@ -92,7 +92,7 @@ export default function PuchaseOrderList() {
 
           <tbody>
 
-            {poDetails.map((po: any) => (
+            {poDetails.data.map((po: any) => (
               <tr
                 key={po.id}
                 className="border-t hover:bg-slate-50"
@@ -130,11 +130,27 @@ export default function PuchaseOrderList() {
                   <div className="flex gap-2">
 
                     <Link 
-                    href={`/admin/product/${poDetails.id}/details`}
+                    href={`/admin/purchase-order/${po.id}/edit`}
+                    className="inline-flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-slate-100"
+                                        >
+                      <Edit size={18} />
+                      Edit
+                    </Link>
+
+                    <Link 
+                    href={`/admin/purchase-order/${po.id}/details`}
                     className="inline-flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-slate-100"
                                         >
                       <Eye size={18} />
                       Details
+                    </Link>
+
+                    <Link 
+                    href={`/admin/purchase-order/${po.id}/delete`}
+                    className="inline-flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-slate-100"
+                                        >
+                      <Trash2 size={18} />
+                      Delete
                     </Link>
 
                   </div>
@@ -147,6 +163,7 @@ export default function PuchaseOrderList() {
           </tbody>
 
         </table>
+                               
 
       </div>
 
@@ -154,7 +171,7 @@ export default function PuchaseOrderList() {
 
       <div className="lg:hidden mt-6 space-y-4">
 
-        {poDetails.map((po: any) => (
+        {poDetails.data.map((po: any) => (
 
           <div
             key={po.id}
@@ -196,9 +213,21 @@ export default function PuchaseOrderList() {
             <div className="grid grid-cols-1 gap-2 mt-4">
 
               <Link 
-                href={`/admin/product/${poDetails.id}/details`}
+                href={`/admin/purchase-order/${po.id}/edit`}
+              className="bg-sky-500 text-white py-2 rounded-lg text-center">
+                Edit
+              </Link>
+
+               <Link 
+                href={`/admin/purchase-order/${po}/details`}
               className="bg-sky-500 text-white py-2 rounded-lg text-center">
                 View Details
+              </Link>
+
+               <Link 
+                href={`/admin/purchase-order/${po.id}/delete`}
+              className="bg-sky-500 text-white py-2 rounded-lg text-center">
+                Delete
               </Link>
 
 
@@ -209,6 +238,51 @@ export default function PuchaseOrderList() {
         ))}
 
       </div>
+       {/** PAGINATION */}
+                                <div className="flex flex-col md:flex-row items-center justify-between p-4 border-t">
+            
+                                    <p className="text-sm text-gray-500">
+                                        Showing {poDetails.from} to {poDetails.to} of{" "}
+                                        {poDetails.total} Purchase Orders
+                                    </p>
+            
+                                    <div className="flex gap-2 mt-3 md:mt-0">
+            
+                                        {poDetails.links.map((link: any, index: number) => (
+            
+                                            <button
+                                                key={index}
+                                                disabled={!link.url}
+                                                onClick={() => {
+                                                    if (link.url) {
+                                                        router.visit(link.url, {
+                                                            preserveState: true,
+                                                            replace: true,
+                                                        });
+                                                    }
+                                                }}
+                                                className={`px-3 py-2 rounded-lg border text-sm
+                                                    ${
+                                                        link.active
+                                                            ? "bg-sky-600 text-white"
+                                                            : "bg-white hover:bg-gray-100"
+                                                    }
+                                                    ${
+                                                        !link.url
+                                                            ? "opacity-50 cursor-not-allowed"
+                                                            : ""
+                                                    }
+                                                `}
+                                                dangerouslySetInnerHTML={{
+                                                    __html: link.label,
+                                                }}
+                                            />
+            
+                                        ))}
+            
+                                    </div>
+            
+                                </div>
 
     </div>
     </section></AdminMainLayout>

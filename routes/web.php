@@ -85,14 +85,18 @@ Route::get('/admin/inventory-transactions',[InventoryTransactionsController::cla
 Route::get('/admin/inventory-transactions/new-transaction',[InventoryTransactionsController::class,'goToNewInventoryTransactions'])->name('gotonewinventorytransactions')->middleware('staffonly');
 
                 // PURCHASE ORDER
-        // GO TO PURCHASE ORDER PAGE
+        // GO TO PURCHASE ORDER LIST
 Route::get('/admin/purchase-orders',[InventoryTransactionsController::class,'goToPurchaseOrderList'])->name('gotopurchaseorderlist')->middleware('staffonly');
-
+         // GO TO PURCHASE ORDER NEW
 Route::get('/admin/purchase-order/new',[InventoryTransactionsController::class,'goToNewPurchaseOrder'])->name('gotonewpurchaseorder')->middleware('staffonly');
-
+        // SAVE NEW PUCHASE ORDER
 Route::post('/admin/purchase-order/save',[InventoryTransactionsController::class,'savePurchaseOrder'])->name('savepurchaseorder')->middleware('staffonly');
+        // GO TO EDIT PURCHASE ORDER
+Route::get('/admin/purchase-order/{id}/edit',[InventoryTransactionsController::class,'goToEditPurchaseOrder'])->name('gotoeditpurchaseorder')->middleware('staffonly');
+        
 
-        // BUSINESS PARTNERS
+
+// BUSINESS PARTNERS
         // GO TO SUPPLIERS PAGE
 Route::get('/admin/supplier/list',[BusinessPartnersController::class,'goToSuppliersPage'])->name('gotosupplierspage')->middleware('staffonly');
         // GO TO ADD SUPPLIERS PAGE

@@ -6,8 +6,11 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import SummaryLine from "@/components/ui/SummaryLine";
 
-export default function PurchaseOrderPage() {
-    const { supplierList,ponumber } = usePage().props as any;
+export default function PurchaseOrderEditPage() {
+    const { supplierList,poDetails,poItems} = usePage().props as any;
+    console.log(poDetails);
+    console.log(poItems);
+
     const [items, setItems] = useState([]);
 
     const today = () => {
@@ -224,7 +227,7 @@ const handleSubmit = (e: React.FormEvent) => {
                             </label>
 
                             <input
-                                value={ponumber}
+                                //value={ponumber}
                                 readOnly
                                 className="w-full bg-gray-100 border rounded-xl px-4 py-3"
                             />
