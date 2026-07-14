@@ -149,6 +149,8 @@ const handleSubmit = (e: React.FormEvent) => {
 
 };
 
+const [supplier,setSupplier ] = useState(false);
+    
     return (
 
         <AdminMainLayout>
@@ -207,9 +209,9 @@ const handleSubmit = (e: React.FormEvent) => {
                             onChange={(e) => setPurchaseOrder({...purchaseOrder, supplier_id: e.target.value})}
                             >
 
-                                <option value="">Select Supplier</option>
+                                <option value="" >Select Supplier</option>
                                 {supplierList.map((supplier: any) => (
-                                    <option key={supplier.id} value={supplier.id}>
+                                    <option key={supplier.id} value={supplier.id} >
                                     {supplier.name}
                                     </option>
                                         ))}
@@ -381,6 +383,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                 onChange={(e) => searchVariants(e.target.value)}
                                 placeholder="Search SKU or Variant"
                                 className="w-full border rounded-xl px-4 py-3"
+                                disabled={!supplier}
                             />
 
                             {searchResults.length > 0 && (

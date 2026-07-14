@@ -18,13 +18,13 @@ export default function PurchaseOrderEditPage() {
         supplier_id: poDetails.supplier_id,
         po_number:poDetails.po_number,
         order_date: poDetails.order_date,
-        expected_delivery: poDetails.expected_delivery,
+        expected_delivery: poDetails.expected_delivery ?? "",
         payment_terms: poDetails.payment_terms,
         status:poDetails.status,
-        suppliers_quotation_no: poDetails.suppliers_quotation_no,
-        reference_no: poDetails.reference_no,
-        remarks: poDetails.remarks,
-        discount:poDetails.discount,
+        suppliers_quotation_no: poDetails.suppliers_quotation_no ?? "",
+        reference_no: poDetails.reference_no ?? "",
+        remarks: poDetails.remarks ?? "",
+        discount:poDetails.discount ?? 0,
     });
 
     const mapTransactionItem = (item: any) => ({
