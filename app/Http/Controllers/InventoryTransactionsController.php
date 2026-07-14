@@ -110,7 +110,35 @@ class InventoryTransactionsController extends Controller
     public function goToEditPurchaseOrder($id){
         $supplierList = Supplier::orderBy('name','asc')->get();
         $poDetails = PurchaseOrder::where('id','=',$id)->firstOrFail();
-        $poItems = PurchaseOrderItem::where('purchase_order_id','=',$id)->get();
+        $poItems = DB::table('purchase_order_items as poitems')
+                    ->leftJoin('product_variants as variants','variants.id','=','poitems.product_variant_id')    
+                    ->leftJoin('uoms as uom','uom.id','=','poitems.uom_id')     
+                    ->select([
+                    'variants.sku as sku',
+                    'variants.variant_name as variant_name',
+                    'variants.cost_price as cost_price',
+                    'poitems.product_variant_id as product_variant_id',
+                    'poitems.purchase_order_id as purchase_order_id',
+                    'poitems.quantity as quantity',
+                    'poitems.amount as amount',
+                    'poitems.remarks as remarks',
+                    'poitems.uom_id as uom_id',
+                    'uom.code as uom_code',
+                    ])
+                    ->groupBy([
+                    'variants.sku',
+                    'variants.variant_name',
+                    'variants.cost_price',
+                    'poitems.product_variant_id',
+                    'poitems.purchase_order_id',
+                    'poitems.quantity',
+                    'poitems.amount',
+                    'poitems.remarks',
+                    'poitems.uom_id',
+                    'uom.code',
+                    ])
+                    ->where('poitems.purchase_order_id','=',$id)
+                    ->get();
         return Inertia::render('admin/inventoryPurchaseOrderEdit',[
             'supplierList' => $supplierList,
             'poDetails' => $poDetails,

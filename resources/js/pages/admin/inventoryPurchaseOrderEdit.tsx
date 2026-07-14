@@ -1,32 +1,50 @@
 import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { Link,usePage,router } from "@inertiajs/react";
 import { ArrowLeft, Save, Send, Search, Trash2, PackageSearch } from "lucide-react";
-import { useState } from "react";
+import { useState,useEffect } from "react";
 import axios from "axios";
 import Swal from "sweetalert2";
 import SummaryLine from "@/components/ui/SummaryLine";
 
 export default function PurchaseOrderEditPage() {
     const { supplierList,poDetails,poItems} = usePage().props as any;
-    console.log(poDetails);
-    console.log(poItems);
-
+   
     const [items, setItems] = useState([]);
 
     const today = () => {
     return new Date().toISOString().split("T")[0];
     };
     const [purchaseOrder, setPurchaseOrder] = useState({
-        supplier_id: "",
-        order_date: today(),
-        expected_delivery: "",
-        payment_terms: "",
-        status:"",
-        suppliers_quotation_no: "",
-        reference_no: "",
-        remarks: "",
-        discount:"0",
+        supplier_id: poDetails.supplier_id,
+        po_number:poDetails.po_number,
+        order_date: poDetails.order_date,
+        expected_delivery: poDetails.expected_delivery,
+        payment_terms: poDetails.payment_terms,
+        status:poDetails.status,
+        suppliers_quotation_no: poDetails.suppliers_quotation_no,
+        reference_no: poDetails.reference_no,
+        remarks: poDetails.remarks,
+        discount:poDetails.discount,
     });
+
+    const mapTransactionItem = (item: any) => ({
+        product_variant_id: item.product_variant_id,
+        sku: item.sku,
+        variant_name: item.variant_name,
+        quantity: Number(item.quantity),
+        cost_price: Number(item.cost_price),
+        amount: Number(item.amount),
+        remarks: item.remarks ?? "",
+        uom_code: item.uom_code,
+        uom_id: item.uom_id,
+        purchasing_qty: Number(item.conversion_qty),
+        });
+        
+    useEffect(() => {
+        setTransactionItems(
+            poItems.map(mapTransactionItem)
+        );
+    }, [poItems]);    
 
         // ADD / REMOVE ITEMS ON THE LIST
     const [transactionItems, setTransactionItems] = useState<any[]>([]);    
@@ -227,7 +245,7 @@ const handleSubmit = (e: React.FormEvent) => {
                             </label>
 
                             <input
-                                //value={ponumber}
+                                value={purchaseOrder.po_number}
                                 readOnly
                                 className="w-full bg-gray-100 border rounded-xl px-4 py-3"
                             />

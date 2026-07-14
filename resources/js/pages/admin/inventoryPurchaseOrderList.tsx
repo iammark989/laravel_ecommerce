@@ -3,13 +3,13 @@ import { Plus, Search, Edit, Eye,Trash2 } from "lucide-react";
 import { useState } from "react";
 import { Link,usePage,router } from "@inertiajs/react";
 import StatusBadge from "@/components/ui/StatusBadge";
+import PurchaseOrderActions from "@/components/ui/PurchaseOrderActions";
 
 export default function PuchaseOrderList() {
   const [search, setSearch] = useState("");
 
   const { poDetails } = usePage().props as any;
 
-  
   
   return (
 
@@ -126,35 +126,7 @@ export default function PuchaseOrderList() {
 
                 
                 <td className="p-4">
-
-                  <div className="flex gap-2">
-
-                    <Link 
-                    href={`/admin/purchase-order/${po.id}/edit`}
-                    className="inline-flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-slate-100"
-                                        >
-                      <Edit size={18} />
-                      Edit
-                    </Link>
-
-                    <Link 
-                    href={`/admin/purchase-order/${po.id}/details`}
-                    className="inline-flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-slate-100"
-                                        >
-                      <Eye size={18} />
-                      Details
-                    </Link>
-
-                    <Link 
-                    href={`/admin/purchase-order/${po.id}/delete`}
-                    className="inline-flex items-center gap-2 px-4 py-2 border rounded-xl hover:bg-slate-100"
-                                        >
-                      <Trash2 size={18} />
-                      Delete
-                    </Link>
-
-                  </div>
-
+                   <PurchaseOrderActions po={po} />
                 </td>
 
               </tr>
@@ -212,23 +184,7 @@ export default function PuchaseOrderList() {
 
             <div className="grid grid-cols-1 gap-2 mt-4">
 
-              <Link 
-                href={`/admin/purchase-order/${po.id}/edit`}
-              className="bg-sky-500 text-white py-2 rounded-lg text-center">
-                Edit
-              </Link>
-
-               <Link 
-                href={`/admin/purchase-order/${po}/details`}
-              className="bg-sky-500 text-white py-2 rounded-lg text-center">
-                View Details
-              </Link>
-
-               <Link 
-                href={`/admin/purchase-order/${po.id}/delete`}
-              className="bg-sky-500 text-white py-2 rounded-lg text-center">
-                Delete
-              </Link>
+              <PurchaseOrderActions po={po} />
 
 
             </div>
