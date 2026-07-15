@@ -93,8 +93,8 @@ Route::get('/admin/purchase-order/new',[InventoryTransactionsController::class,'
 Route::post('/admin/purchase-order/save',[InventoryTransactionsController::class,'savePurchaseOrder'])->name('savepurchaseorder')->middleware('staffonly');
         // GO TO EDIT PURCHASE ORDER
 Route::get('/admin/purchase-order/{id}/edit',[InventoryTransactionsController::class,'goToEditPurchaseOrder'])->name('gotoeditpurchaseorder')->middleware('staffonly');
-        
-
+        // GO TO VIEW DETAILS PUCHASE ORDER
+Route::get('/admin/purchase-order/{id}/details',[InventoryTransactionsController::class,'goToDetailsPurchaseOrder'])->name('gotoviewdetailspurchaseorder')->middleware('staffonly');
 
 // BUSINESS PARTNERS
         // GO TO SUPPLIERS PAGE

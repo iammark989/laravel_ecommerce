@@ -6,8 +6,8 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import SummaryLine from "@/components/ui/SummaryLine";
 
-export default function PurchaseOrderEditPage() {
-    const { supplierList,poDetails,poItems} = usePage().props as any;
+export default function PurchaseOrderFormPage() {
+    const { supplierList,poDetails,poItems,readOnly } = usePage().props as any;
    
     const [items, setItems] = useState([]);
 
@@ -24,7 +24,7 @@ export default function PurchaseOrderEditPage() {
         suppliers_quotation_no: poDetails.suppliers_quotation_no ?? "",
         reference_no: poDetails.reference_no ?? "",
         remarks: poDetails.remarks ?? "",
-        discount:poDetails.discount ?? 0,
+        discount:Number(poDetails.discount) ?? 0,
     });
 
     const mapTransactionItem = (item: any) => ({
@@ -170,6 +170,28 @@ const handleSubmit = (e: React.FormEvent) => {
 
 };
 
+const getStatusColor = (status: string) => {
+    switch (status) {
+        case "draft":
+            return "bg-gray-100 text-gray-700 border-gray-300";
+
+        case "submitted":
+            return "bg-sky-100 text-sky-700 border-sky-300";
+
+        case "partially_received":
+            return "bg-amber-100 text-amber-700 border-amber-300";
+
+        case "completed":
+            return "bg-green-100 text-green-700 border-green-300";
+
+        case "cancelled":
+            return "bg-red-100 text-red-700 border-red-300";
+
+        default:
+            return "bg-gray-100 text-gray-700";
+    }
+};
+
     return (
 
         <AdminMainLayout>
@@ -183,11 +205,11 @@ const handleSubmit = (e: React.FormEvent) => {
                     <div>
 
                         <h1 className="text-3xl font-bold">
-                            New Purchase Order
+                            Purchase Order
                         </h1>
 
                         <p className="text-gray-500">
-                            Create a purchase order for supplier purchasing.
+                           Purchase order for supplier purchasing.
                         </p>
 
                     </div>
@@ -226,6 +248,7 @@ const handleSubmit = (e: React.FormEvent) => {
                             required
                             value={purchaseOrder.supplier_id}
                             onChange={(e) => setPurchaseOrder({...purchaseOrder, supplier_id: e.target.value})}
+                            disabled={readOnly}
                             >
 
                                 <option value="">Select Supplier</option>
@@ -248,6 +271,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                 value={purchaseOrder.po_number}
                                 readOnly
                                 className="w-full bg-gray-100 border rounded-xl px-4 py-3"
+                                disabled={readOnly}
                             />
 
                         </div>
@@ -259,9 +283,10 @@ const handleSubmit = (e: React.FormEvent) => {
                             </label>
 
                             <input
-                                value="Draft"
+                                value={poDetails.status}
                                 readOnly
-                                className="w-full bg-yellow-100 text-yellow-700 border rounded-xl px-4 py-3"
+                                className={`w-full ${getStatusColor(poDetails.status)} font-medium border rounded-xl px-4 py-3`}
+                                disabled={readOnly}
                             />
 
                         </div>
@@ -278,6 +303,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                 onChange={(e)=>setPurchaseOrder({...purchaseOrder,order_date:e.target.value})}
                                 className="w-full border rounded-xl px-4 py-3"
                                 required
+                                disabled={readOnly}
                             />
 
                         </div>
@@ -294,6 +320,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                 value={purchaseOrder.expected_delivery}
                                 onChange={(e)=>setPurchaseOrder({...purchaseOrder,expected_delivery:e.target.value})}
                                 className="w-full border rounded-xl px-4 py-3"
+                                disabled={readOnly}
                             />
 
                         </div>
@@ -309,6 +336,7 @@ const handleSubmit = (e: React.FormEvent) => {
                             value={purchaseOrder.payment_terms}
                             onChange={(e) => setPurchaseOrder({...purchaseOrder,payment_terms:e.target.value})}
                             required
+                            disabled={readOnly}
                             >
                                 <option value="">Select Payment Terms</option>
                                 <option value="cash">Cash</option>
@@ -346,6 +374,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                 onChange={(e) => setPurchaseOrder({...purchaseOrder,suppliers_quotation_no:e.target.value})}
                                 maxLength={25}
                                 minLength={2}
+                                disabled={readOnly}
                             />
 
                         </div>
@@ -362,6 +391,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                 onChange={(e)=>setPurchaseOrder({...purchaseOrder,reference_no:e.target.value})}
                                 maxLength={50}
                                 minLength={2}
+                                disabled={readOnly}
                             />
 
                         </div>
@@ -380,6 +410,7 @@ const handleSubmit = (e: React.FormEvent) => {
                             value={purchaseOrder.remarks}
                             onChange={(e)=>setPurchaseOrder({...purchaseOrder,remarks:e.target.value})}
                             maxLength={500}
+                            disabled={readOnly}
                         />
 
                     </div>
@@ -402,6 +433,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                 onChange={(e) => searchVariants(e.target.value)}
                                 placeholder="Search SKU or Variant"
                                 className="w-full border rounded-xl px-4 py-3"
+                                disabled={readOnly}
                             />
 
                             {searchResults.length > 0 && (
@@ -477,10 +509,14 @@ const handleSubmit = (e: React.FormEvent) => {
                                         Remarks
                                     </th>
 
-                                    <th className="p-4">
+                                    {(readOnly) ?
+                                     ''
+                                    :
+                                    (<th className="p-4">
                                         Action
-                                    </th>
-
+                                    </th>)
+                                    }
+                                    
                                 </tr>
 
                             </thead>
@@ -528,6 +564,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                                     min="0"
                                                     maxLength={12}
                                                     value={item.quantity}
+                                                    disabled={readOnly}
                                                     onChange={(e) => {
                                                         const updated = [...transactionItems];
 
@@ -540,7 +577,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                                             Number(e.target.value) * item.cost_price;                                                     
                                                         setTransactionItems(totalamount);
                                                     }}
-                                                    className={`w-24 border rounded-lg px-3 py-2 ${
+                                                    className={`w-24 ${readOnly ? '' : 'border'} text-center rounded-lg px-3 py-2 ${
                                                                     errors[`transactionItems.${index}.quantity`]
                                                                         ? "border-red-500"
                                                                         : ""
@@ -570,6 +607,7 @@ const handleSubmit = (e: React.FormEvent) => {
                                                 <input
                                                     type="text"
                                                     value={item.remarks}
+                                                    disabled={readOnly}
                                                     onChange={(e) => {
                                                         const updated = [...transactionItems];
 
@@ -578,13 +616,15 @@ const handleSubmit = (e: React.FormEvent) => {
 
                                                         setTransactionItems(updated);
                                                     }}
-                                                    className="border rounded-lg px-3 py-2"
+                                                    className={`${readOnly ? '' : 'border'} rounded-lg px-3 py-2`}
                                                     maxLength={255}
                                                 />
                                             </td>
 
-                                            
-                                            <td className="p-3">
+                                            {(readOnly) ? 
+                                            ''
+                                            :
+                                            <td className="p-3" >
                                                 <button
                                                     type="button"
                                                     onClick={() =>
@@ -595,6 +635,8 @@ const handleSubmit = (e: React.FormEvent) => {
                                                     Remove
                                                 </button>
                                             </td>
+                                            }
+                                            
 
                                         </tr>
 
@@ -636,9 +678,14 @@ const handleSubmit = (e: React.FormEvent) => {
                                 label="Subtotal"
                                 value={`₱${subtotalAmount.toLocaleString()}`}
                         />
-
-                        <div className="flex items-center justify-between">
-
+                        {(readOnly)
+                        ?
+                        (<SummaryLine
+                                label="Discount"
+                                value={`₱${purchaseOrder.discount.toLocaleString()}`}
+                        />)
+                        :
+                        (<div className="flex items-center justify-between">
                             <span className="text-gray-600">
                                 Discount
                             </span>
@@ -648,9 +695,10 @@ const handleSubmit = (e: React.FormEvent) => {
                                 placeholder="0.00"
                                 maxLength={12}
                                 value={purchaseOrder.discount}
-                                onChange={(e) => setPurchaseOrder({...purchaseOrder, discount: e.target.value})}
+                                onChange={(e) => setPurchaseOrder({...purchaseOrder, discount: Number(e.target.value)})}
                             />
-                        </div>
+                        </div>)
+                        }
 
                         <SummaryLine
                             label="Tax"
@@ -680,37 +728,43 @@ const handleSubmit = (e: React.FormEvent) => {
                 {/* Buttons */}
 
                 <div className="flex flex-col sm:flex-row justify-end gap-3">
+                    <div className="flex gap-3">
+                            <Link
+                                href="/admin/purchase-orders"
+                                className="border rounded-xl px-6 py-3 bg-white hover:bg-gray-300"
+                            >
+                                Cancel
+                            </Link>
+                            {readOnly ? (
+                                <button
+                                    type="button"
+                                    className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl px-6 py-3 flex items-center gap-2"
+                                >
+                                    <Save size={18} />
+                                    Print
+                                </button>
+                            ) : (
+                                <>
+                                    <button
+                                        type="submit"
+                                        onClick={() => setAction("draft")}
+                                        className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl px-6 py-3 flex items-center gap-2"
+                                    >
+                                        <Save size={18} />
+                                        Save Draft
+                                    </button>
 
-                    <Link
-                        href="/admin/purchase-orders"
-                        className="border rounded-xl px-6 py-3 bg-white hover:bg-gray-300"
-                    >
-                        Cancel
-                    </Link>
-
-                    <button
-                        type="submit"
-                        onClick={() => setAction("draft")}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white rounded-xl px-6 py-3 flex items-center justify-center gap-2"
-                    >
-
-                        <Save size={18} />
-
-                        Save Draft
-
-                    </button>
-
-                    <button
-                        type='submit'
-                        onClick={() => setAction("submitted")}
-                        className="bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-6 py-3 flex items-center justify-center gap-2"
-                    >
-
-                        <Send size={18} />
-
-                        Submit Purchase Order
-
-                    </button>
+                                    <button
+                                        type="submit"
+                                        onClick={() => setAction("submitted")}
+                                        className="bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-6 py-3 flex items-center gap-2"
+                                    >
+                                        <Send size={18} />
+                                        Submit Purchase Order
+                                    </button>
+                                </>
+                            )}
+                        </div>                                     
 
                 </div>
                        </form>             
