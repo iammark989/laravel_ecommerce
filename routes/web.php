@@ -95,6 +95,9 @@ Route::post('/admin/purchase-order/save',[InventoryTransactionsController::class
 Route::get('/admin/purchase-order/{id}/edit',[InventoryTransactionsController::class,'goToEditPurchaseOrder'])->name('gotoeditpurchaseorder')->middleware('staffonly');
         // GO TO VIEW DETAILS PUCHASE ORDER
 Route::get('/admin/purchase-order/{id}/details',[InventoryTransactionsController::class,'goToDetailsPurchaseOrder'])->name('gotoviewdetailspurchaseorder')->middleware('staffonly');
+        // DELETE PURCHASE ORDER ---DRAFT STATUS ONLY---
+Route::delete('/admin/purchase-order/{purchaseOrder}',[InventoryTransactionsController::class,'deletePurchaseOrder'])->name('deletepurchaseorder')->middleware('staffonly');
+
 
 // BUSINESS PARTNERS
         // GO TO SUPPLIERS PAGE

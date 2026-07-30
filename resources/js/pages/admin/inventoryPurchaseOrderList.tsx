@@ -4,13 +4,30 @@ import { useState } from "react";
 import { Link,usePage,router } from "@inertiajs/react";
 import StatusBadge from "@/components/ui/StatusBadge";
 import PurchaseOrderActions from "@/components/ui/PurchaseOrderActions";
+import Swal from "sweetalert2";
 
 export default function PuchaseOrderList() {
   const [search, setSearch] = useState("");
 
   const { poDetails } = usePage().props as any;
-
   
+  const deletePurchaseOrder = (id: number) => {
+    Swal.fire({
+        title: "Delete Purchase Order?",
+        text: "This draft purchase order will be permanently deleted.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#dc2626",
+        cancelButtonColor: "#6b7280",
+        confirmButtonText: "Yes, Delete",
+        cancelButtonText: "Cancel",
+    }).then((result) => {
+        if (result.isConfirmed) {
+            router.delete(`/admin/purchase-order/${id}`);
+        }
+    });
+};
+
   return (
 
     <AdminMainLayout><section>
@@ -126,7 +143,7 @@ export default function PuchaseOrderList() {
 
                 
                 <td className="p-4">
-                   <PurchaseOrderActions po={po} />
+                   <PurchaseOrderActions po={po} onDelete={deletePurchaseOrder}/>
                 </td>
 
               </tr>
@@ -184,7 +201,7 @@ export default function PuchaseOrderList() {
 
             <div className="grid grid-cols-1 gap-2 mt-4">
 
-              <PurchaseOrderActions po={po} />
+              <PurchaseOrderActions po={po} onDelete={deletePurchaseOrder}/>
 
 
             </div>

@@ -19,10 +19,10 @@ import { Link } from "@inertiajs/react";
 export default function DashboardPage() {
 
     const dashboard = {
-        products: 125,
-        variants: 384,
-        suppliers: 18,
-        customers: 542,
+        products: 50,
+        variants: 85,
+        suppliers: 5,
+        customers: 99,
 
         lowStock: 15,
         outOfStock: 4,

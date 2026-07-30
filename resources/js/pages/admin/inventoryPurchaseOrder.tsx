@@ -24,6 +24,8 @@ export default function PurchaseOrderPage() {
         remarks: "",
         discount:"0",
     });
+    
+
 
         // ADD / REMOVE ITEMS ON THE LIST
     const [transactionItems, setTransactionItems] = useState<any[]>([]);    
@@ -383,7 +385,7 @@ const [supplier,setSupplier ] = useState(false);
                                 onChange={(e) => searchVariants(e.target.value)}
                                 placeholder="Search SKU or Variant"
                                 className="w-full border rounded-xl px-4 py-3"
-                                disabled={!supplier}
+                                disabled={!purchaseOrder.supplier_id}
                             />
 
                             {searchResults.length > 0 && (

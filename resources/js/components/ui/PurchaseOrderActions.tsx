@@ -1,17 +1,21 @@
 
     import { Link } from "@inertiajs/react";
     import { Eye,Edit,Trash2 } from "lucide-react";
+    import Swal from "sweetalert2";
+    import { router } from "@inertiajs/react";
 
 
     
     interface PurchaseOrderActionsProps {
     po: any;
+    onDelete: (id: number) => void;
 }
 
 export default function PurchaseOrderActions({
-    po,
+    po, onDelete,
 }: PurchaseOrderActionsProps) {
-       
+
+           
     switch (po.status) {
         case "draft":
             return (
@@ -32,13 +36,13 @@ export default function PurchaseOrderActions({
                         Edit
                     </Link>
 
-                    <Link
-                        href={`/admin/purchase-order/${po.id}/delete`}
+                    <button
+                        onClick={() => onDelete(po.id)}
                         className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600"
                     >
                         <Trash2 size={18} />
                         Delete
-                    </Link>
+                    </button>
                 </div>
             );
 

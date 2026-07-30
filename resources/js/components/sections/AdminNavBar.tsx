@@ -224,6 +224,7 @@ export default function AdminNavbar({
                                             py-3
                                             text-red-600
                                             hover:bg-red-50
+                                            hover:cursor-pointer
                                         "
                                     >
                                         <LogOut size={18} />

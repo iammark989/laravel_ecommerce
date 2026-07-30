@@ -95,10 +95,7 @@ export default function PurchaseOrderFormPage() {
         0
     );
 
-    const grandTotal = subtotalAmount - Number(purchaseOrder.discount);
-    
-
-    
+    const grandTotal = subtotalAmount - Number(purchaseOrder.discount);    
     
 const [loading, setLoading] = useState(false);    
 const [search, setSearch] = useState("");
@@ -152,7 +149,7 @@ const handleSubmit = (e: React.FormEvent) => {
             onSuccess:() =>{
                Swal.fire({
               icon: "success",
-              title: "Puchase Order Successfully Created",
+              title: "Puchase Order Saved!",
               showConfirmButton: true,
               confirmButtonColor: "#34abf0",
               timer: 2000,
@@ -244,11 +241,11 @@ const getStatusColor = (status: string) => {
                             </label>
 
                             <select 
-                            className="w-full border rounded-xl px-4 py-3"
+                            className="w-full border rounded-xl px-4 py-3 bg-gray-100"
                             required
                             value={purchaseOrder.supplier_id}
                             onChange={(e) => setPurchaseOrder({...purchaseOrder, supplier_id: e.target.value})}
-                            disabled={readOnly}
+                            disabled
                             >
 
                                 <option value="">Select Supplier</option>

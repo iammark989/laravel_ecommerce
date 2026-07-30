@@ -123,6 +123,7 @@ class InventoryTransactionsController extends Controller
                 'poitems.purchase_order_id',
                 'poitems.quantity',
                 'poitems.amount',
+                'poitems.conversion_qty',
                 'poitems.remarks',
                 'poitems.uom_id',
                 'uom.code as uom_code',
@@ -241,6 +242,36 @@ class InventoryTransactionsController extends Controller
                         }
                 
                 });
+    }
+
+    // Delete Purchase Order -- Draft Status only //
+   public function deletePurchaseOrder(PurchaseOrder $purchaseOrder)
+    {
+        
+        if ($purchaseOrder->status !== 'draft') {
+            return back()->with(
+                'error',
+                'Only draft purchase orders can be deleted.'
+            );
+        }
+
+        DB::transaction(function () use ($purchaseOrder) {
+
+            PurchaseOrderItem::where(
+                'purchase_order_id',
+                $purchaseOrder->id
+            )->delete();
+
+            $purchaseOrder->delete();
+
+        });
+
+        return redirect()
+            ->route('gotopurchaseorderlist')
+            ->with(
+                'success',
+                'Purchase Order deleted successfully.'
+            );
     }
 
     
