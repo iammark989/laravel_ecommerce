@@ -1,18 +1,18 @@
 
     import { Link } from "@inertiajs/react";
     import { Eye,Edit,Trash2 } from "lucide-react";
-    import Swal from "sweetalert2";
-    import { router } from "@inertiajs/react";
+
 
 
     
     interface PurchaseOrderActionsProps {
     po: any;
     onDelete: (id: number) => void;
+    onCancel: (id: number) => void;
 }
 
 export default function PurchaseOrderActions({
-    po, onDelete,
+    po, onDelete, onCancel,
 }: PurchaseOrderActionsProps) {
 
            
@@ -38,7 +38,7 @@ export default function PurchaseOrderActions({
 
                     <button
                         onClick={() => onDelete(po.id)}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600"
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white hover:cursor-pointer hover:bg-red-600"
                     >
                         <Trash2 size={18} />
                         Delete
@@ -57,12 +57,12 @@ export default function PurchaseOrderActions({
                         Details
                     </Link>
 
-                    <Link
-                        href={`/admin/purchase-order/${po.id}/cancel`}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white hover:bg-red-600"
+                    <button
+                        onClick={() => onCancel(po.id)}
+                        className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-red-500 text-white hover:cursor-pointer hover:bg-red-600"
                     >
                         Cancel
-                    </Link>
+                    </button>
                 </div>
             );
 

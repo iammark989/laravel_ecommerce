@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Addresse;
+use App\Models\GoodsReceipt;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\Role;
@@ -54,6 +55,10 @@ class User extends Authenticatable
 
     public function approvebyusers(){
         return $this->hasMany(PurchaseOrder::class,'approved_by','id');
+    }
+
+    public function goodsreceipts(){
+        return $this->hasMany(GoodsReceipt::class,'approved_by','id');
     }
 
     public function updatedbyusers(){

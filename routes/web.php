@@ -97,6 +97,14 @@ Route::get('/admin/purchase-order/{id}/edit',[InventoryTransactionsController::c
 Route::get('/admin/purchase-order/{id}/details',[InventoryTransactionsController::class,'goToDetailsPurchaseOrder'])->name('gotoviewdetailspurchaseorder')->middleware('staffonly');
         // DELETE PURCHASE ORDER ---DRAFT STATUS ONLY---
 Route::delete('/admin/purchase-order/{purchaseOrder}',[InventoryTransactionsController::class,'deletePurchaseOrder'])->name('deletepurchaseorder')->middleware('staffonly');
+        // CANCEL PURCHASE ORDER
+Route::put('/admin/purchase-order/{purchaseOrder}',[InventoryTransactionsController::class,'cancelPurchaseOrder'])->name('cancelpurchaseorder')->middleware('staffonly');
+
+
+                // GOODS RECEIPT
+        // GO TO GOODS RECEIPT LIST
+Route::get('/admin/goods-receipts',[InventoryTransactionsController::class,'goToGoodsReceiptList'])->name('gotogoodsreceiptlist')->middleware('staffonly');
+
 
 
 // BUSINESS PARTNERS

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\GoodsReceipt;
 use App\Models\ProductVariant;
 use App\Models\PurchaseOrder;
 use App\Models\User;
@@ -31,8 +32,12 @@ class Warehouse extends Model
         return $this->hasMany(ProductVariant::class,'warehouse_id','id');
     }
 
-    public function warehouses(){
+    public function purchaseorders(){
         return $this->hasMany(PurchaseOrder::class,'warehouse_id','id');
+    }
+
+    public function goodsreceipts(){
+        return $this->hasMany(GoodsReceipt::class,'warehouse_id','id');
     }
 
     protected function name(): Attribute

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\GoodsReceiptItem;
 use App\Models\Product;
 use App\Models\PurchaseOrderItem;
 use App\Models\Uom;
@@ -77,6 +78,10 @@ class ProductVariant extends Model
 
     public function purchaseorderitems(){
         return $this->hasMany(PurchaseOrderItem::class,'product_variant_id','id');
+    }
+
+    public function goodsreceiptitems(){
+        return $this->hasMany(GoodsReceiptItem::class,'product_variant_id','id');
     }
 
 protected function variant_name(): Attribute

@@ -245,27 +245,20 @@ class InventoryTransactionsController extends Controller
     }
 
     // Delete Purchase Order -- Draft Status only //
-   public function deletePurchaseOrder(PurchaseOrder $purchaseOrder)
-    {
-        
+   public function deletePurchaseOrder(PurchaseOrder $purchaseOrder){
         if ($purchaseOrder->status !== 'draft') {
             return back()->with(
                 'error',
                 'Only draft purchase orders can be deleted.'
             );
         }
-
         DB::transaction(function () use ($purchaseOrder) {
-
             PurchaseOrderItem::where(
                 'purchase_order_id',
                 $purchaseOrder->id
             )->delete();
-
             $purchaseOrder->delete();
-
         });
-
         return redirect()
             ->route('gotopurchaseorderlist')
             ->with(
@@ -274,6 +267,55 @@ class InventoryTransactionsController extends Controller
             );
     }
 
-    
+    // CANCEL PURCHASE ORDER
+    public function cancelPurchaseOrder(PurchaseOrder $purchaseOrder)
+        {
+            if ($purchaseOrder->status !== 'submitted') {
+                return back()->with(
+                    'error',
+                    'Only submitted purchase orders can be cancelled.'
+                );
+            }
+
+            {/**if ($purchaseOrder->goodsReceipts()->exists()) {
+                return back()->with(
+                    'error',
+                    'This purchase order has already been received and can no longer be cancelled.'
+                );
+            }***/}
+
+            $purchaseOrder->update([
+                'status' => 'cancelled',
+            ]);
+
+            return redirect()
+                ->route('gotopurchaseorderlist')
+                ->with('success', 'Purchase Order cancelled.');
+        }
+
+
+        // GOODS RECEIPT CONTROLLER
+    public function goToGoodsReceiptList(){
+         $grDetails = DB::table('goods_receipts as gr')
+            ->leftJoin('suppliers as supplier', 'supplier.id', '=', 'gr.supplier_id')
+            ->leftJoin('purchase_orders as po', 'po.id', '=', 'gr.purchase_order_id')
+            ->leftJoin('warehouses as wh','wh.id','=','gr.warehouse_id')
+            ->select(
+                'gr.id',
+                'gr.gr_number',
+                'po.po_number',
+                'supplier.supplier_name',
+                'gr.received_date',
+                'gr.status',
+                'wh.name as warehouse',
+            )
+            ->orderByDesc('gr.received_date')
+            ->paginate(15);
+   
+
+        return Inertia::render('admin/inventoryGoodsReceiptList',[
+            'grDetails' => $grDetails,
+        ]);
+     }
 
 }

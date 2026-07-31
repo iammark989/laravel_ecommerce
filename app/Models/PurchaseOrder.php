@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\GoodsReceipt;
 use App\Models\PurchaseOrderItem;
 use App\Models\Supplier;
 use App\Models\User;
@@ -44,6 +45,10 @@ class PurchaseOrder extends Model
         return $this->hasMany(PurchaseOrderItem::class,'purchase_order_id','id');
     }
 
+     public function goodsreceipts(){
+        return $this->hasMany(GoodsReceipt::class,'purchase_order_id','id');
+    }
+
     public function warehouse(){
         return $this->belongsTo(Warehouse::class,'warehouse_id','id');
     }
@@ -60,5 +65,6 @@ class PurchaseOrder extends Model
         return $this->belongsTo(User::class,'updated_by','id');
     }
     
+
     
 }

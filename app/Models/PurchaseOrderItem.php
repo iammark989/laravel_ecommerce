@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\GoodsReceiptItem;
 use App\Models\ProductVariant;
 use App\Models\PurchaseOrder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -32,5 +33,9 @@ class PurchaseOrderItem extends Model
 
     public function productvariant(){
         return $this->belongsTo(ProductVariant::class,'product_variant_id','id');
+    }
+
+    public function goodsreceiptitems(){
+        return $this->hasMany(GoodsReceiptItem::class,'purchase_order_items_id','id');
     }
 }
