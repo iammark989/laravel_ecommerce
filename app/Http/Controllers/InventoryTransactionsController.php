@@ -158,7 +158,7 @@ class InventoryTransactionsController extends Controller
 
 
     // SAVE PURCHASE ORDER
-    public function savePurchaseOrder(Request $request){
+    public function saveUpdatePurchaseOrder(Request $request){
         $incomingFields = $request->validate([
                 'supplier_id' => 'required|exists:suppliers,id',
                 //'warehouse_id' => '',
@@ -244,6 +244,97 @@ class InventoryTransactionsController extends Controller
                 });
     }
 
+
+     // SAVE UPDATE PURCHASE ORDER
+    public function saveChangesPurchaseOrder(Request $request, PurchaseOrder $purchaseOrder){
+        $incomingFields = $request->validate([
+                'po_number' => 'required',
+                'supplier_id' => 'required|exists:suppliers,id',
+                //'warehouse_id' => '',
+                'order_date' => 'required|date',
+                'expected_delivery' => 'nullable|date|after_or_equal:order_date',
+                'payment_terms' => 'required|in:cash,cod,net15,net30',
+                //'status' => '',
+                'suppliers_quotation_no' => 'nullable|max:25',
+                'reference_no' => 'nullable|max:50',
+                'remarks' => 'nullable|string|max:500',
+                'discount' => 'numeric|min:0',
+
+                'transactionItems' => 'required|array|min:1',
+                'transactionItems.*.sku' => 'required|string|max:50',
+                'transactionItems.*.product_variant_id' => 'required|exists:product_variants,id',
+                'transactionItems.*.quantity' => 'required|numeric|gt:0',
+                'transactionItems.*.cost_price' => 'required|numeric|min:0',
+                'transactionItems.*.product_variant_id' => '',
+                //'transactionItems.*.warehouse_id' => '',
+                'transactionItems.*.uom_id' => 'nullable',
+                'transactionItems.*.purchasing_qty' => 'nullable',
+                'transactionItems.*.remarks' => 'nullable|string|max:255',
+        ]);
+
+            if ($request->action === 'draft') {
+                $status = 'draft';
+            }
+            if ($request->action === 'submitted') {
+                $status = 'submitted';
+            }
+
+            $subtotal = 0;
+            foreach ($request->transactionItems as $item) {
+                $subtotal +=
+                    $item['quantity']
+                    *
+                    $item['cost_price'];
+            }
+
+            $discount = $request->discount;
+
+            $tax = 0;
+
+            $grandTotal = $subtotal - $discount + $tax;
+
+            $warehouse = Warehouse::where('id','=','1')->firstOrFail();
+
+          DB::transaction(function () use ($request, $incomingFields, $warehouse, $user, $grandTotal, $subtotal,$status,$id) { 
+                    $purchaseOrder = PurchaseOrder::where('id','=',$id);
+                    
+                   $purchaseOrder->update([
+                        'po_number' =>  $incomingFields['po_number'],
+                        'supplier_id' => $incomingFields['supplier_id'],
+                        'order_date' => $incomingFields['order_date'],
+                        'expected_delivery' => $incomingFields['expected_delivery'],
+                        'payment_terms' => $incomingFields['payment_terms'],
+                        'suppliers_quotation_no' => $incomingFields['suppliers_quotation_no'],
+                        'reference_no' => $incomingFields['reference_no'],
+                        'remarks' => $incomingFields['remarks'],
+                        'status' => $status,
+                        'warehouse_id' => $warehouse->id,
+                        'discount' => $incomingFields['discount'],
+                        'subtotal' => $subtotal,
+                        'grand_total' => $grandTotal,
+                        'tax' => 0,
+                    ]);
+                    $purchaseOrderItem = PurchaseOrderItem::where('purchase_order_id','=',$id);
+                    foreach ($incomingFields['transactionItems'] as $items) {
+                        $purchaseOrderItem->update(
+                            [
+                                'purchase_order_id' => $purchaseOrder->id,
+                                'product_variant_id' => $items['product_variant_id'],
+                                'uom_id' => $items['uom_id'],
+                                'quantity' => $items['quantity'],
+                                'cost_price' => $items['cost_price'],
+                                'amount' => $items['quantity'] * $items['cost_price'],
+                                'conversion_qty' => $items['purchasing_qty'],
+                                'remarks' => $items['remarks'],
+                            ],
+
+                        );
+                        }
+                
+                });
+    }
+
+
     // Delete Purchase Order -- Draft Status only //
    public function deletePurchaseOrder(PurchaseOrder $purchaseOrder){
         if ($purchaseOrder->status !== 'draft') {
@@ -295,6 +386,7 @@ class InventoryTransactionsController extends Controller
 
 
         // GOODS RECEIPT CONTROLLER
+        // GO TO GOODS RECEIPT LIST
     public function goToGoodsReceiptList(){
          $grDetails = DB::table('goods_receipts as gr')
             ->leftJoin('suppliers as supplier', 'supplier.id', '=', 'gr.supplier_id')
@@ -316,6 +408,11 @@ class InventoryTransactionsController extends Controller
         return Inertia::render('admin/inventoryGoodsReceiptList',[
             'grDetails' => $grDetails,
         ]);
+     }
+
+        // GO TO GOODS RECEIPT NEW
+     public function goToNewGoodsReceipt(){
+        return Inertia::render('admin/inventoryGoodsReceipt');
      }
 
 }

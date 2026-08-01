@@ -2,18 +2,46 @@ import AdminMainLayout from "@/components/layout/AdminMainLayout";
 import { Link,usePage,router } from "@inertiajs/react";
 import { ArrowLeft, Save, Send, Search, Trash2, PackageSearch } from "lucide-react";
 import { useState } from "react";
+import PurchaseOrderModal from "@/components/modals/PurchaseOrderModal";
 import axios from "axios";
 import Swal from "sweetalert2";
 import SummaryLine from "@/components/ui/SummaryLine";
 
 export default function GoodsReceiptPage() {
     const { purchaseOrderItems } = usePage().props as any;
-    const { errors } = usePage().props;
-    const [loading, setLoading] = useState(false);    
+    const { errors, } = usePage().props;
+    const [loading, setLoading] = useState(false);
+    const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState<any | null>(null);
+    const [ openModal,setOpenModal ] = useState(false);
+    const [purchaseOrders, setPurchaseOrders] = useState([]);
+    const handleSelectPurchaseOrder = (po: any) => {
+
+        selectedPurchaseOrder(true);
+
+       // setSelectedPurchaseOrder(po);
+
+        setOpenModal(false);
+
+        // later:
+        // setTransactionItems(po.items)
+
+    };
 
     const [ goodsReceipt, setGoodsReceipt ] = useState({
        
     });
+
+        const loadPurchaseOrders = async () => {
+
+        const response = await axios.get(
+            "/api/search/purchase-orders",
+            
+
+        );
+
+        setPurchaseOrders(response.data);
+
+    };
     
 
 const handleSubmit = (e: React.FormEvent) => {
@@ -35,11 +63,11 @@ const handleSubmit = (e: React.FormEvent) => {
                     <div>
 
                         <h1 className="text-3xl font-bold">
-                            New Goods receipt
+                            Goods receipt
                         </h1>
 
                         <p className="text-gray-500">
-                            Add goods from purchase order.
+                            Goods receipt to post delivered items base on purchase orders.
                         </p>
 
                     </div>
@@ -56,13 +84,116 @@ const handleSubmit = (e: React.FormEvent) => {
 
                 </div>
 
+                    {/** Copy From Purchase Order */}
+                {selectedPurchaseOrder  ?
+                
+                <div className="bg-green-50 border border-green-200 rounded-2xl p-5">
+
+                        <div className="flex flex-col lg:flex-row justify-between gap-4">
+
+                            <div>
+
+                                <p className="text-sm text-green-700 font-medium">
+                                    Purchase Order Selected
+                                </p>
+
+                                <h2 className="text-xl font-bold">
+                                    PO-20260801-00021
+                                </h2>
+
+                                <p className="text-gray-600 mt-1">
+                                    ABC Foods Corporation
+                                </p>
+
+                            </div>
+
+                            <button
+                                type="button"
+                                className="
+                                    bg-white
+                                    border
+                                    rounded-xl
+                                    px-5
+                                    py-3
+                                    hover:bg-gray-100
+                                "
+                                onClick={() => setSelectedPurchaseOrder(false)}
+                            >
+                                Change Purchase Order
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                : 
+                 <div className="bg-white rounded-2xl shadow-sm border p-6">
+
+                    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+
+                        <div>
+
+                            <h2 className="text-lg font-semibold text-slate-800">
+                                Purchase Order
+                            </h2>
+
+                            <p className="text-sm text-gray-500 mt-1">
+                                Select a submitted or partially received Purchase Order to copy its items.
+                            </p>
+
+                        </div>
+
+                        <button
+                            type="button"
+                            className="
+                                inline-flex items-center justify-center
+                                gap-2
+                                px-5 py-3
+                                rounded-xl
+                                bg-sky-600
+                                text-white
+                                font-medium
+                                hover:bg-sky-700
+                                transition
+                                w-full
+                                sm:w-auto
+                            "
+                            onClick={async () => {
+                                        await loadPurchaseOrders();
+                                        setOpenModal(true);
+                                    }}
+                        >
+                            <PackageSearch size={20} />
+
+                            Select Purchase Order
+                        </button>
+
+                    </div>
+
+                </div>
+                
+                }
+
+                
+                 <PurchaseOrderModal
+                    open={openModal}
+                    onClose={() => setOpenModal(false)}
+                    onSelect={handleSelectPurchaseOrder}
+                    purchaseOrders={purchaseOrders}
+                />
+          
+             
+
+
                 {/* Supplier Information */}
                 <form onSubmit={handleSubmit} className="space-y-6">
                     
                 <div className="bg-white rounded-2xl shadow-sm p-6">
 
+                    
+
                     <h2 className="font-semibold text-lg mb-5">
-                        Purchase Order Information
+                        Goods Receipt Information
                     </h2>
 
                     <div className="grid lg:grid-cols-3 md:grid-cols-2 gap-5">
@@ -70,7 +201,7 @@ const handleSubmit = (e: React.FormEvent) => {
                         <div>
 
                             <label className="block mb-2">
-                                Goods Receipt No. <span className="text-red-500">*</span>
+                                Goods Receipt No. 
                             </label>
 
                                 <input
@@ -84,7 +215,7 @@ const handleSubmit = (e: React.FormEvent) => {
                         <div>
 
                             <label className="block mb-2">
-                                Warehouse
+                                Warehouse <span className="text-red-500">*</span>
                             </label>
 
 
@@ -117,7 +248,10 @@ const handleSubmit = (e: React.FormEvent) => {
 
                         </div>
                         
-                         <div className="mt-5">
+                         
+
+                </div>
+                <div className="mt-5">
 
                         <label className="block mb-2">
                             Remarks
@@ -132,8 +266,6 @@ const handleSubmit = (e: React.FormEvent) => {
                         />
 
                     </div>
-
-                </div>
                 </div>
 
                 {/* Reference */}
@@ -179,214 +311,7 @@ const handleSubmit = (e: React.FormEvent) => {
                 </div>
 
               
-                {/* Purchase Order Items */}
-
-                <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-
-                    <div className="overflow-x-auto">
-
-                        <table className="w-full">
-
-                            <thead className="bg-slate-50">
-
-                                <tr>
-
-                                    <th className="p-4 text-left">
-                                        SKU
-                                    </th>
-
-                                    <th className="p-4 text-left">
-                                        Product Variant
-                                    </th>
-
-                                    <th className="p-4">
-                                        Purchase Order Qty
-                                    </th>
-
-                                    <th className="p-4">
-                                        UoM
-                                    </th>
-
-                                    <th className="p-4">
-                                        Cost Price
-                                    </th>
-
-                                    <th className="p-4">
-                                        Amount
-                                    </th>
-
-                                    <th className="p-4">
-                                        Received Quantity
-                                    </th>
-
-                                    <th className="p-4">
-                                        Remarks
-                                    </th>
-
-                                </tr>
-
-                            </thead>
-                            
-                            <tbody>
-
-                                  {purchaseOrderItems.length === 0 ? <tr>
-                                    <td
-                                        colSpan={6}
-                                        className="py-12 text-center"
-                                    >
-                                        <div className="flex flex-col items-center gap-2">
-                                            <PackageSearch className="w-10 h-10 text-gray-300" />
-
-                                            <p className="text-gray-500 font-medium">
-                                                Copy list of items from purchase order
-                                            </p>
-
-                                            
-                                        </div>
-                                    </td>
-                                </tr> : ''}
-
-                                {purchaseOrderItems.map((item, index) => (
-
-                                        <tr key={index}  className={`border-b ${
-                                                errors[`transactionItems.${index}.quantity`]
-                                                    ? "bg-red-50"
-                                                    : ""
-                                            }`}>
-
-                                            <td className="p-3">
-                                                {item.sku}
-                                            </td>
-
-                                            <td className="p-3">
-                                                {item.variant_name}
-                                            </td>
-
-                                            <td className="p-3">
-                                                <input
-                                                    type="number"
-                                                    min="0"
-                                                    maxLength={12}
-                                                    value={item.quantity}
-                                                    className="w-24 border rounded-lg px-3 py-2"
-                                                />
-                                               
-                                            </td>
-
-                                             <td className="p-3">
-                                               {item.uom_code.toUpperCase()}
-                                            </td>
-
-                                            <td className="p-3">
-                                                {item.cost_price}
-                                            </td>
-
-                                            <td className="p-3">
-                                                {item.amount.toLocaleString()}
-                                            </td>      
-
-                                            <td className="p-3">
-                                                <input
-                                                    type="text"
-                                                    value={item.received_qty}
-                                                    //onChange={}
-                                                    className="border rounded-lg px-3 py-2"
-                                                />
-                                            </td>      
-                                           
-
-                                            <td className="p-3">
-                                                <input
-                                                    type="text"
-                                                    value={item.remarks}
-                                                    //onChange={(e) => {}
-                                                    className="border rounded-lg px-3 py-2"
-                                                    maxLength={255}
-                                                />
-                                            </td>
-
-                                        
-
-                                        </tr>
-
-                                    ))}  
-                                 
-
-                            </tbody>
-                          
-                        </table>
-
-                    </div>
-
-                </div>
-
-                {/* Summary */}
-
-                <div className="flex justify-end mt-8">
-
-                <div className="w-full md:w-[420px] bg-white rounded-2xl shadow-sm border p-6">
-
-                    <h2 className="text-lg font-semibold mb-5">
-                        Financial Summary
-                    </h2>
-
-                    <div className="space-y-4">
-
-                        <SummaryLine
-                            label="Total Items"
-                           value={`${purchaseOrderItems.length}`}
-                           
-                        />
-
-                        <SummaryLine
-                            label="Total Quantity"
-                           value={`${purchaseOrderItems.toLocaleString()}`}                         
-                        />
-
-                        <SummaryLine
-                                label="Subtotal"
-                                value={`₱${purchaseOrderItems.toLocaleString()}`}
-                        />
-
-                        <div className="flex items-center justify-between">
-
-                            <span className="text-gray-600">
-                                Discount
-                            </span>
-                            <input
-                                type="number"
-                                className="w-28 border rounded-lg px-3 py-2 text-right"
-                                placeholder="0.00"
-                                maxLength={12}
-                                value={purchaseOrderItems.discount}
-                                //onChange={}
-                            />
-                        </div>
-
-                        <SummaryLine
-                            label="Tax"
-                                value="₱0.00"
-                        />
-
-                        <hr />
-
-                        <div className="flex justify-between items-center">
-
-                            <span className="text-lg font-semibold">
-                                Grand Total
-                            </span>
-
-                            <span className="text-2xl font-bold text-sky-600">
-                                ₱{purchaseOrderItems.toLocaleString()}
-                            </span>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </div>
+               
 
                 {/* Buttons */}
 

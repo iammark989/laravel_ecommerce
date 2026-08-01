@@ -91,6 +91,8 @@ Route::get('/admin/purchase-orders',[InventoryTransactionsController::class,'goT
 Route::get('/admin/purchase-order/new',[InventoryTransactionsController::class,'goToNewPurchaseOrder'])->name('gotonewpurchaseorder')->middleware('staffonly');
         // SAVE NEW PUCHASE ORDER
 Route::post('/admin/purchase-order/save',[InventoryTransactionsController::class,'savePurchaseOrder'])->name('savepurchaseorder')->middleware('staffonly');
+        // SAVE UPDATE PURCHASE ORDER
+Route::put('/admin/purchase-order/{purchaseOrder}/update',[InventoryTransactionsController::class,'saveUpdatePurchaseOrder'])->name('saveupdatepurchaseorder')->middleware('staffonly');
         // GO TO EDIT PURCHASE ORDER
 Route::get('/admin/purchase-order/{id}/edit',[InventoryTransactionsController::class,'goToEditPurchaseOrder'])->name('gotoeditpurchaseorder')->middleware('staffonly');
         // GO TO VIEW DETAILS PUCHASE ORDER
@@ -104,7 +106,8 @@ Route::put('/admin/purchase-order/{purchaseOrder}',[InventoryTransactionsControl
                 // GOODS RECEIPT
         // GO TO GOODS RECEIPT LIST
 Route::get('/admin/goods-receipts',[InventoryTransactionsController::class,'goToGoodsReceiptList'])->name('gotogoodsreceiptlist')->middleware('staffonly');
-
+        // GOT TO GOODS RECEIPT NEW
+Route::get('/admin/goods-receipts/new',[InventoryTransactionsController::class,'goToNewGoodsReceipt'])->name('gotonewgoodsreceipt')->middleware('staffonly');
 
 
 // BUSINESS PARTNERS

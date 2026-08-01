@@ -145,7 +145,7 @@ const handleSubmit = (e: React.FormEvent) => {
 
         };
 
-        router.post("/admin/purchase-order/save",payload,{
+        router.post(`/admin/purchase-order/${poDetails.id}/update`,{...payload,_method:"put",},{
             onSuccess:() =>{
                Swal.fire({
               icon: "success",
