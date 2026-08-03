@@ -158,7 +158,7 @@ class InventoryTransactionsController extends Controller
 
 
     // SAVE PURCHASE ORDER
-    public function saveUpdatePurchaseOrder(Request $request){
+    public function savePurchaseOrder(Request $request){
         $incomingFields = $request->validate([
                 'supplier_id' => 'required|exists:suppliers,id',
                 //'warehouse_id' => '',
@@ -246,7 +246,7 @@ class InventoryTransactionsController extends Controller
 
 
      // SAVE UPDATE PURCHASE ORDER
-    public function saveChangesPurchaseOrder(Request $request, PurchaseOrder $purchaseOrder){
+    public function saveUpdatePurchaseOrder(Request $request, PurchaseOrder $purchaseOrder){
         $incomingFields = $request->validate([
                 'po_number' => 'required',
                 'supplier_id' => 'required|exists:suppliers,id',
@@ -259,7 +259,6 @@ class InventoryTransactionsController extends Controller
                 'reference_no' => 'nullable|max:50',
                 'remarks' => 'nullable|string|max:500',
                 'discount' => 'numeric|min:0',
-
                 'transactionItems' => 'required|array|min:1',
                 'transactionItems.*.sku' => 'required|string|max:50',
                 'transactionItems.*.product_variant_id' => 'required|exists:product_variants,id',
@@ -295,12 +294,8 @@ class InventoryTransactionsController extends Controller
 
             $warehouse = Warehouse::where('id','=','1')->firstOrFail();
 
-          DB::transaction(function () use ($request, $incomingFields, $warehouse, $user, $grandTotal, $subtotal,$status,$id) { 
-                    $purchaseOrder = PurchaseOrder::where('id','=',$id);
-                    
+          DB::transaction(function () use ($request, $incomingFields, $warehouse, $grandTotal, $subtotal,$status,$purchaseOrder) {                     
                    $purchaseOrder->update([
-                        'po_number' =>  $incomingFields['po_number'],
-                        'supplier_id' => $incomingFields['supplier_id'],
                         'order_date' => $incomingFields['order_date'],
                         'expected_delivery' => $incomingFields['expected_delivery'],
                         'payment_terms' => $incomingFields['payment_terms'],
@@ -314,9 +309,13 @@ class InventoryTransactionsController extends Controller
                         'grand_total' => $grandTotal,
                         'tax' => 0,
                     ]);
-                    $purchaseOrderItem = PurchaseOrderItem::where('purchase_order_id','=',$id);
+                    PurchaseOrderItem::where(
+                        'purchase_order_id',
+                        $purchaseOrder->id
+                    )->delete();
+                    $purchaseOrderItem = PurchaseOrderItem::where('purchase_order_id','=',$purchaseOrder->id);
                     foreach ($incomingFields['transactionItems'] as $items) {
-                        $purchaseOrderItem->update(
+                        $purchaseOrderItem->create(
                             [
                                 'purchase_order_id' => $purchaseOrder->id,
                                 'product_variant_id' => $items['product_variant_id'],

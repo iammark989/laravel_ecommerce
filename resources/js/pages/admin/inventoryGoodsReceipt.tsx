@@ -14,18 +14,13 @@ export default function GoodsReceiptPage() {
     const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState<any | null>(null);
     const [ openModal,setOpenModal ] = useState(false);
     const [purchaseOrders, setPurchaseOrders] = useState([]);
-    const handleSelectPurchaseOrder = (po: any) => {
+  const handleSelectPurchaseOrder = async (id: number) => {
+    console.log(id);
 
-        selectedPurchaseOrder(true);
+    const response = await axios.get(`/api/purchase-orders/${id}/details`);
 
-       // setSelectedPurchaseOrder(po);
-
-        setOpenModal(false);
-
-        // later:
-        // setTransactionItems(po.items)
-
-    };
+    console.log(response.data);
+};
 
     const [ goodsReceipt, setGoodsReceipt ] = useState({
        
@@ -35,13 +30,13 @@ export default function GoodsReceiptPage() {
 
         const response = await axios.get(
             "/api/search/purchase-orders",
-            
-
         );
 
         setPurchaseOrders(response.data);
 
     };
+
+    
     
 
 const handleSubmit = (e: React.FormEvent) => {

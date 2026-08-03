@@ -2,13 +2,14 @@ import { Search, X, PackageSearch } from "lucide-react";
 import { useState } from "react";
 import StatusBadge from "../ui/StatusBadge";
 
+
 interface PurchaseOrderModalProps {
 
     open: boolean;
 
     onClose: () => void;
 
-    onSelect: (purchaseOrder: any) => void;
+    onSelect: (id: number) => void;
 
     purchaseOrders: PurchaseOrder[];
 
@@ -175,7 +176,7 @@ return (
 
                               <button
                                   onClick={() => {
-                                          onSelect(po);
+                                          onSelect(po.id);
                                           onClose();
                                           }}
                                   className="

@@ -9,6 +9,8 @@ use Inertia\Inertia;
 class SearchController extends Controller
 {
 
+
+        // SEARCH PURCHASE ORDER
         public function purchaseOrders()
         {
                $purchaseOrders = PurchaseOrder::query()

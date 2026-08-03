@@ -124,7 +124,7 @@ export default function GoodsReceiptList() {
                                 </p>
 
                                 <Link
-                                    href="/admin/goods-receipt/new"
+                                    href="/admin/goods-receipts/new"
                                     className="mt-2 inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-white hover:bg-sky-700"
                                 >
                                     <Plus size={18} />
