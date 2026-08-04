@@ -27,25 +27,7 @@ class PurchaseOrderController extends Controller
         'uoms.id',
         '=',
         'purchase_order_items.uom_id'
-    )
-    ->join(
-        'purchase_orders',
-        'purchase_orders.id',
-        '=',
-        'purchase_order_items.purchase_order_id',
-    )
-    ->join(
-        'suppliers',
-        'suppliers.id',
-        '=',
-        'purchase_orders.supplier_id'
-    )
-    ->join(
-        'warehouses',
-        'warehouses.id',
-        '=',
-        'purchase_orders.warehouse_id',
-    )
+    ) 
     ->select(
         'purchase_order_items.id',
         'products.name',
@@ -54,11 +36,29 @@ class PurchaseOrderController extends Controller
         'purchase_order_items.quantity',
         'purchase_order_items.cost_price',
         'purchase_order_items.amount',
-        'purchase_order_items.remarks',
+        'purchase_order_items.remarks as items_remarks',
         'uoms.code as uom',
+    )
+    ->where('purchase_order_items.purchase_order_id', $purchaseOrder)
+    ->get();
+
+    $header = PurchaseOrder::query()
+    ->join(
+        'suppliers',
+        'suppliers.id',
+        '=',
+        'purchase_orders.supplier_id')
+    ->join(
+        'warehouses',
+        'warehouses.id',
+        '=',
+        'purchase_orders.warehouse_id',
+    )
+    ->select(
+        'purchase_orders.id',
         'purchase_orders.po_number',
         'purchase_orders.order_date',
-        'purchase_orders.expected_delivery',     
+        'purchase_orders.expected_delivery',
         'purchase_orders.payment_terms',
         'purchase_orders.suppliers_quotation_no',
         'purchase_orders.reference_no',
@@ -66,13 +66,16 @@ class PurchaseOrderController extends Controller
         'purchase_orders.tax',
         'purchase_orders.subtotal',
         'purchase_orders.grand_total',
-        'purchase_orders.remarks',
-        'suppliers.name',
-        'warehouses.name',
+        'purchase_orders.remarks as po_remarks',
+        'suppliers.name as supplier',
+        'warehouses.name as warehouse',
     )
-    ->where('purchase_order_items.purchase_order_id', $purchaseOrder)
-    ->get();
+    ->where('purchase_orders.id', $purchaseOrder)
+    ->firstOrFail();
 
-     return response()->json($items);
+     return response()->json([
+    'header' => $header,
+     'items' => $items,
+     ]);
     }
 }

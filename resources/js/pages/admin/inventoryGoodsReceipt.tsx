@@ -11,32 +11,30 @@ export default function GoodsReceiptPage() {
     const { purchaseOrderItems } = usePage().props as any;
     const { errors, } = usePage().props;
     const [loading, setLoading] = useState(false);
-    const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState<any | null>(null);
+    const [selectedPurchaseOrder, setSelectedPurchaseOrder] = useState<any | null>(null)
     const [ openModal,setOpenModal ] = useState(false);
-    const [purchaseOrders, setPurchaseOrders] = useState([]);
-  const handleSelectPurchaseOrder = async (id: number) => {
-    console.log(id);
-
-    const response = await axios.get(`/api/purchase-orders/${id}/details`);
-
-    console.log(response.data);
+    const [ purchaseOrders, setPurchaseOrders ] = useState([]);
+    const [ purchaseOrdersDetails, setPurchaseOrdersDetails ] = useState<any | null>(null)
+    
+    const handleSelectPurchaseOrder = async (id: number) => {
+    const selectedPO = await axios.get(`/api/purchase-orders/${id}/details`);
+    setPurchaseOrdersDetails(selectedPO.data.items);
+    setSelectedPurchaseOrder(selectedPO.data.header);
+    console.log(selectedPO.data);
 };
 
     const [ goodsReceipt, setGoodsReceipt ] = useState({
        
     });
 
+        // Purchase list for modal
         const loadPurchaseOrders = async () => {
-
         const response = await axios.get(
             "/api/search/purchase-orders",
         );
-
         setPurchaseOrders(response.data);
+        };
 
-    };
-
-    
     
 
 const handleSubmit = (e: React.FormEvent) => {
@@ -93,11 +91,11 @@ const handleSubmit = (e: React.FormEvent) => {
                                 </p>
 
                                 <h2 className="text-xl font-bold">
-                                    PO-20260801-00021
+                                    {selectedPurchaseOrder.po_number}
                                 </h2>
 
                                 <p className="text-gray-600 mt-1">
-                                    ABC Foods Corporation
+                                    {selectedPurchaseOrder.supplier}
                                 </p>
 
                             </div>
@@ -169,13 +167,155 @@ const handleSubmit = (e: React.FormEvent) => {
                 
                 }
 
-                
+                {/** MODAL */}
                  <PurchaseOrderModal
                     open={openModal}
                     onClose={() => setOpenModal(false)}
                     onSelect={handleSelectPurchaseOrder}
                     purchaseOrders={purchaseOrders}
                 />
+
+
+                 {/* Reference */}
+
+                <div className="bg-white rounded-2xl shadow-sm p-6">
+
+                    <h2 className="font-semibold text-lg mb-5">
+                        Purchase Order Information
+                    </h2>
+
+                    <div className="grid lg:grid-cols-2 gap-5">
+
+                        <div>
+
+                            <label className="block mb-2">
+                                Reference Number
+                            </label>
+
+                                <input
+                               value={selectedPurchaseOrder?.reference_no ?? ""}
+                                readOnly
+                                className="w-full bg-gray-100 border rounded-xl px-4 py-3"
+
+                            />
+
+                        </div>
+
+                         <div>
+
+                            <label className="block mb-2">
+                                Supplier's Quotation No.
+                            </label>
+
+                            <input
+                                readOnly
+                                className="w-full bg-gray-100 border rounded-xl px-4 py-3"
+                                value={selectedPurchaseOrder?.suppliers_quotation_no ?? ""}
+                            />
+
+                        </div>
+
+                        <div>
+
+                            <label className="block mb-2">
+                                Order date
+                            </label>
+
+                            <input
+                                readOnly
+                                className="w-full bg-gray-100 border rounded-xl px-4 py-3"
+                                value={selectedPurchaseOrder?.order_date ?? ""}
+                            />
+
+                        </div>
+
+                        <div>
+
+                            <label className="block mb-2">
+                                Expected Delivery Date
+                            </label>
+
+                                <input
+                               value={selectedPurchaseOrder?.expected_delivery ?? ""}
+                                readOnly
+                                className="w-full bg-gray-100 border rounded-xl px-4 py-3"
+
+                            />
+
+                        </div>
+
+                        <div>
+
+                            <label className="block mb-2">
+                                Payment Terms
+                            </label>
+
+                                <input
+                               value={selectedPurchaseOrder?.payment_terms ?? ""}
+                                readOnly
+                                className="w-full bg-gray-100 border rounded-xl px-4 py-3"
+
+                            />
+
+                        </div>
+
+                        <div>
+
+                            <label className="block mb-2">
+                                Warehouse
+                            </label>
+
+                                <input
+                               value={selectedPurchaseOrder?.warehouse ?? ""}
+                                readOnly
+                                className="w-full bg-gray-100 border rounded-xl px-4 py-3"
+
+                            />
+
+                        </div>
+
+                    </div>
+                    <div>
+
+                            <label className="block mb-2">
+                                Note
+                            </label>
+
+                                <textarea
+                               value={selectedPurchaseOrder?.po_remarks ?? ""}
+                                readOnly
+                                className="w-full bg-gray-100 border rounded-xl px-4 py-3"
+
+                            />
+
+                        </div>
+
+                        <div>
+
+                          <SummaryLine
+    label="Subtotal"
+    value={selectedPurchaseOrder?.subtotal}
+/>
+
+<SummaryLine
+    label="Discount"
+    value={selectedPurchaseOrder?.discount}
+/>
+
+<SummaryLine
+    label="Tax"
+    value={selectedPurchaseOrder?.tax}
+/>
+
+<SummaryLine
+    label="Grand Total"
+    value={selectedPurchaseOrder?.grand_total}
+
+/>
+
+                        </div>
+
+                </div>
           
              
 
@@ -262,51 +402,6 @@ const handleSubmit = (e: React.FormEvent) => {
 
                     </div>
                 </div>
-
-                {/* Reference */}
-
-                <div className="bg-white rounded-2xl shadow-sm p-6">
-
-                    <h2 className="font-semibold text-lg mb-5">
-                        Purchase Order Information
-                    </h2>
-
-                    <div className="grid lg:grid-cols-2 gap-5">
-
-                        <div>
-
-                            <label className="block mb-2">
-                                Purchase Order No.
-                            </label>
-
-                                <input
-                               // value={}
-                                readOnly
-                                className="w-full bg-gray-100 border rounded-xl px-4 py-3"
-                            />
-
-                        </div>
-
-                        <div>
-
-                            <label className="block mb-2">
-                                Reference No.
-                            </label>
-
-                            <input
-                               // value={}
-                                readOnly
-                                className="w-full bg-gray-100 border rounded-xl px-4 py-3"
-                            />
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-              
-               
 
                 {/* Buttons */}
 
