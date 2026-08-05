@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\GoodsReceipt;
 use App\Models\ProductVariant;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
@@ -385,6 +386,7 @@ class InventoryTransactionsController extends Controller
 
 
         // GOODS RECEIPT CONTROLLER
+        
         // GO TO GOODS RECEIPT LIST
     public function goToGoodsReceiptList(){
          $grDetails = DB::table('goods_receipts as gr')
@@ -409,9 +411,23 @@ class InventoryTransactionsController extends Controller
         ]);
      }
 
+       private function generateGRnumber(): string {
+        $lastGR = GoodsReceipt::latest('id')->first();
+        $today = date("Ymd");
+        if (!$lastGR) {
+            return 'GR-'.$today."-00001"; 
+        }
+        // Get last 5 digits
+        $lastNumber = (int) substr($lastGR->gr_number, -5);
+        return "GR-{$today}-" . str_pad($lastNumber + 1, 5, '0', STR_PAD_LEFT);
+    }
+
+
         // GO TO GOODS RECEIPT NEW
      public function goToNewGoodsReceipt(){
-        return Inertia::render('admin/inventoryGoodsReceipt');
+        return Inertia::render('admin/inventoryGoodsReceipt',[
+            'gr_number' => $this->generateGRnumber(),
+        ]);
      }
 
 }

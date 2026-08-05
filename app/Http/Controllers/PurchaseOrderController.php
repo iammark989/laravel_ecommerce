@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
 
 class PurchaseOrderController extends Controller
 {
@@ -30,14 +32,16 @@ class PurchaseOrderController extends Controller
     ) 
     ->select(
         'purchase_order_items.id',
-        'products.name',
+        'products.name as product_name',
         'product_variants.variant_name', 
         'product_variants.sku',
         'purchase_order_items.quantity',
         'purchase_order_items.cost_price',
         'purchase_order_items.amount',
         'purchase_order_items.remarks as items_remarks',
+        'purchase_order_items.received_qty',
         'uoms.code as uom',
+        DB::raw('purchase_order_items.quantity - purchase_order_items.received_qty AS remaining_qty'),
     )
     ->where('purchase_order_items.purchase_order_id', $purchaseOrder)
     ->get();
@@ -73,9 +77,13 @@ class PurchaseOrderController extends Controller
     ->where('purchase_orders.id', $purchaseOrder)
     ->firstOrFail();
 
+    
+
+    
      return response()->json([
     'header' => $header,
      'items' => $items,
+     
      ]);
     }
 }
