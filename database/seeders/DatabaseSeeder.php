@@ -58,5 +58,9 @@ class DatabaseSeeder extends Seeder
             'role_id' => '2',
             'is_staff' => '1',
         ]);
+
+        $this->call([
+        MasterDataSeeder::class,
+        ]);
     }
 }
