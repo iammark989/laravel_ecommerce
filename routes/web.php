@@ -3,6 +3,7 @@
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BusinessPartnersController;
 use App\Http\Controllers\CustomersController;
+use App\Http\Controllers\GoodsReceiptController;
 use App\Http\Controllers\InventoryTransactionsController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -105,10 +106,11 @@ Route::put('/admin/purchase-order/{purchaseOrder}',[InventoryTransactionsControl
 
                 // GOODS RECEIPT
         // GO TO GOODS RECEIPT LIST
-Route::get('/admin/goods-receipts',[InventoryTransactionsController::class,'goToGoodsReceiptList'])->name('gotogoodsreceiptlist')->middleware('staffonly');
+Route::get('/admin/goods-receipts',[GoodsReceiptController::class,'goToGoodsReceiptList'])->name('gotogoodsreceiptlist')->middleware('staffonly');
         // GOT TO GOODS RECEIPT NEW
 Route::get('/admin/goods-receipts/new',[InventoryTransactionsController::class,'goToNewGoodsReceipt'])->name('gotonewgoodsreceipt')->middleware('staffonly');
-
+        // SAVE GOODS RECEIPT ITEMS
+Route::post('/admin/goods-receipts',[GoodsReceiptController::class, 'store'])->name('goods-receipts.store')->middleware('staffonly');
 
 // BUSINESS PARTNERS
         // GO TO SUPPLIERS PAGE

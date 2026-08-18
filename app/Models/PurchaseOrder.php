@@ -9,6 +9,7 @@ use App\Models\User;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 
 class PurchaseOrder extends Model
@@ -63,6 +64,11 @@ class PurchaseOrder extends Model
 
     public function updatedbyuser(){
         return $this->belongsTo(User::class,'updated_by','id');
+    }
+
+    public function items(): HasMany
+    {
+        return $this->hasMany(PurchaseOrderItem::class);
     }
     
 

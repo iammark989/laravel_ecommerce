@@ -17,12 +17,18 @@ export default function GoodsReceiptPage() {
     const [ purchaseOrdersDetails, setPurchaseOrdersDetails ] = useState<any[]>([]);
     
     const handleSelectPurchaseOrder = async (id: number) => {
-    const selectedPO = await axios.get(`/api/purchase-orders/${id}/details`);
-    setPurchaseOrdersDetails(selectedPO.data.items);
-    setSelectedPurchaseOrder(selectedPO.data.header);
-    
+    const selectedPO = await axios.get(
+        `/api/purchase-orders/${id}/details`
+    );
+    setPurchaseOrdersDetails(
+        selectedPO.data.items.map((item: any) => ({
+            ...item,
+            receive_now_qty: 0,
+        }))
+    );
 
-};
+    setSelectedPurchaseOrder(selectedPO.data.header);
+    };
 
     const today = () => {
     return new Date().toISOString().split("T")[0];
@@ -46,6 +52,74 @@ export default function GoodsReceiptPage() {
 
 const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!selectedPurchaseOrder) {
+        Swal.fire({
+            icon: "warning",
+            title: "Purchase Order Required",
+            text: "Please select a Purchase Order first.",
+        });
+
+        return;
+    }
+
+    const items = purchaseOrdersDetails
+        .filter((item) => Number(item.receive_now_qty) > 0)
+        .map((item) => ({
+            purchase_order_item_id: item.id,
+            received_qty: Number(item.receive_now_qty),
+        }));
+
+    if (items.length === 0) {
+        Swal.fire({
+            icon: "warning",
+            title: "No Items to Receive",
+            text: "Please enter a received quantity for at least one item.",
+        });
+
+        return;
+    }
+
+    const payload = {
+        purchase_order_id: selectedPurchaseOrder.id,
+        received_date: grData.received_date,
+        remarks: grData.remarks,
+        items,
+    };
+
+    //console.log(payload);
+
+    router.post(
+    "/admin/goods-receipts",
+    payload,
+    {
+        onStart: () => setLoading(true),
+
+        onFinish: () => setLoading(false),
+
+        onSuccess: () => {
+            Swal.fire({
+                icon: "success",
+                title: "Goods Receipt Posted",
+                text: "The Goods Receipt has been successfully posted.",
+                timer: 2000,
+                showConfirmButton: false,
+            }).then(() => {
+                window.location.href = "/admin/goods-receipts";
+            });
+        },
+
+        onError: (errors) => {
+           //console.log(errors);
+
+            Swal.fire({
+                icon: "error",
+                title: "Unable to Post",
+                text: `${errors.items ? "Received quantity cannot exceed the remaining quantity" : ""}`,
+            });
+        },
+    }
+);
 
 };
 
@@ -456,10 +530,6 @@ const formatCurrency = (value: number | string | null | undefined) => {
                                     </th>
 
                                     <th className="p-4">
-                                        Qty
-                                    </th>
-
-                                    <th className="p-4">
                                         UoM
                                     </th>
 
@@ -469,6 +539,18 @@ const formatCurrency = (value: number | string | null | undefined) => {
 
                                     <th className="p-4">
                                         Amount
+                                    </th>
+
+                                    <th className="p-4">
+                                        Order Qty
+                                    </th>
+
+                                    <th className="p-4">
+                                        Received Qty
+                                    </th>
+
+                                    <th className="p-4">
+                                        Remaining Qty
                                     </th>
 
                                     <th className="p-4">
@@ -526,10 +608,6 @@ const formatCurrency = (value: number | string | null | undefined) => {
                                             </td>
 
                                              <td className="p-3 text-right">
-                                                {formatCurrency(item.quantity)}
-                                            </td>
-
-                                             <td className="p-3 text-right">
                                                {item.uom.toUpperCase()}
                                             </td>
 
@@ -539,37 +617,49 @@ const formatCurrency = (value: number | string | null | undefined) => {
 
                                             <td className="p-3 text-right">
                                                {formatCurrency(item.amount)}
-                                            </td>            
-                                           
+                                            </td>  
 
                                             <td className="p-3 text-right">
-                                               {item.remaining_qty || "-"}
+                                                {formatCurrency(item.quantity)}
+                                            </td>
+
+                                            <td className="p-3 text-right">
+                                               {formatCurrency(item.received_qty) || "-"}
+                                            </td>          
+                                           
+                                            <td className="p-3 text-right">
+                                                {formatCurrency(item.remaining_qty) || "-"}
+                                            </td>
+
+                                            <td className="p-3 text-right">
+                                               {item.items_remarks || "-"}
                                             </td>
 
                                             <td className="p-3 text-right">
                                                 <input
                                                     type="number"
                                                     min="0"
+                                                    disabled={Number(item.remaining_qty) === 0}
                                                     maxLength={12}
-                                                    
-                                                    value={item.received_qty}
+                                                    value={item.receive_now_qty}
                                                     onChange={(e) => {
 
                                                         const updated = [...purchaseOrdersDetails];
 
-                                                        updated[index].received_qty = e.target.value;
+                                                       updated[index].receive_now_qty = e.target.value;
 
                                                         setPurchaseOrdersDetails(updated);
 
                                                     }}
-                                                    className="w-28
+                                                    className={`w-28
                                                             border
                                                             rounded-lg
                                                             px-3
                                                             py-2
                                                             text-right
                                                             focus:ring-2
-                                                            focus:ring-sky-500"
+                                                            focus:ring-sky-500
+                                                            ${Number(item.remaining_qty) === 0 ? 'bg-green-100' : ''}`}
                                                 />
                                                 {errors[`transactionItems.${index}.received_qty`] && (
                                                     <p className="text-red-500 text-xs mt-1">
@@ -611,12 +701,12 @@ const formatCurrency = (value: number | string | null | undefined) => {
                             bg-sky-600 hover:bg-sky-700 text-white rounded-xl px-6 py-3 flex items-center justify-center gap-2
                             ${!selectedPurchaseOrder ? "opacity-50 cursor-not-allowed" : "hover:cursor-pointer"}
                             `}
-                        disabled={!selectedPurchaseOrder}
+                        disabled={loading || !selectedPurchaseOrder}
                     >
 
                         <Send size={18} />
 
-                        Post Goods Receipt
+                        {loading ? "Posting..." : "Post Goods Receipt"}
 
                     </button>
 

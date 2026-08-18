@@ -28,8 +28,8 @@ return new class extends Migration
             $table->text('remarks')->nullable();
 
             $table->enum('status',[
-                    'posted',
-                    'void',
+                    'complete',
+                    'incomplete',
             ]);
 
             $table->foreignId('created_by')->nullable()->constrained('users');

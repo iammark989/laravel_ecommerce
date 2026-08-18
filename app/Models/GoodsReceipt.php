@@ -18,6 +18,7 @@ class GoodsReceipt extends Model
         'gr_number',
         'purchase_order_id',
         'warehouse_id',
+        'supplier_id',
         'received_date',
         'reference_no',
         'remarks',
