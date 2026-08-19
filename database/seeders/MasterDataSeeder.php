@@ -2,14 +2,46 @@
 
 namespace Database\Seeders;
 
+use App\Models\PriceList;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 class MasterDataSeeder extends Seeder
 {
     public function run(): void
     {
+
+        Role::create([
+            'name' => 'customer',
+        ]);
+        Role::create([
+            'name' => 'super_user',
+        ]);
+
+        PriceList::create([
+               'code' => 'Retail',
+                'description' => 'Retail Price',
+                'is_active' => true,
+        ]);
+        
+        // User::factory(10)->create();
+
+        User::create([
+            'first_name' => 'mark arvin',
+            'middle_name' => 'd',
+            'last_name' => 'valenzuela',
+            'suffix' => '',
+            'mobile' => '09123456789',
+            'username' => 'developer',
+            'email' => 'markarvinvalenzuela@gmail.com',
+            'password' => Hash::make('P@ssword1!'),
+            'role_id' => '2',
+            'is_staff' => '1',
+        ]);
         /*
         |--------------------------------------------------------------------------
         | UOMs
@@ -530,6 +562,52 @@ class MasterDataSeeder extends Seeder
                     'created_by' => null,
                     'updated_by' => null,
                     'is_active' => true,
+                    'updated_at' => now(),
+                    'created_at' => now(),
+                ]
+            );
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | Variant Prices
+        |--------------------------------------------------------------------------
+        */
+
+        $retailPriceListId = DB::table('price_lists')
+            ->where('code', 'Retail')
+            ->value('id');
+
+        $retailPrices = [
+            'COF-55G'   => 125.00,
+            'COF-100G'  => 185.00,
+
+            'OJ-250ML'  => 110.00,
+            'OJ-1L'     => 175.00,
+
+            'WTR-350ML' => 105.00,
+            'WTR-15L'   => 145.00,
+
+            'CHP-50G'   => 120.00,
+            'CHP-100G'  => 165.00,
+
+            'RICE-5KG'  => 390.00,
+            'RICE-25KG' => 1750.00,
+        ];
+
+        foreach ($retailPrices as $sku => $price) {
+
+            $variantId = DB::table('product_variants')
+                ->where('sku', $sku)
+                ->value('id');
+
+            DB::table('variant_prices')->updateOrInsert(
+                [
+                    'product_variant_id' => $variantId,
+                    'price_list_id' => $retailPriceListId,
+                ],
+                [
+                    'price' => $price,
                     'updated_at' => now(),
                     'created_at' => now(),
                 ]
