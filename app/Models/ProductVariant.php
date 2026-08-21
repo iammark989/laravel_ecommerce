@@ -7,7 +7,7 @@ use App\Models\Product;
 use App\Models\PurchaseOrderItem;
 use App\Models\Uom;
 use App\Models\VariantImage;
-use App\Models\VariantInventorie;
+use App\Models\VariantInventory;
 use App\Models\VariantPrice;
 use App\Models\Warehouse;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -69,7 +69,7 @@ class ProductVariant extends Model
     }
 
      public function productinventories(){
-        return $this->hasMany(VariantInventorie::class,'product_variant_id','id');
+        return $this->hasMany(VariantInventory::class,'product_variant_id','id');
     }
 
     public function variantimages(){
@@ -82,6 +82,10 @@ class ProductVariant extends Model
 
     public function goodsreceiptitems(){
         return $this->hasMany(GoodsReceiptItem::class,'product_variant_id','id');
+    }
+
+    public function inventorytransactionitems(){
+        return $this->hasMany(inventorytransactionitems::class,'product_variant_id','id');
     }
 
 protected function variant_name(): Attribute

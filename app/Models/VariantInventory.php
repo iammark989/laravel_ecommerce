@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 
-class VariantInventorie extends Model
+class VariantInventory extends Model
 {
-     use HasFactory, Notifiable;
+    use HasFactory, Notifiable;
 
      protected $fillable = [
         'product_variant_id',

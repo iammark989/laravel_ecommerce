@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\GoodsReceipt;
 use App\Models\GoodsReceiptItem;
+use App\Models\InventoryTransaction;
+use App\Models\InventoryTransactionItem;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
+use App\Models\VariantInventory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
@@ -124,6 +127,17 @@ class GoodsReceiptController extends Controller
                         'created_by' => auth()->id(),
                     ]);
 
+                    // Add Inventory Transaction
+                        $inventoryTransaction = InventoryTransaction::create([
+                            'transaction_type'=>'stock_in',
+                            'reason'=>'supplier_delivery',
+                            'status'=>'posted',
+                            'reference_type'=>'goods_receipt',
+                            'reference_number'=> $goodsReceipt->gr_number,
+                            'created_by'=>auth()->id(),
+                            'posted_at'=> now(),
+                        ]);
+
 
                     // Process items
                     foreach ($incomingFields['items'] as $incomingItem) {
@@ -175,6 +189,33 @@ class GoodsReceiptController extends Controller
                             'received_qty',
                             $receivedQty
                         );
+
+                        
+                        $variantInventory = VariantInventory::where(
+                            'product_variant_id',
+                            $purchaseOrderItem->product_variant_id
+                        )
+                        ->lockForUpdate()
+                        ->firstOrFail();
+
+                        $stockBefore = $variantInventory->quantity_on_hand;
+                        
+                        $stockAfter = $stockBefore + $incomingItem['received_qty'];
+
+                        // Add Inventory Transaction Items
+                        InventoryTransactionItem::create([
+                            'inventory_transaction_id' =>$inventoryTransaction->id,
+                            'product_variant_id' => $purchaseOrderItem->product_variant_id,
+                            'quantity'=> $receivedQty,
+                            'stock_before' => $stockBefore,
+                            'stock_after'=>$stockAfter,
+                        ]);
+
+                        // Add received quantity on variant_inventories
+                        $variantInventory->update([
+                            'quantity_on_hand' => $stockAfter,
+                        ]);  
+                         
                     }
 
 
@@ -189,7 +230,7 @@ class GoodsReceiptController extends Controller
                             ? 'partially_received'
                             : 'completed',
                     ]);
-                   
+ 
                 });
             }
 

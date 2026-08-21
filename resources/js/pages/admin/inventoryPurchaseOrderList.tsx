@@ -156,7 +156,7 @@ export default function PuchaseOrderList() {
                               </p>
 
                               <Link
-                                  href="/admin/purchase_order/new"
+                                  href="/admin/purchase-order/new"
                                   className="mt-2 inline-flex items-center gap-2 rounded-lg bg-sky-600 px-4 py-2 text-white hover:bg-sky-700"
                               >
                                   <Plus size={18} />

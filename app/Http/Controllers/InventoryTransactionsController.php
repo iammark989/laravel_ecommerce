@@ -387,30 +387,7 @@ class InventoryTransactionsController extends Controller
 
         // GOODS RECEIPT CONTROLLER
         
-        // GO TO GOODS RECEIPT LIST
-    public function goToGoodsReceiptList(){
-         $grDetails = DB::table('goods_receipts as gr')
-            ->leftJoin('suppliers as supplier', 'supplier.id', '=', 'gr.supplier_id')
-            ->leftJoin('purchase_orders as po', 'po.id', '=', 'gr.purchase_order_id')
-            ->leftJoin('warehouses as wh','wh.id','=','gr.warehouse_id')
-            ->select(
-                'gr.id',
-                'gr.gr_number',
-                'po.po_number',
-                'supplier.supplier_name',
-                'gr.received_date',
-                'gr.status',
-                'wh.name as warehouse',
-            )
-            ->orderByDesc('gr.received_date')
-            ->paginate(15);
-   
-
-        return Inertia::render('admin/inventoryGoodsReceiptList',[
-            'grDetails' => $grDetails,
-        ]);
-     }
-
+     
        private function generateGRnumber(): string {
         $lastGR = GoodsReceipt::latest('id')->first();
         $today = date("Ymd");

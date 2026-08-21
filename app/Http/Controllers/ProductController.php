@@ -9,7 +9,7 @@ use App\Models\Product;
 use App\Models\ProductVariant;
 use App\Models\Uom;
 use App\Models\VariantImage;
-use App\Models\VariantInventorie;
+use App\Models\VariantInventory;
 use App\Models\VariantPrice;
 use App\Models\Warehouse;
 use Illuminate\Http\Request;
@@ -252,7 +252,7 @@ class ProductController extends Controller
                 'base_uom_id' => $incomingFields['selling_uom_id'],
             ]);
 
-            VariantInventorie::create([
+            VariantInventory::create([
                 'product_variant_id' => $variant->id,
                 'quantity_on_hand' => $incomingFields['quantity_on_hand'],
                 'reorder_level' => $incomingFields['reorder_level'],
@@ -483,7 +483,7 @@ class ProductController extends Controller
             $products = Product::where('slug','=',$slug)->firstOrFail();
             $currentVariant = ProductVariant::where('id','=',$variantid)->firstOrfail();
             $currentVariantImage = VariantImage::where('product_variant_id','=',$variantid)->first();
-            $currentInventory = VariantInventorie::where('product_variant_id','=',$variantid)->first();
+            $currentInventory = VariantInventory::where('product_variant_id','=',$variantid)->first();
             $currentPrice = VariantPrice::where('product_variant_id','=',$variantid)->firstOrfail();
         $incomingFields = $request->validate([
                     'sku' => [

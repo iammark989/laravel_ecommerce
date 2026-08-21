@@ -21,25 +21,29 @@ return new class extends Migration
             ]);
 
             $table->enum('reason',[
-                'Supplier Delivery',
-                'Customer Return',
-                'Initial Stock',
-                'Transfer In',
-                'Stock Correction',
-                'Other',
-                'Sale',
-                'Damage',
-                'Expired',
-                'Transfer Out',
-                'Lost',
-                'Sample',
-                'Physical Count',
-                'Inventory Audit',
-                'Correction',
-                'System Adjustment',
+                'supplier_delivery',
+                'customer_return',
+                'initial_stock',
+                'transfer_in',
+                'stock_correction',
+                'other',
+                'sale',
+                'damage',
+                'expired',
+                'transfer_out',
+                'lost',
+                'sample',
+                'physical_count',
+                'inventory_audit',
+                'correction',
+                'system_adjustment',
             ]);
 
-            $table->String('status');
+            $table->enum('status', [
+                'draft',
+                'posted',
+                'cancelled',
+            ]);
 
             $table->string('reference_type')->nullable();
             $table->string('invoice_no')->nullable();
@@ -47,9 +51,10 @@ return new class extends Migration
             
             $table->text('remarks')->nullable();
 
-            $table->unsignedBigInteger('created_by');
+            $table->foreignId('created_by')
+                    ->constrained('users');
 
-            $table->timestamp('posted_at');
+            $table->timestamp('posted_at')->nullable();
 
             $table->timestamps();
         });
