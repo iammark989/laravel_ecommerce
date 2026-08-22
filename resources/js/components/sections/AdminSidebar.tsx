@@ -25,10 +25,10 @@ import {
     BadgeDollarSign,
     PackageOpen,
     Handshake,
-    User,
+    ArrowLeftRight,
     UsersRound,
     PackageSearch,
-    FileSpreadsheet,
+    ClipboardPenLine,
     ChartColumn,
     PackageCheck
 } from "lucide-react";
@@ -210,6 +210,27 @@ export default function AdminSidebar() {
                             href="/admin/product/list"
                             icon={<Package size={18} />}
                             label="Item Masterlist"
+                        />
+
+                        <SidebarChild
+                            href="/admin/product/stocks"
+                            icon={<Boxes size={18} />}
+                            label="Stocks"
+                        />
+                        <SidebarChild
+                            href="/admin/product/transactions"
+                            icon={<ArrowLeftRight size={18} />}
+                            label="Transactions"
+                        />
+                        <SidebarChild
+                            href="/admin/product/adjustment"
+                            icon={<ClipboardPenLine size={18} />}
+                            label="Adjustment"
+                        />
+                        <SidebarChild
+                            href="/admin/product/reports"
+                            icon={<BarChart3 size={18} />}
+                            label="Reports"
                         />
                     </SidebarDropdown>
 

@@ -200,7 +200,7 @@ class GoodsReceiptController extends Controller
 
                         $stockBefore = $variantInventory->quantity_on_hand;
                         
-                        $stockAfter = $stockBefore + $incomingItem['received_qty'];
+                        $stockAfter = $stockBefore + $receivedQty;
 
                         // Add Inventory Transaction Items
                         InventoryTransactionItem::create([
@@ -233,6 +233,4 @@ class GoodsReceiptController extends Controller
  
                 });
             }
-
-
 }

@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BusinessPartnersController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\GoodsReceiptController;
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryTransactionsController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -111,6 +112,8 @@ Route::get('/admin/goods-receipts',[GoodsReceiptController::class,'goToGoodsRece
 Route::get('/admin/goods-receipts/new',[InventoryTransactionsController::class,'goToNewGoodsReceipt'])->name('gotonewgoodsreceipt')->middleware('staffonly');
         // SAVE GOODS RECEIPT ITEMS
 Route::post('/admin/goods-receipts',[GoodsReceiptController::class, 'store'])->name('goods-receipts.store')->middleware('staffonly');
+
+Route::get('/admin/product/stocks',[InventoryController::class,'inventoryStocks'])->name('inventoryStocks')->middleware('staffonly');
 
 // BUSINESS PARTNERS
         // GO TO SUPPLIERS PAGE

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
@@ -18,4 +19,9 @@ Route::get(
 Route::get(
     '/purchase-orders/{purchaseOrder}/details',
     [PurchaseOrderController::class, 'purchaseOrdersDetails']
+);
+
+Route::get(
+    '/inventory',
+    [InventoryController::class, 'index']
 );
