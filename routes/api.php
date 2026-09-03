@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\InventoryTransactionsController;
 use App\Http\Controllers\PurchaseOrderController;
 use App\Http\Controllers\SearchController;
 use Illuminate\Http\Request;
@@ -25,3 +26,7 @@ Route::get(
     '/inventory',
     [InventoryController::class, 'index']
 );
+
+Route::get('/inventory-transactions', [InventoryTransactionsController::class, 'index']);
+
+Route::get('/inventory-transactions/{inventoryTransaction}',[InventoryTransactionsController::class, 'show']);

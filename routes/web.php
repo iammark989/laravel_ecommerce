@@ -114,6 +114,19 @@ Route::get('/admin/goods-receipts/new',[InventoryTransactionsController::class,'
 Route::post('/admin/goods-receipts',[GoodsReceiptController::class, 'store'])->name('goods-receipts.store')->middleware('staffonly');
 
 Route::get('/admin/product/stocks',[InventoryController::class,'inventoryStocks'])->name('inventoryStocks')->middleware('staffonly');
+route::get('/admin/product/transactions',[InventoryTransactionsController::class,'inventorytransactions'])->name('inventory-transactions')->middleware('staffonly');
+
+Route::get(
+    '/admin/inventory-transactions/{inventoryTransaction}',
+    function ($inventoryTransaction) {
+        return Inertia::render(
+            'admin/inventorytransactionshow',
+            [
+                'id' => $inventoryTransaction,
+            ]
+        );
+    }
+);
 
 // BUSINESS PARTNERS
         // GO TO SUPPLIERS PAGE

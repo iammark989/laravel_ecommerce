@@ -7,6 +7,7 @@ use App\Models\ProductVariant;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class InventoryTransactionItem extends Model
 {
@@ -21,12 +22,18 @@ class InventoryTransactionItem extends Model
         'stock_after',
     ];
     
-    public function inventorytransaction(){
-        return $this->belongsTo(InventoryTransaction::class,'inventory_transaction_id','id');
+     public function inventoryTransaction(): BelongsTo
+    {
+        return $this->belongsTo(
+            InventoryTransaction::class
+        );
     }
 
-    public function productvariant(){
-        return $this->belongsTo(ProductVariant::class,'product_variant_id','id');
+    public function productVariant(): BelongsTo
+    {
+        return $this->belongsTo(
+            ProductVariant::class
+        );
     }
 
 }

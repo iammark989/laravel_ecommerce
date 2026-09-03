@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\GoodsReceipt;
+use App\Models\InventoryTransaction;
 use App\Models\ProductVariant;
 use App\Models\PurchaseOrder;
 use App\Models\PurchaseOrderItem;
@@ -406,5 +407,70 @@ class InventoryTransactionsController extends Controller
             'gr_number' => $this->generateGRnumber(),
         ]);
      }
+
+
+     ////////////////////////////
+
+     /** INVENTORY TRANSACTIONS INDEX */
+      
+     public function index(Request $request)
+    {
+        $query = InventoryTransaction::query()
+            ->with('user')
+            ->withCount('items')
+            ->latest('posted_at');
+
+        // Search
+        if ($request->filled('search')) {
+            $search = $request->search;
+
+            $query->where(function ($q) use ($search) {
+                $q->where('reference_number', 'like', "%{$search}%")
+                    ->orWhere('reason', 'like', "%{$search}%")
+                    ->orWhere('reference_type', 'like', "%{$search}%");
+            });
+        }
+
+        // Transaction type filter
+        if ($request->filled('transaction_type')) {
+            $query->where(
+                'transaction_type',
+                $request->transaction_type
+            );
+        }
+
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $transactions = $query
+            ->paginate(15)
+            ->withQueryString();
+
+        return response()->json($transactions);
+    }
+
+    /** INVENTORY TRANSACTIONS SHOW */
+    public function show(InventoryTransaction $inventoryTransaction)
+    {
+        $inventoryTransaction->load([
+            'user',
+            'items.productVariant.product',
+            'items.productVariant.uom',
+        ]);
+
+        return response()->json([
+            'transaction' => $inventoryTransaction,
+        ]);
+    }
+
+    /** GO TO INVENTORY TRANSACTIONS PAGE */
+    public function inventorytransactions(){
+        return Inertia::render('admin/inventorytransactions');
+    }
+
+
+
 
 }

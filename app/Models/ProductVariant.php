@@ -56,8 +56,18 @@ class ProductVariant extends Model
         return $this->belongsTo(Uom::class,'purchasing_uom_id','id');
     }
 
-    public function product(){
-        return $this->belongsTo(Product::class,'product_id','id');
+    public function product()
+    {
+        return $this->belongsTo(
+            Product::class
+        );
+    }
+
+    public function uom()
+    {
+        return $this->belongsTo(
+            Uom::class
+        );
     }
 
     public function warehouse(){
