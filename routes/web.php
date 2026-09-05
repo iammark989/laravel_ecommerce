@@ -4,6 +4,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\BusinessPartnersController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\GoodsReceiptController;
+use App\Http\Controllers\InventoryAdjustmentsController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryTransactionsController;
 use App\Http\Controllers\ProductController;
@@ -114,7 +115,10 @@ Route::get('/admin/goods-receipts/new',[InventoryTransactionsController::class,'
 Route::post('/admin/goods-receipts',[GoodsReceiptController::class, 'store'])->name('goods-receipts.store')->middleware('staffonly');
 
 Route::get('/admin/product/stocks',[InventoryController::class,'inventoryStocks'])->name('inventoryStocks')->middleware('staffonly');
-route::get('/admin/product/transactions',[InventoryTransactionsController::class,'inventorytransactions'])->name('inventory-transactions')->middleware('staffonly');
+Route::get('/admin/product/transactions',[InventoryTransactionsController::class,'inventorytransactions'])->name('inventory-transactions')->middleware('staffonly');
+
+
+Route::get('/admin/product/adjustment',[InventoryAdjustmentsController::class,'inventoryadjustment'])->name('inventory-adjustment')->middleware('staffonly');
 
 Route::get(
     '/admin/inventory-transactions/{inventoryTransaction}',
@@ -126,6 +130,11 @@ Route::get(
             ]
         );
     }
+);
+
+Route::post(
+    '/inventory-adjustments',
+    [InventoryAdjustmentsController::class, 'store']
 );
 
 // BUSINESS PARTNERS

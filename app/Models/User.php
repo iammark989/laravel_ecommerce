@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Models\Addresse;
 use App\Models\GoodsReceipt;
+use App\Models\InventoryAdjustment;
 use App\Models\Product;
 use App\Models\PurchaseOrder;
 use App\Models\Role;
@@ -63,6 +64,13 @@ class User extends Authenticatable
 
     public function updatedbyusers(){
         return $this->hasMany(PurchaseOrder::class,'updated_by','id');
+    }
+
+    public function inventoryadjustments()
+    {
+        return $this->hasMany(
+            InventoryAdjustment::class
+        );
     }
 
     protected function firstName(): Attribute

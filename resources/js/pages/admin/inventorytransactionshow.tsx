@@ -63,10 +63,13 @@ interface TransactionResponse {
     transaction: InventoryTransaction;
 }
 
+
+
 export default function InventoryTransactionShow() {
-    const { id } = usePage().props as {
-        id: number;
-    };
+    
+   const id = Number(
+        window.location.pathname.split("/").pop()
+    );
 
     const [transaction, setTransaction] =
         useState<InventoryTransaction | null>(null);

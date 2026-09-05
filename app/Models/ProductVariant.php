@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\GoodsReceiptItem;
+use App\Models\InventoryAdjustmentItem;
 use App\Models\Product;
 use App\Models\PurchaseOrderItem;
 use App\Models\Uom;
@@ -67,6 +68,13 @@ class ProductVariant extends Model
     {
         return $this->belongsTo(
             Uom::class
+        );
+    }
+
+    public function inventoryadjustmentitems()
+    {
+        return $this->hasMany(
+            InventoryAdjustmentItem::class
         );
     }
 

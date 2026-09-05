@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\InventoryAdjustmentsController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\InventoryTransactionsController;
 use App\Http\Controllers\PurchaseOrderController;
@@ -27,6 +28,15 @@ Route::get(
     [InventoryController::class, 'index']
 );
 
+Route::post(
+    '/inventory-adjustments',
+    [InventoryAdjustmentsController::class, 'store']
+);
+
 Route::get('/inventory-transactions', [InventoryTransactionsController::class, 'index']);
 
 Route::get('/inventory-transactions/{inventoryTransaction}',[InventoryTransactionsController::class, 'show']);
+
+Route::get('/inventory-adjustments',[InventoryAdjustmentsController::class, 'index']);
+
+Route::get('/inventory-adjustments/{inventoryAdjustment}',[InventoryAdjustmentsController::class, 'show']);

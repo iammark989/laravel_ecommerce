@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Models\GoodsReceipt;
+use App\Models\InventoryAdjustment;
 use App\Models\ProductVariant;
 use App\Models\PurchaseOrder;
 use App\Models\User;
@@ -38,6 +39,13 @@ class Warehouse extends Model
 
     public function goodsreceipts(){
         return $this->hasMany(GoodsReceipt::class,'warehouse_id','id');
+    }
+
+    public function inventoryadjustments()
+    {
+        return $this->hasMany(
+            InventoryAdjustment::class
+        );
     }
 
     protected function name(): Attribute
