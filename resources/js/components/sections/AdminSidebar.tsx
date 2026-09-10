@@ -223,7 +223,7 @@ export default function AdminSidebar() {
                             label="Transactions"
                         />
                         <SidebarChild
-                            href="/admin/product/adjustment"
+                            href="/admin/inventory-adjustments"
                             icon={<ClipboardPenLine size={18} />}
                             label="Adjustment"
                         />

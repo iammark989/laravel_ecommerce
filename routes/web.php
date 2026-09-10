@@ -116,26 +116,13 @@ Route::post('/admin/goods-receipts',[GoodsReceiptController::class, 'store'])->n
 
 Route::get('/admin/product/stocks',[InventoryController::class,'inventoryStocks'])->name('inventoryStocks')->middleware('staffonly');
 Route::get('/admin/product/transactions',[InventoryTransactionsController::class,'inventorytransactions'])->name('inventory-transactions')->middleware('staffonly');
+Route::get('/admin/inventory-transactions/{inventoryTransaction}',[InventoryTransactionsController::class,'inventorytransactionshow'])->middleware('staffonly');
 
 
 Route::get('/admin/product/adjustment',[InventoryAdjustmentsController::class,'inventoryadjustment'])->name('inventory-adjustment')->middleware('staffonly');
+Route::post('/admin/inventory-adjustments/store',[InventoryAdjustmentsController::class, 'store'])->middleware('staffonly');
+Route::get('/admin/inventory-adjustments',[InventoryAdjustmentsController::class, 'page'])->middleware('staffonly');
 
-Route::get(
-    '/admin/inventory-transactions/{inventoryTransaction}',
-    function ($inventoryTransaction) {
-        return Inertia::render(
-            'admin/inventorytransactionshow',
-            [
-                'id' => $inventoryTransaction,
-            ]
-        );
-    }
-);
-
-Route::post(
-    '/inventory-adjustments',
-    [InventoryAdjustmentsController::class, 'store']
-);
 
 // BUSINESS PARTNERS
         // GO TO SUPPLIERS PAGE

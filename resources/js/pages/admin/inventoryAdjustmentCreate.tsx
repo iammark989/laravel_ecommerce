@@ -253,7 +253,7 @@ export default function InventoryAdjustmentCreate() {
 
         try {
             const response = await axios.post(
-                "/api/inventory-adjustments",
+                "/admin/inventory-adjustments/store",
                 {
                     warehouse_id: Number(
                         adjustment.warehouse_id
@@ -282,7 +282,7 @@ export default function InventoryAdjustmentCreate() {
             );
 
             window.location.href =
-                "/admin/inventory-adjustments";
+                "/admin/product/adjustment";
 
         } catch (error: any) {
             console.error(error);
@@ -337,7 +337,7 @@ export default function InventoryAdjustmentCreate() {
                     </div>
 
                     <Link
-                        href="/admin/product/transactions"
+                        href="/admin/inventory-adjustments"
                         className="border rounded-xl px-4 py-2 bg-white flex items-center gap-2 w-fit"
                     >
                         <ArrowLeft size={18} />

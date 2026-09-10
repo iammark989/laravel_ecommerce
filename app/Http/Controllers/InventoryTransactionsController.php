@@ -470,6 +470,14 @@ class InventoryTransactionsController extends Controller
         return Inertia::render('admin/inventorytransactions');
     }
 
+    public function inventorytransactionshow($inventoryTransaction) {
+        return Inertia::render(
+            'admin/inventorytransactionshow',
+            [
+                'id' => $inventoryTransaction,
+            ]
+        );
+    }
 
 
 

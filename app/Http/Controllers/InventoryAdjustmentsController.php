@@ -14,15 +14,15 @@ class InventoryAdjustmentsController extends Controller
 {
 
     public function inventoryadjustment(){
-        return Inertia::render('admin/inventoryTransactionAdjustmentCreate');
+        return Inertia::render('admin/inventoryAdjustmentCreate');
     }
 
     public function index(Request $request)
     {
-        $query = InventoryAdjustment::with([
+         $query = InventoryAdjustment::with([
             'warehouse',
             'user',
-        ]);
+        ])->withCount('items');
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -114,7 +114,9 @@ class InventoryAdjustmentsController extends Controller
             ],
         ]);
 
-        DB::transaction(function () use ($validated) {
+        $user = auth()->user();
+
+        DB::transaction(function () use ($validated,$user) {
 
             /*
             |--------------------------------------------------------------------------
@@ -129,7 +131,7 @@ class InventoryAdjustmentsController extends Controller
                 'reason' => $validated['reason'],
                 'status' => 'posted',
                 'remarks' => $validated['remarks'] ?? null,
-                'created_by' => auth()->id(),
+                'created_by' => $user->id,
                 'posted_at' => now(),
             ]);
 
@@ -266,4 +268,13 @@ class InventoryAdjustmentsController extends Controller
             STR_PAD_LEFT
         );
     }
+
+
+    public function page()
+    {
+        return Inertia::render(
+            'admin/inventoryAdjustment'
+        );
+    }
+
 }
